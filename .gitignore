@@ -1,0 +1,19 @@
+# Private inputs: copies of a live, product-specific system. Never commit.
+_source/
+
+# Local working notes and the site's original design brief
+BRIEF.md
+CLAUDE.local.md
+.claude/settings.local.json
+
+# QA output and scratch
+shots/
+_worktrees/
+*.log
+
+# OS and editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
