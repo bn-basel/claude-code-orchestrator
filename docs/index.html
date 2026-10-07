@@ -31,7 +31,7 @@
       <a href="#safety">Safety</a>
       <a href="#install">Install</a>
     </nav>
-    <a class="btn btn-sm" href="#">
+    <a class="btn btn-sm" href="https://github.com/bn-basel/claude-code-orchestrator">
       <svg class="gh" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       <span>GitHub</span>
     </a>
@@ -43,11 +43,11 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.1</span></p>
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.2</span></p>
       <h1 id="hero-title">Claude Code Orchestrator</h1>
       <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
       <div class="hero-actions">
-        <a class="btn" href="#">
+        <a class="btn" href="https://github.com/bn-basel/claude-code-orchestrator">
           <svg class="gh" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           View on GitHub
         </a>
@@ -100,7 +100,7 @@
           <h3>From idea to live, with three human gates</h3>
         </header>
         <div class="sd-body">
-          <p>The orchestrator (Opus 5.5) runs the loop. Helpers do the narrow jobs: write tests, write code, review. Nothing moves past a gate without proof: a passing command, a clean review, a green CI run, or your yes.</p>
+          <p>The orchestrator (Opus 5.5) runs the loop. Helpers do the narrow jobs: write tests, write code, review, look things up. Nothing moves past a gate without proof: a passing command, a clean review, a green CI run, or your yes.</p>
           <p>Every failure has a defined way back, and a budget: two fixes per task and two review rounds before you are asked to decide.</p>
           <p class="sd-hint">Select a stage on the diagram, or use the arrow keys once one is focused.</p>
         </div>
@@ -318,8 +318,8 @@
           <tr>
             <th scope="row">Typical work</th>
             <td>Wording, a test, one function</td>
-            <td>Core logic, messaging, shared code</td>
-            <td>Database migrations, production data, AI tool list, privacy filter, new packages</td>
+            <td>Core logic, shared code, anything many parts depend on</td>
+            <td>Database migrations, production data, security or privacy code, new packages</td>
           </tr>
           <tr>
             <th scope="row">Design check and plan review</th>
@@ -345,6 +345,12 @@
             <td>Opus · xhigh</td>
             <td>Opus · xhigh, Fable offered</td>
           </tr>
+          <tr>
+            <th scope="row">Lookups and probes</th>
+            <td>scout · Sonnet · medium</td>
+            <td>scout · Sonnet · medium</td>
+            <td>scout · Sonnet · medium</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -356,7 +362,7 @@
     <div class="sec-head">
       <p class="sec-num">04</p>
       <h2 id="helpers-title">The helpers</h2>
-      <p class="sec-intro">Six files in <code>.claude/agents/</code>. Each does one narrow job.</p>
+      <p class="sec-intro">Seven files in <code>.claude/agents/</code>. Each does one narrow job.</p>
     </div>
     <ul class="roster">
       <li>
@@ -395,8 +401,14 @@
         <p class="r-job">Tries to break big work: hostile input, timing, privacy, outages, undo.</p>
         <span class="r-flags"><span class="flag">read-only</span><span class="flag flag-you">needs your yes</span></span>
       </li>
+      <li>
+        <code class="r-file">scout</code>
+        <span class="r-model">Sonnet 5.5 · medium</span>
+        <p class="r-job">Answers one lookup question, with file and line evidence. Keeps reviewers for real reviews.</p>
+        <span class="r-flags"><span class="flag">read-only</span></span>
+      </li>
     </ul>
-    <p class="aside-note">No helper can start another helper.</p>
+    <p class="aside-note">No helper can start another helper, and Claude's built-in helpers are blocked.</p>
   </div>
 </section>
 
@@ -418,11 +430,11 @@
       </li>
       <li class="ly-bump">
         <span class="ly-kind">Speed bump</span>
-        <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets and the production scripts folder. They match command text, which is why the walls exist.</p></div>
+        <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets, migrations and the production scripts folder. They match command text, which is why the walls exist.</p></div>
       </li>
       <li class="ly-bump">
         <span class="ly-kind">Speed bump</span>
-        <div><h3>Ask rules</h3><p>A pop-up appears before installs, paid model runs and edits to the rule files. Tested finding: they work for tools, but they don't stop a helper from starting.</p></div>
+        <div><h3>Ask rules</h3><p>A pop-up appears before installs, web access and edits to the rule files. Tested finding: they work for tools, but they don't stop a helper from starting.</p></div>
       </li>
       <li class="ly-rule">
         <span class="ly-kind">Written rule</span>
@@ -446,6 +458,7 @@
           <div><dt>ORCHESTRATOR.md</dt><dd>playbook, orchestrator only</dd></div>
           <div><dt>PLAN.md</dt><dd>Now · Roadmap · Current feature · Decisions log</dd></div>
           <div><dt>.claude/</dt><dd>settings.json + agents/</dd></div>
+          <div><dt>app/</dt><dd>your code repo, always on main</dd></div>
           <div><dt>ops/</dt><dd>production scripts, human only</dd></div>
           <div><dt>_worktrees/build</dt><dd>where helpers code</dd></div>
         </dl>
@@ -471,9 +484,19 @@
     <div class="sec-head">
       <p class="sec-num">07</p>
       <h2 id="changelog-title">Lessons from real use</h2>
-      <p class="sec-intro">Field-tested on a live production SaaS.</p>
+      <p class="sec-intro">Field-tested on a live production SaaS. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.2</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>A seventh helper, <code>scout</code>, takes simple lookups, so reviewers only do real reviews.</li>
+          <li>You decide four kinds of thing: wording, product behaviour, production and money, scope. The orchestrator decides the rest and logs it.</li>
+          <li>Every decision brought to you starts with a concrete scenario, then a recommendation.</li>
+          <li>New tests are judged against main, also in fix rounds.</li>
+          <li>Published as a template with an install prompt.</li>
+        </ul>
+      </li>
       <li>
         <div class="log-meta"><span class="log-ver">v1.1</span><span class="log-date">Oct 2026</span></div>
         <ul>
@@ -503,7 +526,7 @@
       <h2 id="install-title">Install</h2>
     </div>
     <div>
-      <p class="install-lede">Clone the repo, open Claude Code in your project, and paste <code>INSTALL-PROMPT.md</code>.</p>
+      <p class="install-lede">Clone the repo, open Claude Code in your project, and paste <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/INSTALL-PROMPT.md"><code>INSTALL-PROMPT.md</code></a>.</p>
       <ol class="steps" aria-label="What the install prompt does, one approved step at a time">
         <li>Backs up</li><li>Audits</li><li>Adapts the rules</li><li>Installs</li><li>Tests</li>
       </ol>
@@ -517,7 +540,7 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <p>A personal Claude Code setup by Basel. Not an official Anthropic product.</p>
-    <a href="#">GitHub</a>
+    <a href="https://github.com/bn-basel/claude-code-orchestrator">GitHub</a>
   </div>
 </footer>
 
