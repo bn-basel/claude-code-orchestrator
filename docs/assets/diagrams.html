@@ -125,14 +125,14 @@ function drawLoop() {
     { title: 'BUILD + PROVE', note: 'helpers do the work; the orchestrator proves it by command', steps: [
       { who: 'help', agent: 'test-writer', opt: true, name: 'Tests first', sub: 'Tests that must fail now, then they are frozen' },
       { who: 'help', agent: 'implementer', name: 'Build', sub: 'One task at a time, in its own checkout' },
-      { who: 'orch', name: 'Check by command', sub: 'Runs the tests and checks the scope itself', fail: ['fails → back to Build (max 2)'] },
-      { who: 'help', agent: 'reviewer', name: 'Code review', sub: 'Sees only the plan, the diff and the test output', fail: ['blocker in code → Build', 'blocker in design → Plan'] },
+      { who: 'orch', name: 'Check by command', sub: 'Runs the tests and checks the scope itself', fail: [['Check fails → 06 Build', '2 tries, then you decide']] },
+      { who: 'help', agent: 'reviewer', name: 'Code review', sub: 'Sees only the plan, the diff and the test output', fail: [['Code problem → 06 Build'], ['Design problem → 02 Plan']] },
     ] },
     { title: 'SHIP + LEARN', note: 'you merge; the orchestrator verifies and learns', steps: [
-      { who: 'orch', name: 'Open the PR', sub: 'Runs the full suite, opens one PR, waits for CI', fail: ['CI fails → back to Build'] },
+      { who: 'orch', name: 'Open the PR', sub: 'Runs the full suite, opens one PR, waits for CI', fail: [['CI fails → 06 Build']] },
       { who: 'you', name: 'Merge', sub: 'Merging is deploying' },
-      { who: 'orch', name: 'Verify', sub: 'Confirms the deploy; feature on for one account', fail: ['fails live → switch it off, then back to Plan'] },
-      { who: 'orch', name: 'Learn', sub: 'Updates the plan, proposes up to 2 new rules', next: 'then the next feature starts at Idea' },
+      { who: 'orch', name: 'Verify', sub: 'Confirms the deploy; feature on for one account', fail: [['Fails live → switch it off,', 'then back to 02 Plan']] },
+      { who: 'orch', name: 'Learn', sub: 'Updates the plan, proposes up to 2 new rules', next: ['Next feature → 01 Idea'] },
     ] },
   ];
 
@@ -162,14 +162,17 @@ function drawLoop() {
 
       // Failure note under the box (drawn first so the box edge sits on top)
       let tabH = 0;
-      const tabX = x + 10, tabW = BW - 20;
+      const tabX = x + 6, tabW = BW - 12;
       if (st.fail || st.next) {
         const g = el(s, 'g');
         const bg = el(g, 'rect', { x: tabX, y: top + BH - 8, width: tabW, height: 10, rx: 7, fill: st.next ? C('go-bg') : C('warn-bg'), stroke: st.next ? C('go-line') : C('warn-line') });
         let ly = top + BH + 15, lines = 0;
-        for (const f of st.fail || [st.next]) {
-          const k = wrapText(g, tabX + 12, ly, (st.next ? '↻ ' : '✕ ') + f, tabW - 24, { size: 12, weight: 500, fill: st.next ? C('go') : C('warn'), lh: 16, indent: 13 });
-          ly += k * 16; lines += k;
+        for (const item of st.fail || [st.next]) {
+          item.forEach((line, j) => {
+            const t = txt(g, tabX + 12 + (j ? 15 : 0), ly, (j ? '' : st.next ? '↻ ' : '↩ ') + line, { size: 12, weight: j ? 400 : 500, fill: st.next ? C('go') : C('warn') });
+            warnOverflow(t, tabX + tabW - 8, st.name + ' note');
+            ly += 16; lines++;
+          });
         }
         tabH = 14 + lines * 16;
         bg.setAttribute('height', tabH);
@@ -177,10 +180,10 @@ function drawLoop() {
       }
 
       el(s, 'rect', { x, y: top, width: BW, height: BH, rx: 9, fill, stroke, 'stroke-width': st.opt ? 1.4 : 1.2, ...(st.opt ? { 'stroke-dasharray': '5 4' } : {}) });
-      if (st.opt) chip(s, x + 12, top - 10, 'wide + closed only', { size: 9.5, h: 18, pad: 7, bg: C('board'), stroke: C('rule-2'), fill: C('ink-3'), weight: 600 });
+      if (st.opt) chip(s, x + 12, top - 10, 'skipped for small changes', { size: 9.5, h: 18, pad: 7, bg: C('board'), stroke: C('rule-2'), fill: C('ink-3'), weight: 600 });
       txt(s, x + 16, top + 26, String(n).padStart(2, '0'), { cls: 'mono', size: 11.5, weight: 500, fill: ink3 });
-      const who = st.who === 'you' ? 'YOU' : st.who === 'orch' ? 'ORCHESTRATOR' : st.agent;
-      txt(s, x + BW - 14, top + 26, who, { cls: 'mono', size: st.who === 'help' ? 11 : 10, weight: 600, anchor: 'end', ls: st.who === 'help' ? 0 : 0.8, fill: st.who === 'help' ? C('ink-3') : ink3 });
+      const who = st.who === 'you' ? 'YOU' : st.who === 'orch' ? 'ORCHESTRATOR' : `HELPER · ${st.agent}`;
+      txt(s, x + BW - 14, top + 26, who, { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: st.who === 'help' ? 0.2 : 0.8, fill: st.who === 'help' ? C('ink-3') : ink3 });
       txt(s, x + 16, top + 54, st.name, { cls: 'cond', size: 20, weight: 600, fill: ink });
       const k = wrapText(s, x + 16, top + 76, st.sub, BW - 30, { size: 12.5, fill: ink2, lh: 16 });
       if (k > 2) console.warn('sub wraps to', k, 'lines:', st.name);
@@ -191,19 +194,8 @@ function drawLoop() {
     y = top + BH + tabMax + 46;
   });
 
-  // Legend
-  const ly = y + 4;
-  el(s, 'line', { x1: 24, x2: W - 24, y1: ly - 24, y2: ly - 24, stroke: C('rule') });
-  let x = BX[0];
-  const item = (draw, label) => { draw(x); x += 22; const t = txt(s, x, ly + 4, label, { size: 12.5, fill: C('ink-2') }); x += t.getComputedTextLength() + 26; };
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('go-bg'), stroke: C('go') }), 'your step');
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('plate') }), 'orchestrator');
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2') }), 'helper');
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2'), 'stroke-dasharray': '4 3' }), 'skipped for small work');
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('warn-bg'), stroke: C('warn-line') }), 'what happens when a check fails');
-
   // Fit the canvas to the content
-  const H = ly + 30;
+  const H = y - 18;
   s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('height', H);
   s.querySelector(':scope > rect').setAttribute('height', H - 1);
 }
