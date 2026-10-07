@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "effortLevel": "high",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "disableBypassPermissionsMode": "disable",
+
+    "allow": [
+      "Edit(./PLAN.md)",
+      "Bash(git status *)", "Bash(git diff *)", "Bash(git log *)", "Bash(git show *)",
+      "Bash(git branch --show-current)", "Bash(git fetch *)", "Bash(git add *)", "Bash(git commit *)",
+      "Bash(git push -u origin feat/*)", "Bash(git push origin feat/*)",
+      "Bash(git switch -c feat/*)", "Bash(git pull --ff-only*)", "Bash(git merge origin/{{MAIN_BRANCH}}*)",
+      "Bash(git worktree add --detach ../check *)", "Bash(git worktree remove --force ../check)",
+      "PowerShell(git status *)", "PowerShell(git diff *)", "PowerShell(git log *)", "PowerShell(git show *)",
+      "PowerShell(git branch --show-current)", "PowerShell(git fetch *)", "PowerShell(git add *)", "PowerShell(git commit *)",
+      "PowerShell(git push -u origin feat/*)", "PowerShell(git push origin feat/*)",
+      "PowerShell(git switch -c feat/*)", "PowerShell(git pull --ff-only*)", "PowerShell(git merge origin/{{MAIN_BRANCH}}*)",
+      "PowerShell(git worktree add --detach ../check *)", "PowerShell(git worktree remove --force ../check)",
+
+      "Bash({{TEST_COMMAND}} *)", "Bash({{FULL_TEST_COMMAND}})", "Bash({{CHECK_COMMAND}})",
+      "PowerShell({{TEST_COMMAND}} *)", "PowerShell({{FULL_TEST_COMMAND}})", "PowerShell({{CHECK_COMMAND}})",
+
+      "Bash(gh auth status *)", "Bash(gh pr create *)", "Bash(gh pr view *)", "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)", "Bash(gh run list *)", "Bash(gh run view *)",
+      "PowerShell(gh auth status *)", "PowerShell(gh pr create *)", "PowerShell(gh pr view *)", "PowerShell(gh pr checks *)",
+      "PowerShell(gh pr diff *)", "PowerShell(gh run list *)", "PowerShell(gh run view *)",
+      "Bash(gh api repos/{{GITHUB_REPO}}/commits/*/check-runs*)", "Bash(gh api repos/{{GITHUB_REPO}}/commits/*/statuses*)",
+      "PowerShell(gh api repos/{{GITHUB_REPO}}/commits/*/check-runs*)", "PowerShell(gh api repos/{{GITHUB_REPO}}/commits/*/statuses*)"
+    ],
+
+    "ask": [
+      "Agent(adversarial-reviewer)",
+      "Edit(./.claude/**)", "Edit(./CLAUDE.md)", "Edit(./ORCHESTRATOR.md)",
+      "WebFetch", "WebSearch",
+      "Bash(gh api *-X*)", "Bash(gh api *--method*)", "Bash(gh api *-f*)", "Bash(gh api *-F*)",
+      "Bash(gh api *--field*)", "Bash(gh api *--raw-field*)", "Bash(gh api *--input*)",
+      "PowerShell(gh api *-X*)", "PowerShell(gh api *--method*)", "PowerShell(gh api *-f*)", "PowerShell(gh api *-F*)",
+      "PowerShell(gh api *--field*)", "PowerShell(gh api *--raw-field*)", "PowerShell(gh api *--input*)",
+      "Bash(npm install *)", "Bash(npm ci *)", "Bash(pnpm add *)", "Bash(yarn add *)",
+      "Bash(pip install *)", "Bash(uv add *)", "Bash(poetry add *)",
+      "PowerShell(npm install *)", "PowerShell(npm ci *)", "PowerShell(pnpm add *)", "PowerShell(yarn add *)",
+      "PowerShell(pip install *)", "PowerShell(uv add *)", "PowerShell(poetry add *)"
+    ],
+
+    "deny": [
+      "Agent(general-purpose)", "Agent(Explore)", "Agent(Plan)", "Agent(claude)",
+      "Agent(claude-code-guide)", "Agent(statusline-setup)",
+
+      "Read(**/.env)", "Read(**/.env.*)", "Edit(**/.env)", "Edit(**/.env.*)",
+      "Bash(cat *.env*)", "PowerShell(Get-Content *.env*)", "PowerShell(type *.env*)",
+
+      "Read({{SECRETS_DIR}}/**)", "Edit({{SECRETS_DIR}}/**)",
+      "Bash(*{{SECRETS_DIR}}*)", "PowerShell(*{{SECRETS_DIR}}*)",
+
+      "Read(./ops/**)", "Edit(./ops/**)",
+      "Bash(ops/*)", "Bash(./ops/*)", "Bash(* ops/*)", "Bash(* ./ops/*)", "Bash(*/ops/*)", "Bash(*\\ops\\*)",
+      "PowerShell(ops*)", "PowerShell(./ops*)", "PowerShell(.\\ops*)", "PowerShell(* ops*)",
+      "PowerShell(* ./ops*)", "PowerShell(* .\\ops*)", "PowerShell(*/ops/*)", "PowerShell(*\\ops\\*)",
+
+      "Bash(git push * {{MAIN_BRANCH}})", "Bash(git push * {{MAIN_BRANCH}} *)", "Bash(git push *:{{MAIN_BRANCH}}*)",
+      "Bash(git push --force*)", "Bash(git push -f*)", "Bash(git push * --force*)", "Bash(git push * -f *)",
+      "PowerShell(git push * {{MAIN_BRANCH}})", "PowerShell(git push * {{MAIN_BRANCH}} *)", "PowerShell(git push *:{{MAIN_BRANCH}}*)",
+      "PowerShell(git push --force*)", "PowerShell(git push -f*)", "PowerShell(git push * --force*)", "PowerShell(git push * -f *)",
+      "Bash(git reset --hard*)", "PowerShell(git reset --hard*)",
+
+      "Bash(gh pr merge *)", "PowerShell(gh pr merge *)",
+      "Bash(gh repo delete *)", "PowerShell(gh repo delete *)",
+
+      "Bash(*{{MIGRATION_TOOL}}*)", "PowerShell(*{{MIGRATION_TOOL}}*)",
+      "Bash({{PROD_CLI}} *)", "PowerShell({{PROD_CLI}} *)",
+
+      "Bash(*sed -i*)", "PowerShell(*sed -i*)"
+    ]
+  },
+
+  "attribution": { "commit": "", "pr": "" }
+}

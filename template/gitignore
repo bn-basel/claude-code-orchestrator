@@ -1,0 +1,10 @@
+# Workspace .gitignore. Install it as `.gitignore` in the workspace folder.
+
+# The code repo has its own git history; this repo only tracks the orchestrator's files.
+{{CODE_DIR}}/
+_worktrees/
+
+# Secrets and local-only settings
+.env
+.env.*
+.claude/settings.local.json
