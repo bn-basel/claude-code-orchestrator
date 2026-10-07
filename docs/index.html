@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code Orchestrator</title>
+<meta name="description" content="A multi-agent development workflow for Claude Code: one orchestrator plans with you, hands small tasks to specialised helpers, proves every change by command and opens one pull request per feature.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315171a'/%3E%3Crect x='6' y='10' width='20' height='12' rx='6' fill='none' stroke='%23f3f1ec' stroke-width='2.4'/%3E%3Ccircle cx='12' cy='10' r='3.2' fill='%234cc38a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="Claude Code Orchestrator, back to top">
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="5.5"/><circle cx="8" cy="6.5" r="2.6"/></svg>
+      <span>cc<span class="brand-sep">/</span>orchestrator</span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#loop">Loop</a>
+      <a href="#labels">Labels</a>
+      <a href="#helpers">Helpers</a>
+      <a href="#safety">Safety</a>
+      <a href="#install">Install</a>
+    </nav>
+    <a class="btn btn-sm" href="#">
+      <svg class="gh" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>GitHub</span>
+    </a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.1</span></p>
+      <h1 id="hero-title">Claude Code Orchestrator</h1>
+      <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#">
+          <svg class="gh" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a class="link-arrow" href="#loop">Follow the loop <span aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+    <ol class="principles" aria-label="Four principles">
+      <li><span class="p-num">01</span><span class="p-text">Decide before building</span></li>
+      <li><span class="p-num">02</span><span class="p-text">Prove before shipping</span></li>
+      <li><span class="p-num">03</span><span class="p-text">Ship so it can be undone</span></li>
+      <li><span class="p-num">04</span><span class="p-text">Process scales with risk</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="loop" id="loop" aria-labelledby="loop-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">01</p>
+      <h2 id="loop-title">The loop</h2>
+      <p class="sec-intro" id="loop-desc">Twelve stages from idea to live feature. Three are yours. Work runs clockwise along the track; when a gate fails, it goes back along a siding. Small work skips the two dashed stages. Select any stage for details.</p>
+    </div>
+  </div>
+
+  <div class="wrap loop-wrap">
+    <div class="board">
+      <div class="board-h">
+<!-- diagram:h -->
+<svg class="dia dia-h" viewBox="0 0 1224 548" role="group" aria-labelledby="loop-title" aria-describedby="loop-desc"><defs><marker id="h-arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path class="arr-warn" d="M0 0L10 5L0 10z"/></marker></defs><path class="byp" d="M408 96 C422 96 416 66 434 66 H546 C564 66 558 96 572 96"/><text class="lbl lbl-byp" x="490" y="56" text-anchor="middle">small work skips</text><path class="byp" d="M748 96 C762 96 756 66 774 66 H886 C904 66 898 96 912 96"/><text class="lbl lbl-byp" x="830" y="56" text-anchor="middle">small work skips</text><path class="trk" id="h-track" d="M150 96 H1142 A40 40 0 0 1 1182 136 V464 A40 40 0 0 1 1142 504 H86 A40 40 0 0 1 46 464 V136 A40 40 0 0 1 86 96 H150"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(235 96) rotate(0)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(235 504) rotate(180)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(405 504) rotate(180)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(575 504) rotate(180)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(745 504) rotate(180)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(915 504) rotate(180)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(1182 300) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(46 300) rotate(270)"/><text class="lbl lbl-loop" transform="translate(30 300) rotate(-90)" text-anchor="middle">next feature</text><g class="ret" data-from="9" data-to="6"><path class="ret-halo" d="M680 404 L680 242 Q680 236 686 236 L954 236 Q960 236 960 230 L960 196"/><path class="ret-line" d="M680 404 L680 242 Q680 236 686 236 L954 236 Q960 236 960 230 L960 196" marker-end="url(#h-arr)"/><circle class="ret-start" cx="680" cy="404" r="3"/></g><g class="ret" data-from="8" data-to="6"><path class="ret-halo" d="M870 404 L870 368 Q870 362 876 362 L994 362 Q1000 362 1000 356 L1000 196"/><path class="ret-line" d="M870 404 L870 368 Q870 362 876 362 L994 362 Q1000 362 1000 356 L1000 196" marker-end="url(#h-arr)"/><circle class="ret-start" cx="870" cy="404" r="3"/></g><g class="ret" data-from="7" data-to="6"><path class="ret-halo" d="M1044 404 L1044 196"/><path class="ret-line" d="M1044 404 L1044 196" marker-end="url(#h-arr)"/><circle class="ret-start" cx="1044" cy="404" r="3"/></g><g class="ret" data-from="11" data-to="2"><path class="ret-halo" d="M290 404 L290 196"/><path class="ret-line" d="M290 404 L290 196" marker-end="url(#h-arr)"/><circle class="ret-start" cx="290" cy="404" r="3"/></g><g class="ret" data-from="8" data-to="2"><path class="ret-halo" d="M790 404 L790 322 Q790 316 784 316 L346 316 Q340 316 340 310 L340 196"/><path class="ret-line" d="M790 404 L790 322 Q790 316 784 316 L346 316 Q340 316 340 310 L340 196" marker-end="url(#h-arr)"/><circle class="ret-start" cx="790" cy="404" r="3"/></g><text class="lbl lbl-ret" data-from="9" data-to="6" x="820" y="228" text-anchor="middle">CI fails</text><text class="lbl lbl-ret" data-from="8" data-to="6" x="935" y="354" text-anchor="middle">blocker in code</text><text class="lbl lbl-ret" data-from="8" data-to="2" x="512" y="308" text-anchor="middle">blocker in design · you re-approve</text><text class="lbl lbl-ret" data-from="7" data-to="6" x="1086" y="294"><tspan>check fails</tspan><tspan x="1086" dy="15">max 2 tries</tspan></text><text class="lbl lbl-ret" data-from="11" data-to="2" x="278" y="294" text-anchor="end"><tspan>live check fails</tspan><tspan x="278" dy="15">switch off first</tspan></text><g class="stn you" data-stage="1" tabindex="0" role="button" aria-label="01 Idea, your step. Show details" aria-controls="readout"><path class="stem" d="M150 96V124"/><rect class="ring" x="71" y="119" width="158" height="82" rx="9"/><rect class="box" x="76" y="124" width="148" height="72" rx="5"/><text class="num" x="88" y="145">01</text><text class="tag" x="212" y="145" text-anchor="end">YOU</text><text class="name" x="88" y="168">Idea</text><text class="sub" x="88" y="185">in plain words</text><circle class="dot" cx="150" cy="96" r="0"/><rect class="dot dot-you" x="144" y="90" width="12" height="12" rx="1.5"/></g><g class="stn" data-stage="2" tabindex="0" role="button" aria-label="02 Plan. Show details" aria-controls="readout"><path class="stem" d="M320 96V124"/><rect class="ring" x="241" y="119" width="158" height="82" rx="9"/><rect class="box" x="246" y="124" width="148" height="72" rx="5"/><text class="num" x="258" y="145">02</text><text class="name" x="258" y="168">Plan</text><text class="sub" x="258" y="185">Opus · small tasks</text><circle class="dot" cx="320" cy="96" r="5.5"/></g><g class="stn opt" data-stage="3" tabindex="0" role="button" aria-label="03 Plan review, wide and closed work only. Show details" aria-controls="readout"><path class="stem" d="M490 96V124"/><rect class="ring" x="411" y="119" width="158" height="82" rx="9"/><rect class="box" x="416" y="124" width="148" height="72" rx="5"/><text class="num" x="428" y="145">03</text><text class="tag" x="552" y="145" text-anchor="end">WIDE · CLOSED</text><text class="name" x="428" y="168">Plan review</text><text class="sub" x="428" y="185">before any code</text><circle class="dot" cx="490" cy="96" r="5.5"/></g><g class="stn you" data-stage="4" tabindex="0" role="button" aria-label="04 Approve plan, your step. Show details" aria-controls="readout"><path class="stem" d="M660 96V124"/><rect class="ring" x="581" y="119" width="158" height="82" rx="9"/><rect class="box" x="586" y="124" width="148" height="72" rx="5"/><text class="num" x="598" y="145">04</text><text class="tag" x="722" y="145" text-anchor="end">YOU</text><text class="name" x="598" y="168">Approve plan</text><text class="sub" x="598" y="185">scope and budget</text><circle class="dot" cx="660" cy="96" r="0"/><rect class="dot dot-you" x="654" y="90" width="12" height="12" rx="1.5"/></g><g class="stn opt" data-stage="5" tabindex="0" role="button" aria-label="05 Tests first, wide and closed work only. Show details" aria-controls="readout"><path class="stem" d="M830 96V124"/><rect class="ring" x="751" y="119" width="158" height="82" rx="9"/><rect class="box" x="756" y="124" width="148" height="72" rx="5"/><text class="num" x="768" y="145">05</text><text class="tag" x="892" y="145" text-anchor="end">WIDE · CLOSED</text><text class="name" x="768" y="168">Tests first</text><text class="sub" x="768" y="185">fail, then frozen</text><circle class="dot" cx="830" cy="96" r="5.5"/></g><g class="stn" data-stage="6" tabindex="0" role="button" aria-label="06 Build. Show details" aria-controls="readout"><path class="stem" d="M1000 96V124"/><rect class="ring" x="921" y="119" width="158" height="82" rx="9"/><rect class="box" x="926" y="124" width="148" height="72" rx="5"/><text class="num" x="938" y="145">06</text><text class="name" x="938" y="168">Build</text><text class="sub" x="938" y="185">Sonnet · worktree</text><circle class="dot" cx="1000" cy="96" r="5.5"/></g><g class="stn" data-stage="7" tabindex="0" role="button" aria-label="07 Check. Show details" aria-controls="readout"><path class="stem" d="M1000 476V504"/><rect class="ring" x="921" y="399" width="158" height="82" rx="9"/><rect class="box" x="926" y="404" width="148" height="72" rx="5"/><text class="num" x="938" y="425">07</text><text class="name" x="938" y="448">Check</text><text class="sub" x="938" y="465">by command</text><circle class="dot" cx="1000" cy="504" r="5.5"/></g><g class="stn" data-stage="8" tabindex="0" role="button" aria-label="08 Code review. Show details" aria-controls="readout"><path class="stem" d="M830 476V504"/><rect class="ring" x="751" y="399" width="158" height="82" rx="9"/><rect class="box" x="756" y="404" width="148" height="72" rx="5"/><text class="num" x="768" y="425">08</text><text class="name" x="768" y="448">Code review</text><text class="sub" x="768" y="465">plan + diff only</text><circle class="dot" cx="830" cy="504" r="5.5"/></g><g class="stn" data-stage="9" tabindex="0" role="button" aria-label="09 Ready. Show details" aria-controls="readout"><path class="stem" d="M660 476V504"/><rect class="ring" x="581" y="399" width="158" height="82" rx="9"/><rect class="box" x="586" y="404" width="148" height="72" rx="5"/><text class="num" x="598" y="425">09</text><text class="name" x="598" y="448">Ready</text><text class="sub" x="598" y="465">one PR · CI green</text><circle class="dot" cx="660" cy="504" r="5.5"/></g><g class="stn you" data-stage="10" tabindex="0" role="button" aria-label="10 Merge, your step. Show details" aria-controls="readout"><path class="stem" d="M490 476V504"/><rect class="ring" x="411" y="399" width="158" height="82" rx="9"/><rect class="box" x="416" y="404" width="148" height="72" rx="5"/><text class="num" x="428" y="425">10</text><text class="tag" x="552" y="425" text-anchor="end">YOU</text><text class="name" x="428" y="448">Merge</text><text class="sub" x="428" y="465">merge = deploy</text><circle class="dot" cx="490" cy="504" r="0"/><rect class="dot dot-you" x="484" y="498" width="12" height="12" rx="1.5"/></g><g class="stn" data-stage="11" tabindex="0" role="button" aria-label="11 Verify. Show details" aria-controls="readout"><path class="stem" d="M320 476V504"/><rect class="ring" x="241" y="399" width="158" height="82" rx="9"/><rect class="box" x="246" y="404" width="148" height="72" rx="5"/><text class="num" x="258" y="425">11</text><text class="name" x="258" y="448">Verify</text><text class="sub" x="258" y="465">behind a switch</text><circle class="dot" cx="320" cy="504" r="5.5"/></g><g class="stn" data-stage="12" tabindex="0" role="button" aria-label="12 Learn. Show details" aria-controls="readout"><path class="stem" d="M150 476V504"/><rect class="ring" x="71" y="399" width="158" height="82" rx="9"/><rect class="box" x="76" y="404" width="148" height="72" rx="5"/><text class="num" x="88" y="425">12</text><text class="name" x="88" y="448">Learn</text><text class="sub" x="88" y="465">plan + rules</text><circle class="dot" cx="150" cy="504" r="5.5"/></g><g class="token" aria-hidden="true"><rect x="-8" y="-6" width="16" height="12" rx="3"/></g></svg>
+<!-- /diagram:h -->
+      </div>
+      <div class="board-v">
+<!-- diagram:v -->
+<svg class="dia dia-v" viewBox="0 0 340 911" role="group" aria-labelledby="loop-title" aria-describedby="loop-desc"><defs><marker id="v-arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path class="arr-warn" d="M0 0L10 5L0 10z"/></marker></defs><path class="byp" d="M34 138 C34 150 21 144 21 158 V190 C21 204 34 198 34 210"/><path class="byp" d="M34 274 C34 286 21 280 21 294 V326 C21 340 34 334 34 346"/><path class="trk" id="v-track" d="M34 38 V887 A13 13 0 0 1 8 887 V26 A13 13 0 0 1 34 26 V38"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 72) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 412) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 487.5) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 578) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 668.5) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 744) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(34 819.5) rotate(90)"/><path class="chev" d="M-4.5 -5L5 0L-4.5 5z" transform="translate(8 412) rotate(270)"/><g class="ret" data-from="7" data-to="6"><path class="ret-halo" d="M282 480 L287.5 480 Q293 480 293 474.5 L293 407 Q293 402 288 402 L283 402"/><path class="ret-line" d="M282 480 L287.5 480 Q293 480 293 474.5 L293 407 Q293 402 288 402 L283 402" marker-end="url(#v-arr)"/><circle class="ret-start" cx="282" cy="480" r="3"/></g><g class="ret" data-from="8" data-to="6"><path class="ret-halo" d="M282 563 L297 563 Q303 563 303 557 L303 394 Q303 388 297 388 L283 388"/><path class="ret-line" d="M282 563 L297 563 Q303 563 303 557 L303 394 Q303 388 297 388 L283 388" marker-end="url(#v-arr)"/><circle class="ret-start" cx="282" cy="563" r="3"/></g><g class="ret" data-from="9" data-to="6"><path class="ret-halo" d="M282 661 L307 661 Q313 661 313 655 L313 380 Q313 374 307 374 L283 374"/><path class="ret-line" d="M282 661 L307 661 Q313 661 313 655 L313 380 Q313 374 307 374 L283 374" marker-end="url(#v-arr)"/><circle class="ret-start" cx="282" cy="661" r="3"/></g><g class="ret" data-from="11" data-to="2"><path class="ret-halo" d="M282 812 L327 812 Q333 812 333 806 L333 110 Q333 104 327 104 L283 104"/><path class="ret-line" d="M282 812 L327 812 Q333 812 333 806 L333 110 Q333 104 327 104 L283 104" marker-end="url(#v-arr)"/><circle class="ret-start" cx="282" cy="812" r="3"/></g><g class="ret" data-from="8" data-to="2"><path class="ret-halo" d="M282 578 L317 578 Q323 578 323 572 L323 130 Q323 124 317 124 L283 124"/><path class="ret-line" d="M282 578 L317 578 Q323 578 323 572 L323 130 Q323 124 317 124 L283 124" marker-end="url(#v-arr)"/><circle class="ret-start" cx="282" cy="578" r="3"/></g><g class="stn you" data-stage="1" tabindex="0" role="button" aria-label="01 Idea, your step. Show details" aria-controls="readout"><path class="stem" d="M34 38H50"/><rect class="ring" x="45" y="15" width="242" height="64" rx="9"/><rect class="box" x="50" y="20" width="232" height="54" rx="5"/><text class="num" x="62" y="41">01</text><text class="tag" x="270" y="41" text-anchor="end">YOU</text><text class="name" x="88" y="42">Idea</text><text class="sub" x="62" y="61">in plain words</text><circle class="dot" cx="34" cy="38" r="0"/><rect class="dot dot-you" x="28" y="32" width="12" height="12" rx="1.5"/></g><g class="stn" data-stage="2" tabindex="0" role="button" aria-label="02 Plan. Show details" aria-controls="readout"><path class="stem" d="M34 106H50"/><rect class="ring" x="45" y="83" width="242" height="64" rx="9"/><rect class="box" x="50" y="88" width="232" height="54" rx="5"/><text class="num" x="62" y="109">02</text><text class="name" x="88" y="110">Plan</text><text class="sub" x="62" y="129">Opus · small tasks</text><circle class="dot" cx="34" cy="106" r="5.5"/></g><g class="stn opt" data-stage="3" tabindex="0" role="button" aria-label="03 Plan review, wide and closed work only. Show details" aria-controls="readout"><path class="stem" d="M34 174H50"/><rect class="ring" x="45" y="151" width="242" height="64" rx="9"/><rect class="box" x="50" y="156" width="232" height="54" rx="5"/><text class="num" x="62" y="177">03</text><text class="tag" x="270" y="177" text-anchor="end">WIDE · CLOSED</text><text class="name" x="88" y="178">Plan review</text><text class="sub" x="62" y="197">before any code</text><circle class="dot" cx="34" cy="174" r="5.5"/></g><g class="stn you" data-stage="4" tabindex="0" role="button" aria-label="04 Approve plan, your step. Show details" aria-controls="readout"><path class="stem" d="M34 242H50"/><rect class="ring" x="45" y="219" width="242" height="64" rx="9"/><rect class="box" x="50" y="224" width="232" height="54" rx="5"/><text class="num" x="62" y="245">04</text><text class="tag" x="270" y="245" text-anchor="end">YOU</text><text class="name" x="88" y="246">Approve plan</text><text class="sub" x="62" y="265">scope and budget</text><circle class="dot" cx="34" cy="242" r="0"/><rect class="dot dot-you" x="28" y="236" width="12" height="12" rx="1.5"/></g><g class="stn opt" data-stage="5" tabindex="0" role="button" aria-label="05 Tests first, wide and closed work only. Show details" aria-controls="readout"><path class="stem" d="M34 310H50"/><rect class="ring" x="45" y="287" width="242" height="64" rx="9"/><rect class="box" x="50" y="292" width="232" height="54" rx="5"/><text class="num" x="62" y="313">05</text><text class="tag" x="270" y="313" text-anchor="end">WIDE · CLOSED</text><text class="name" x="88" y="314">Tests first</text><text class="sub" x="62" y="333">fail, then frozen</text><circle class="dot" cx="34" cy="310" r="5.5"/></g><g class="stn" data-stage="6" tabindex="0" role="button" aria-label="06 Build. Show details" aria-controls="readout"><path class="stem" d="M34 378H50"/><rect class="ring" x="45" y="355" width="242" height="64" rx="9"/><rect class="box" x="50" y="360" width="232" height="54" rx="5"/><text class="num" x="62" y="381">06</text><text class="name" x="88" y="382">Build</text><text class="sub" x="62" y="401">Sonnet · worktree</text><circle class="dot" cx="34" cy="378" r="5.5"/></g><g class="stn" data-stage="7" tabindex="0" role="button" aria-label="07 Check. Show details" aria-controls="readout"><path class="stem" d="M34 446H50"/><rect class="ring" x="45" y="423" width="242" height="79" rx="9"/><rect class="box" x="50" y="428" width="232" height="69" rx="5"/><text class="num" x="62" y="449">07</text><text class="name" x="88" y="450">Check</text><text class="sub" x="62" y="469">by command</text><text class="sub sub-ret" x="62" y="484">↑ check fails → 06, max 2</text><circle class="dot" cx="34" cy="446" r="5.5"/></g><g class="stn" data-stage="8" tabindex="0" role="button" aria-label="08 Code review. Show details" aria-controls="readout"><path class="stem" d="M34 529H50"/><rect class="ring" x="45" y="506" width="242" height="94" rx="9"/><rect class="box" x="50" y="511" width="232" height="84" rx="5"/><text class="num" x="62" y="532">08</text><text class="name" x="88" y="533">Code review</text><text class="sub" x="62" y="552">plan + diff only</text><text class="sub sub-ret" x="62" y="567">↑ blocker in code → 06</text><text class="sub sub-ret" x="62" y="582">↑ blocker in design → 02</text><circle class="dot" cx="34" cy="529" r="5.5"/></g><g class="stn" data-stage="9" tabindex="0" role="button" aria-label="09 Ready. Show details" aria-controls="readout"><path class="stem" d="M34 627H50"/><rect class="ring" x="45" y="604" width="242" height="79" rx="9"/><rect class="box" x="50" y="609" width="232" height="69" rx="5"/><text class="num" x="62" y="630">09</text><text class="name" x="88" y="631">Ready</text><text class="sub" x="62" y="650">one PR · CI green</text><text class="sub sub-ret" x="62" y="665">↑ CI fails → 06</text><circle class="dot" cx="34" cy="627" r="5.5"/></g><g class="stn you" data-stage="10" tabindex="0" role="button" aria-label="10 Merge, your step. Show details" aria-controls="readout"><path class="stem" d="M34 710H50"/><rect class="ring" x="45" y="687" width="242" height="64" rx="9"/><rect class="box" x="50" y="692" width="232" height="54" rx="5"/><text class="num" x="62" y="713">10</text><text class="tag" x="270" y="713" text-anchor="end">YOU</text><text class="name" x="88" y="714">Merge</text><text class="sub" x="62" y="733">merge = deploy</text><circle class="dot" cx="34" cy="710" r="0"/><rect class="dot dot-you" x="28" y="704" width="12" height="12" rx="1.5"/></g><g class="stn" data-stage="11" tabindex="0" role="button" aria-label="11 Verify. Show details" aria-controls="readout"><path class="stem" d="M34 778H50"/><rect class="ring" x="45" y="755" width="242" height="79" rx="9"/><rect class="box" x="50" y="760" width="232" height="69" rx="5"/><text class="num" x="62" y="781">11</text><text class="name" x="88" y="782">Verify</text><text class="sub" x="62" y="801">behind a switch</text><text class="sub sub-ret" x="62" y="816">↑ live check fails → 02</text><circle class="dot" cx="34" cy="778" r="5.5"/></g><g class="stn" data-stage="12" tabindex="0" role="button" aria-label="12 Learn. Show details" aria-controls="readout"><path class="stem" d="M34 861H50"/><rect class="ring" x="45" y="838" width="242" height="79" rx="9"/><rect class="box" x="50" y="843" width="232" height="69" rx="5"/><text class="num" x="62" y="864">12</text><text class="name" x="88" y="865">Learn</text><text class="sub" x="62" y="884">plan + rules</text><text class="sub sub-ret sub-loop" x="62" y="899">↻ next feature → 01</text><circle class="dot" cx="34" cy="861" r="5.5"/></g><g class="token" aria-hidden="true"><rect x="-6" y="-8" width="12" height="16" rx="3"/></g></svg>
+<!-- /diagram:v -->
+      </div>
+      <ul class="legend" aria-label="Legend">
+        <li><span class="lg lg-trk" aria-hidden="true"></span>Main line</li>
+        <li><span class="lg lg-you" aria-hidden="true"></span>Your step</li>
+        <li><span class="lg lg-opt" aria-hidden="true"></span>Wide and closed work only</li>
+        <li><span class="lg lg-ret" aria-hidden="true"></span>Return path</li>
+        <li class="lg-byp-item"><span class="lg lg-byp" aria-hidden="true"></span>Small-work bypass</li>
+      </ul>
+    </div>
+
+    <div class="readout" id="readout" tabindex="-1">
+      <article class="stage-detail is-active" data-stage="0">
+        <header class="sd-head">
+          <p class="sd-kicker">How to read it</p>
+          <h3>From idea to live, with three human gates</h3>
+        </header>
+        <div class="sd-body">
+          <p>The orchestrator (Opus 5.5) runs the loop. Helpers do the narrow jobs: write tests, write code, review. Nothing moves past a gate without proof: a passing command, a clean review, a green CI run, or your yes.</p>
+          <p>Every failure has a defined way back, and a budget: two fixes per task and two review rounds before you are asked to decide.</p>
+          <p class="sd-hint">Select a stage on the diagram, or use the arrow keys once one is focused.</p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-1" data-stage="1">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 01 of 12</p>
+          <h3>Idea</h3>
+          <p class="sd-tags"><span class="t t-you">You</span></p>
+        </header>
+        <div class="sd-body">
+          <p>Describe the feature in plain words. No template and no ticket format. The orchestrator turns it into a plan.</p>
+          <p class="sd-next">Next: <a href="#stage-2" data-go="2">02 Plan</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-2" data-stage="2">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 02 of 12</p>
+          <h3>Plan</h3>
+          <p class="sd-tags"><span class="t">Orchestrator · Opus 5.5 · high</span></p>
+        </header>
+        <div class="sd-body">
+          <ul>
+            <li>Splits the feature into small tasks. Each has a label, a list of allowed files and a <em>Done when</em> line that a command can check.</li>
+            <li>Lists every helper run in advance, plus a retry budget.</li>
+            <li>For wide and closed work it also writes a design check: how it fits, what it changes, and what it leaves alone.</li>
+          </ul>
+          <p class="sd-in">Comes back here when code review finds a <strong>blocker in design</strong>, or the <strong>live check fails</strong>.</p>
+          <p class="sd-next">Next: <a href="#stage-3" data-go="3">03 Plan review</a> or, for small work, <a href="#stage-4" data-go="4">04 Approve the plan</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-3" data-stage="3">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 03 of 12</p>
+          <h3>Plan review</h3>
+          <p class="sd-tags"><span class="t t-opt">Wide and closed only</span><span class="t">reviewer · Opus 5.5</span></p>
+        </header>
+        <div class="sd-body">
+          <p>A fresh reviewer reads the plan before any code exists. Mistakes are cheapest here.</p>
+          <p>For big or closed work, the orchestrator can offer Fable as an adversarial reviewer. It only runs after your yes.</p>
+          <p class="sd-next">Next: <a href="#stage-4" data-go="4">04 Approve the plan</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-4" data-stage="4">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 04 of 12</p>
+          <h3>Approve the plan</h3>
+          <p class="sd-tags"><span class="t t-you">You</span></p>
+        </header>
+        <div class="sd-body">
+          <p>You get a plain explanation: what changes, how it is built, how it is proven, the risks and the cost.</p>
+          <p>Your approval covers exactly the listed helper runs, plus 2 fixes per task and 2 review rounds. Anything beyond that comes back to you.</p>
+          <p class="sd-next">Next: <a href="#stage-5" data-go="5">05 Tests first</a> or, for small work, <a href="#stage-6" data-go="6">06 Build</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-5" data-stage="5">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 05 of 12</p>
+          <h3>Tests first, then frozen</h3>
+          <p class="sd-tags"><span class="t t-opt">Wide and closed only</span><span class="t">test-writer · Sonnet 5.5 · high</span></p>
+        </header>
+        <div class="sd-body">
+          <p>A test-writer turns each <em>Done when</em> line into tests before the code exists. They must fail at first. Then they are frozen: the coder cannot edit them.</p>
+          <p class="sd-next">Next: <a href="#stage-6" data-go="6">06 Build</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-6" data-stage="6">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 06 of 12</p>
+          <h3>Build</h3>
+          <p class="sd-tags"><span class="t">implementer · Sonnet 5.5</span></p>
+        </header>
+        <div class="sd-body">
+          <ul>
+            <li>One task at a time, in an isolated worktree, inside its allowed files.</li>
+            <li>If anything is unclear, it stops and reports instead of guessing.</li>
+            <li>It commits but never pushes.</li>
+          </ul>
+          <p class="sd-in">Comes back here when the <strong>check fails</strong>, review finds a <strong>blocker in code</strong>, or <strong>CI fails</strong>.</p>
+          <p class="sd-next">Next: <a href="#stage-7" data-go="7">07 Check by command</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-7" data-stage="7">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 07 of 12</p>
+          <h3>Check by command</h3>
+          <p class="sd-tags"><span class="t">Orchestrator</span></p>
+        </header>
+        <div class="sd-body">
+          <p>The orchestrator runs commands instead of reading code. All four must hold:</p>
+          <ul>
+            <li>the named tests pass;</li>
+            <li>the new tests fail on main, which proves they test the change;</li>
+            <li>only the planned files changed;</li>
+            <li>frozen tests are untouched.</li>
+          </ul>
+          <p class="sd-out"><span class="sd-out-k">If it fails</span> Back to Build. At most 2 tries, then you decide.</p>
+          <p class="sd-next">Next: <a href="#stage-8" data-go="8">08 Code review</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-8" data-stage="8">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 08 of 12</p>
+          <h3>Code review</h3>
+          <p class="sd-tags"><span class="t">reviewer · Opus 5.5</span></p>
+        </header>
+        <div class="sd-body">
+          <p>The reviewer sees only the plan, the diff and the test output. It never sees the coder's own account of what it did.</p>
+          <p>Findings are ranked: <span class="rank">blocker in code</span> <span class="rank">blocker in design</span> <span class="rank">should fix</span> <span class="rank">note</span></p>
+          <p class="sd-out"><span class="sd-out-k">Blocker in code</span> Back to Build, for that task only, with the evidence and the scope.</p>
+          <p class="sd-out"><span class="sd-out-k">Blocker in design</span> Back to Plan. You re-approve.</p>
+          <p class="sd-next">Next: <a href="#stage-9" data-go="9">09 Ready</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-9" data-stage="9">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 09 of 12</p>
+          <h3>Ready</h3>
+          <p class="sd-tags"><span class="t">Orchestrator</span></p>
+        </header>
+        <div class="sd-body">
+          <p>Sync with main, run the full test suite, and open one pull request. It uses the same template every time:</p>
+          <p class="pr-tpl"><span>What</span><span>Why</span><span>Proof</span><span>Review</span><span>Database</span><span>Feature switch</span><span>Risks</span><span>How to undo</span></p>
+          <p>Then wait for CI to go green.</p>
+          <p class="sd-out"><span class="sd-out-k">If CI fails</span> Back to Build.</p>
+          <p class="sd-next">Next: <a href="#stage-10" data-go="10">10 Merge</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-10" data-stage="10">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 10 of 12</p>
+          <h3>Merge</h3>
+          <p class="sd-tags"><span class="t t-you">You</span></p>
+        </header>
+        <div class="sd-body">
+          <p>Apply any database migration first, then merge. Merging is deploying, so this click is the release.</p>
+          <p class="sd-next">Next: <a href="#stage-11" data-go="11">11 Verify</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-11" data-stage="11">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 11 of 12</p>
+          <h3>Verify</h3>
+          <p class="sd-tags"><span class="t">Orchestrator + you</span></p>
+        </header>
+        <div class="sd-body">
+          <p>Confirm the deploy. New customer-facing features ship behind a switch that is turned on for one customer first. You do a quick check on your phone.</p>
+          <p class="sd-out"><span class="sd-out-k">If the live check fails</span> Switch the feature off first, then back to Plan.</p>
+          <p class="sd-next">Next: <a href="#stage-12" data-go="12">12 Learn</a></p>
+        </div>
+      </article>
+
+      <article class="stage-detail" id="stage-12" data-stage="12">
+        <header class="sd-head">
+          <p class="sd-kicker">Stage 12 of 12</p>
+          <h3>Learn</h3>
+          <p class="sd-tags"><span class="t">Orchestrator</span></p>
+        </header>
+        <div class="sd-body">
+          <p>Update the plan file, and propose zero to two new standing rules for your approval. Then the loop starts again with the next feature.</p>
+          <p class="sd-next">Next: <a href="#stage-1" data-go="1">01 Idea</a>, for the next feature</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="moments" id="moments" aria-labelledby="moments-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">02</p>
+      <h2 id="moments-title">Where you come in</h2>
+      <p class="sec-intro">Four moments. Everything else runs without you.</p>
+    </div>
+    <ol class="levers">
+      <li><span class="lv-num">1</span><h3>Approve the plan</h3><p>One plain summary of scope, proof, risk and cost.</p></li>
+      <li><span class="lv-num">2</span><h3>Say yes to Fable</h3><p>Only when asked, and always with a reason.</p></li>
+      <li><span class="lv-num">3</span><h3>Run any migration</h3><p>Database changes stay in human hands.</p></li>
+      <li><span class="lv-num">4</span><h3>Click merge</h3><p>Merge is deploy. The release is your click.</p></li>
+    </ol>
+    <p class="aside-note">The orchestrator never relays prompts through you, and never asks you to carry messages between chats.</p>
+  </div>
+</section>
+
+<section class="labels" id="labels" aria-labelledby="labels-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">03</p>
+      <h2 id="labels-title">Labels: process scales with risk</h2>
+      <p class="sec-intro">Every task gets a label from one question. When unsure, pick the higher label.</p>
+    </div>
+    <blockquote class="question"><p>If this goes wrong, how hard is it to undo?</p></blockquote>
+    <div class="table-scroll" role="region" aria-label="Labels compared: small, wide, closed" tabindex="0">
+      <table class="risk">
+        <thead>
+          <tr>
+            <th scope="col"><span class="vh">Aspect</span></th>
+            <th scope="col"><span class="aspect a1" aria-hidden="true"><i></i><i></i><i></i></span>Small</th>
+            <th scope="col"><span class="aspect a2" aria-hidden="true"><i></i><i></i><i></i></span>Wide</th>
+            <th scope="col"><span class="aspect a3" aria-hidden="true"><i></i><i></i><i></i></span>Closed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Typical work</th>
+            <td>Wording, a test, one function</td>
+            <td>Core logic, messaging, shared code</td>
+            <td>Database migrations, production data, AI tool list, privacy filter, new packages</td>
+          </tr>
+          <tr>
+            <th scope="row">Design check and plan review</th>
+            <td><span class="no">No</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="yes">Yes</span>, Fable offered</td>
+          </tr>
+          <tr>
+            <th scope="row">Tests first, frozen</th>
+            <td><span class="no">No</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="yes">Yes</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Implementer</th>
+            <td>Sonnet · high</td>
+            <td>Sonnet · xhigh</td>
+            <td>You choose, usually Opus</td>
+          </tr>
+          <tr>
+            <th scope="row">Code review</th>
+            <td>Opus · high</td>
+            <td>Opus · xhigh</td>
+            <td>Opus · xhigh, Fable offered</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="helpers" id="helpers" aria-labelledby="helpers-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">04</p>
+      <h2 id="helpers-title">The helpers</h2>
+      <p class="sec-intro">Six files in <code>.claude/agents/</code>. Each does one narrow job.</p>
+    </div>
+    <ul class="roster">
+      <li>
+        <code class="r-file">implementer</code>
+        <span class="r-model">Sonnet 5.5 · high</span>
+        <p class="r-job">Codes one small task.</p>
+        <span class="r-flags"></span>
+      </li>
+      <li>
+        <code class="r-file">implementer-wide</code>
+        <span class="r-model">Sonnet 5.5 · xhigh <span class="r-alt">Opus on request</span></span>
+        <p class="r-job">Codes one wide or closed task, checking first what depends on the code.</p>
+        <span class="r-flags"></span>
+      </li>
+      <li>
+        <code class="r-file">test-writer</code>
+        <span class="r-model">Sonnet 5.5 · high</span>
+        <p class="r-job">Writes the tests before the code.</p>
+        <span class="r-flags"></span>
+      </li>
+      <li>
+        <code class="r-file">reviewer</code>
+        <span class="r-model">Opus 5.5 · xhigh</span>
+        <p class="r-job">Reviews plans and code.</p>
+        <span class="r-flags"><span class="flag">read-only</span></span>
+      </li>
+      <li>
+        <code class="r-file">reviewer-light</code>
+        <span class="r-model">Opus 5.5 · high</span>
+        <p class="r-job">The same review, sized for small work.</p>
+        <span class="r-flags"><span class="flag">read-only</span></span>
+      </li>
+      <li>
+        <code class="r-file">adversarial-reviewer</code>
+        <span class="r-model">Fable 5.1</span>
+        <p class="r-job">Tries to break big work: hostile input, timing, privacy, outages, undo.</p>
+        <span class="r-flags"><span class="flag">read-only</span><span class="flag flag-you">needs your yes</span></span>
+      </li>
+    </ul>
+    <p class="aside-note">No helper can start another helper.</p>
+  </div>
+</section>
+
+<section class="safety" id="safety" aria-labelledby="safety-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">05</p>
+      <h2 id="safety-title">Safety, strongest first</h2>
+      <p class="sec-intro">Walls hold even if every agent misbehaves. Speed bumps catch honest mistakes. Written rules set the intent.</p>
+    </div>
+    <ol class="layers">
+      <li class="ly-wall">
+        <span class="ly-kind">Wall</span>
+        <div><h3>Branch protection on main</h3><p>Changes reach main only through a pull request with green checks. The bypass list is empty, so the rules also bind the owner's own login, which the agents use.</p></div>
+      </li>
+      <li class="ly-wall">
+        <span class="ly-kind">Wall</span>
+        <div><h3>No production secrets on the machine</h3><p>Local env files hold fake values. Real keys live outside the project.</p></div>
+      </li>
+      <li class="ly-bump">
+        <span class="ly-kind">Speed bump</span>
+        <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets and the production scripts folder. They match command text, which is why the walls exist.</p></div>
+      </li>
+      <li class="ly-bump">
+        <span class="ly-kind">Speed bump</span>
+        <div><h3>Ask rules</h3><p>A pop-up appears before installs, paid model runs and edits to the rule files. Tested finding: they work for tools, but they don't stop a helper from starting.</p></div>
+      </li>
+      <li class="ly-rule">
+        <span class="ly-kind">Written rule</span>
+        <div><h3>The playbook</h3><p>Fable only after a yes in chat. Nothing runs outside the approved plan. Anything unclear means stop and report.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="setup" id="setup" aria-labelledby="setup-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">06</p>
+      <h2 id="setup-title">How it runs: files and sessions</h2>
+    </div>
+    <div class="setup-grid">
+      <figure class="tree">
+        <figcaption>Project layout</figcaption>
+<dl class="tree-list">
+          <div><dt>CLAUDE.md</dt><dd>shared rules, every agent</dd></div>
+          <div><dt>ORCHESTRATOR.md</dt><dd>playbook, orchestrator only</dd></div>
+          <div><dt>PLAN.md</dt><dd>Now · Roadmap · Current feature · Decisions log</dd></div>
+          <div><dt>.claude/</dt><dd>settings.json + agents/</dd></div>
+          <div><dt>ops/</dt><dd>production scripts, human only</dd></div>
+          <div><dt>_worktrees/build</dt><dd>where helpers code</dd></div>
+        </dl>
+      </figure>
+      <div class="sessions">
+        <p class="mini-h">Start line</p>
+        <div class="startline">
+          <p id="startline-text">You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.</p>
+          <button class="copy" type="button" data-copy="startline-text" hidden>Copy</button>
+        </div>
+        <ul class="ticks">
+          <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, so any fresh session can pick up where the last one stopped.</li>
+          <li>Start a fresh session after a merge once the context passes about half.</li>
+          <li>Never go past about 700k tokens.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="changelog" id="changelog" aria-labelledby="changelog-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">07</p>
+      <h2 id="changelog-title">Lessons from real use</h2>
+      <p class="sec-intro">Field-tested on a live production SaaS.</p>
+    </div>
+    <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.1</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>Feature branches are created with <code>--no-track</code>, so a push can never aim at main.</li>
+          <li>Ask rules don't stop helpers from starting, so Fable's gate is a written rule plus a log.</li>
+          <li>Each helper costs about 20k tokens just to start, so small tasks are grouped.</li>
+          <li>Checks for old wording search for one distinctive word.</li>
+          <li>No AI attribution lines in commits.</li>
+        </ul>
+      </li>
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.0</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>Installed the playbook, six helpers, safety settings and branch protection.</li>
+          <li>Moved production secrets out of the project.</li>
+          <li>Shipped the first feature through the full loop.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="install" id="install" aria-labelledby="install-title">
+  <div class="wrap install-in">
+    <div>
+      <p class="sec-num">08</p>
+      <h2 id="install-title">Install</h2>
+    </div>
+    <div>
+      <p class="install-lede">Clone the repo, open Claude Code in your project, and paste <code>INSTALL-PROMPT.md</code>.</p>
+      <ol class="steps" aria-label="What the install prompt does, one approved step at a time">
+        <li>Backs up</li><li>Audits</li><li>Adapts the rules</li><li>Installs</li><li>Tests</li>
+      </ol>
+      <p class="install-note">One approved step at a time.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p>A personal Claude Code setup by Basel. Not an official Anthropic product.</p>
+    <a href="#">GitHub</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
