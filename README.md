@@ -23,12 +23,12 @@ as my own workflow improves.
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/loop-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/loop-light.png">
-  <img alt="The loop in three phases. Decide: your idea, the orchestrator's plan, a plan review for wide and closed work, and your approval. Build and prove: tests first for wide and closed work, build, check by command, code review. Ship and learn: open the PR, you merge, verify, learn. Failed checks, code blockers and CI failures go back to Build; design blockers and failed live checks go back to Plan." src="docs/assets/loop-light.png" width="100%">
+  <img alt="Flowchart from your prompt to live. Your prompt, then Plan, then a yes/no check: you approve? No goes back to Plan. Then Build, Check by command, and: all checks pass? No goes back to Build. Code review, then: review clean? A code problem goes back to Build, a design problem back to Plan. Open the pull request, then: CI green? No goes back to Build. You merge, the orchestrator verifies, then: works live? No switches it off and goes back to Plan. Finally Learn, and the next feature starts at a new prompt." src="docs/assets/loop-light.png" width="100%">
 </picture>
 
-Every task gets a label from one question: *if this goes wrong, how hard is it to undo?* **Small** work skips the
-two dashed steps. **Wide** and **closed** work gets a plan review and tests written first. Failures go back with a
-budget of two fixes per task and two review rounds; after that, you decide.
+Every task gets a label from one question: *if this goes wrong, how hard is it to undo?* **Small** work takes the
+light path. **Wide** and **closed** work also gets a review of the plan and tests written before the code. Every way
+back has a budget of two fixes per task and two review rounds; after that, you decide.
 
 ## The team
 

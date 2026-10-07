@@ -85,23 +85,19 @@ function warnOverflow(textNode, maxRight, label) {
   if (b.x + b.width > maxRight + 0.5) console.warn('overflow', label, Math.round(b.x + b.width - maxRight));
 }
 
-/* ───────────── 1. The loop: three phases, read like lines of text ───────────── */
+/* ───────────── 1. The loop: a flowchart from your prompt to live ───────────── */
 function wrapText(p, x, y, str, maxW, o) {
-  // Writes str on as many lines as needed; returns the number of lines.
   const lh = o.lh || 16, words = str.split(' ');
   let line = '', n = 0, t = txt(p, x, y, '', o);
   for (const w of words) {
     const test = line ? line + ' ' + w : w;
     t.textContent = test;
-    if (t.getComputedTextLength() > maxW && line) {
-      t.textContent = line; n++;
-      t = txt(p, x + (o.indent || 0), y + n * lh, w, o); line = w;
-    } else line = test;
+    if (t.getComputedTextLength() > maxW && line) { t.textContent = line; n++; t = txt(p, x, y + n * lh, w, o); line = w; }
+    else line = test;
   }
   return n + 1;
 }
 function rounded(points, r = 8) {
-  // Orthogonal polyline with rounded corners.
   let d = `M${points[0][0]} ${points[0][1]}`;
   for (let i = 1; i < points.length - 1; i++) {
     const [px, py] = points[i - 1], [x, y] = points[i], [nx, ny] = points[i + 1];
@@ -113,89 +109,105 @@ function rounded(points, r = 8) {
 }
 
 function drawLoop() {
-  const W = 940, BX = [36, 260, 484, 708], BW = 196, BH = 104;
+  const W = 940, CX = 470, BW = 300, BH = 56, GW = 188, GH = 50, GAP = 24;
+  const BL = CX - BW / 2, BR = CX + BW / 2;
+  const laneL = (k) => BL - 46 * k, laneR = (k) => BR + 46 * k;
   const s = svgRoot('loop', W, 2000);
-  const phases = [
-    { title: 'DECIDE', note: 'you approve the plan before any code exists', steps: [
-      { who: 'you', name: 'Idea', sub: 'Describe the feature you want, in plain words' },
-      { who: 'orch', name: 'Plan', sub: 'Small tasks, each with its files and a check' },
-      { who: 'help', agent: 'reviewer', opt: true, name: 'Plan review', sub: 'A fresh reviewer checks the plan before any code' },
-      { who: 'you', name: 'Approve', sub: 'Scope, proof, risk and cost, in plain words' },
-    ] },
-    { title: 'BUILD + PROVE', note: 'helpers do the work; the orchestrator proves it by command', steps: [
-      { who: 'help', agent: 'test-writer', opt: true, name: 'Tests first', sub: 'Tests that must fail now, then they are frozen' },
-      { who: 'help', agent: 'implementer', name: 'Build', sub: 'One task at a time, in its own checkout' },
-      { who: 'orch', name: 'Check by command', sub: 'Runs the tests and checks the scope itself', fail: [['Check fails → 06 Build', '2 tries, then you decide']] },
-      { who: 'help', agent: 'reviewer', name: 'Code review', sub: 'Sees only the plan, the diff and the test output', fail: [['Code problem → 06 Build'], ['Design problem → 02 Plan']] },
-    ] },
-    { title: 'SHIP + LEARN', note: 'you merge; the orchestrator verifies and learns', steps: [
-      { who: 'orch', name: 'Open the PR', sub: 'Runs the full suite, opens one PR, waits for CI', fail: [['CI fails → 06 Build']] },
-      { who: 'you', name: 'Merge', sub: 'Merging is deploying' },
-      { who: 'orch', name: 'Verify', sub: 'Confirms the deploy; feature on for one account', fail: [['Fails live → switch it off,', 'then back to 02 Plan']] },
-      { who: 'orch', name: 'Learn', sub: 'Updates the plan, proposes up to 2 new rules', next: ['Next feature → 01 Idea'] },
-    ] },
+
+  // Main spine, top to bottom. Gates are yes/no questions; "no" loops back.
+  const items = [
+    { box: 'prompt', who: 'you', name: 'Your prompt', sub: 'Describe the feature in plain words' },
+    { box: 'plan', who: 'orch', name: 'Plan', sub: 'Small tasks, each with a check' },
+    { gate: 'You approve?', who: 'you', no: [{ side: 'L', to: 'plan', lane: 1, label: 'no: change it' }] },
+    { box: 'build', who: 'help', tag: 'HELPERS', name: 'Build', sub: 'Tests first if risky, then code' },
+    { box: 'check', who: 'orch', name: 'Check by command', sub: 'Runs the tests, checks the files' },
+    { gate: 'All checks pass?', no: [{ side: 'R', to: 'build', lane: 1, label: 'no: fix it' }] },
+    { box: 'review', who: 'help', tag: 'HELPER · reviewer', name: 'Code review', sub: 'Sees only the plan and the diff' },
+    { gate: 'Review clean?', no: [{ side: 'R', to: 'build', lane: 2, label: 'code problem' }, { side: 'L', to: 'plan', lane: 2, label: 'design problem' }] },
+    { box: 'pr', who: 'orch', name: 'Open the pull request', sub: 'Full test suite, one PR per feature' },
+    { gate: 'CI green?', no: [{ side: 'R', to: 'build', lane: 3, label: 'no: fix it' }] },
+    { box: 'merge', who: 'you', name: 'Merge', sub: 'Merging is deploying' },
+    { box: 'verify', who: 'orch', name: 'Verify', sub: 'Feature on for one account first' },
+    { gate: 'Works live?', no: [{ side: 'L', to: 'plan', lane: 3, label: 'no: switch it off' }] },
+    { box: 'learn', who: 'orch', name: 'Learn', sub: 'Update the plan, propose new rules' },
   ];
 
-  const arrow = (d, col = 'ink-3') => el(s, 'path', { d, fill: 'none', stroke: C(col), 'stroke-width': 1.6, 'marker-end': `url(#a-${col === 'ink-3' ? 'ink' : col})` });
-  let y = 26, n = 0, prevMid = null;
+  // Title
+  txt(s, 28, 40, 'ONE FEATURE, FROM PROMPT TO LIVE', { cls: 'mono', size: 12, weight: 600, ls: 1.2, fill: C('ink-2') });
 
-  phases.forEach((ph, pi) => {
-    // Phase heading
-    const hy = y + 14;
-    const num = txt(s, BX[0], hy, `0${pi + 1}`, { cls: 'mono', size: 12, weight: 500, fill: C('ink-3') });
-    const ttl = txt(s, BX[0] + 28, hy, ph.title, { cls: 'mono', size: 12.5, weight: 600, ls: 1.2 });
-    txt(s, BX[0] + 28 + ttl.getComputedTextLength() + 14, hy, ph.note, { size: 13, fill: C('ink-3') });
-    const top = y + 34, mid = top + BH / 2;
+  // Layout
+  let y = 64;
+  const pos = {};
+  for (const it of items) {
+    it.top = y; it.h = it.box ? BH : GH; it.mid = y + it.h / 2;
+    if (it.box) pos[it.box] = it;
+    y += it.h + GAP;
+  }
+  const bottom = y - GAP;
 
-    // Wrap arrow from the previous row's last box into this row's first box
-    if (prevMid) {
-      const wy = y - 14;
-      arrow(rounded([[BX[3] + BW, prevMid.y], [W - 18, prevMid.y], [W - 18, wy], [16, wy], [16, mid], [BX[0] - 2, mid]]));
+  // Entry points on the target boxes: outer lanes enter higher, so nothing crosses.
+  const loops = [];
+  items.forEach((it) => (it.no || []).forEach((n) => loops.push({ ...n, from: it })));
+  loops.push({ side: 'L', to: 'prompt', lane: 4, label: 'next feature', from: pos.learn, next: true });
+  for (const side of ['L', 'R']) {
+    const byTarget = {};
+    loops.filter((l) => l.side === side).forEach((l) => (byTarget[l.to] = byTarget[l.to] || []).push(l));
+    for (const [to, ls] of Object.entries(byTarget)) {
+      ls.sort((a, b) => b.lane - a.lane);
+      ls.forEach((l, i) => (l.entryY = pos[to].top + ((i + 1) * pos[to].h) / (ls.length + 1)));
     }
-    let tabMax = 0;
-    ph.steps.forEach((st, i) => {
-      n++;
-      const x = BX[i];
-      let fill = C('surface'), stroke = C('rule-2'), ink = C('ink'), ink2 = C('ink-2'), ink3 = C('ink-3');
-      if (st.who === 'orch') { fill = C('plate'); stroke = C('plate'); ink = C('plate-ink'); ink2 = C('plate-ink-2'); ink3 = C('plate-ink-2'); }
-      if (st.who === 'you') { fill = C('go-bg'); stroke = C('go'); ink3 = C('go'); }
+  }
 
-      // Failure note under the box (drawn first so the box edge sits on top)
-      let tabH = 0;
-      const tabX = x + 6, tabW = BW - 12;
-      if (st.fail || st.next) {
-        const g = el(s, 'g');
-        const bg = el(g, 'rect', { x: tabX, y: top + BH - 8, width: tabW, height: 10, rx: 7, fill: st.next ? C('go-bg') : C('warn-bg'), stroke: st.next ? C('go-line') : C('warn-line') });
-        let ly = top + BH + 15, lines = 0;
-        for (const item of st.fail || [st.next]) {
-          item.forEach((line, j) => {
-            const t = txt(g, tabX + 12 + (j ? 15 : 0), ly, (j ? '' : st.next ? '↻ ' : '↩ ') + line, { size: 12, weight: j ? 400 : 500, fill: st.next ? C('go') : C('warn') });
-            warnOverflow(t, tabX + tabW - 8, st.name + ' note');
-            ly += 16; lines++;
-          });
-        }
-        tabH = 14 + lines * 16;
-        bg.setAttribute('height', tabH);
-        tabMax = Math.max(tabMax, tabH);
-      }
-
-      el(s, 'rect', { x, y: top, width: BW, height: BH, rx: 9, fill, stroke, 'stroke-width': st.opt ? 1.4 : 1.2, ...(st.opt ? { 'stroke-dasharray': '5 4' } : {}) });
-      if (st.opt) chip(s, x + 12, top - 10, 'skipped for small changes', { size: 9.5, h: 18, pad: 7, bg: C('board'), stroke: C('rule-2'), fill: C('ink-3'), weight: 600 });
-      txt(s, x + 16, top + 26, String(n).padStart(2, '0'), { cls: 'mono', size: 11.5, weight: 500, fill: ink3 });
-      const who = st.who === 'you' ? 'YOU' : st.who === 'orch' ? 'ORCHESTRATOR' : `HELPER · ${st.agent}`;
-      txt(s, x + BW - 14, top + 26, who, { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: st.who === 'help' ? 0.2 : 0.8, fill: st.who === 'help' ? C('ink-3') : ink3 });
-      txt(s, x + 16, top + 54, st.name, { cls: 'cond', size: 20, weight: 600, fill: ink });
-      const k = wrapText(s, x + 16, top + 76, st.sub, BW - 30, { size: 12.5, fill: ink2, lh: 16 });
-      if (k > 2) console.warn('sub wraps to', k, 'lines:', st.name);
-
-      if (i > 0) arrow(`M${BX[i - 1] + BW} ${mid} H${x - 2}`);
-    });
-    prevMid = { y: mid };
-    y = top + BH + tabMax + 46;
+  // Spine arrows
+  items.forEach((it, i) => {
+    if (i === items.length - 1) return;
+    const y1 = it.top + it.h, y2 = items[i + 1].top;
+    el(s, 'path', { d: `M${CX} ${y1} V${y2 - 1}`, stroke: C('ink-3'), 'stroke-width': 1.6, fill: 'none', 'marker-end': 'url(#a-ink)' });
+    if (it.gate) txt(s, CX + 9, y1 + 16, 'yes', { cls: 'mono', size: 11, weight: 600, fill: C('go') });
   });
 
-  // Fit the canvas to the content
-  const H = y - 18;
+  // Loops (drawn before the shapes so shapes sit on top)
+  for (const l of loops) {
+    const col = l.next ? 'go' : 'warn';
+    const lx = l.side === 'L' ? laneL(l.lane) : laneR(l.lane);
+    const sx = l.next ? BL : l.side === 'L' ? CX - GW / 2 : CX + GW / 2;
+    const ex = l.side === 'L' ? BL - 2 : BR + 2;
+    el(s, 'path', { d: rounded([[sx, l.from.mid], [lx, l.from.mid], [lx, l.entryY], [ex, l.entryY]]), fill: 'none', stroke: C(col), 'stroke-width': 1.8, 'marker-end': `url(#a-${col})` });
+    const lblX = l.side === 'L' ? sx - 10 : sx + 10;
+    txt(s, lblX, l.from.mid - 8, l.label, { size: 12, weight: 600, anchor: l.side === 'L' ? 'end' : 'start', fill: C(col) });
+  }
+
+  // Shapes
+  for (const it of items) {
+    if (it.box) {
+      let fill = C('surface'), stroke = C('rule-2'), ink = C('ink'), ink2 = C('ink-2'), tagc = C('ink-3');
+      if (it.who === 'orch') { fill = C('plate'); stroke = C('plate'); ink = C('plate-ink'); ink2 = C('plate-ink-2'); tagc = C('plate-ink-2'); }
+      if (it.who === 'you') { fill = C('go-bg'); stroke = C('go'); tagc = C('go'); }
+      el(s, 'rect', { x: BL, y: it.top, width: BW, height: BH, rx: 9, fill, stroke, 'stroke-width': 1.3 });
+      txt(s, BL + 18, it.top + 24, it.name, { cls: 'cond', size: 17.5, weight: 600, fill: ink });
+      txt(s, BL + 18, it.top + 43, it.sub, { size: 12.5, fill: ink2 });
+      const tag = it.tag || (it.who === 'you' ? 'YOU' : 'ORCHESTRATOR');
+      txt(s, BR - 16, it.top + 23, tag, { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: 0.6, fill: tagc });
+    } else {
+      const isYou = it.who === 'you';
+      const { top, mid } = it;
+      el(s, 'path', { d: `M${CX - GW / 2} ${mid} L${CX} ${top} L${CX + GW / 2} ${mid} L${CX} ${top + GH} Z`, fill: isYou ? C('go-bg') : C('board'), stroke: isYou ? C('go') : C('ink-3'), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
+      txt(s, CX, mid + 4.5, it.gate, { size: 13, weight: 600, anchor: 'middle', fill: isYou ? C('go') : C('ink') });
+    }
+  }
+
+  // Side notes
+  const noteR = laneR(3) + 26, noteW = W - 24 - noteR;
+  const ry = pos.build.top + 6;
+  txt(s, noteR, ry, 'BACK TO BUILD', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
+  wrapText(s, noteR, ry + 20, 'At most 2 fixes per task and 2 review rounds. Then you decide.', noteW, { size: 12, fill: C('ink-2'), lh: 16 });
+  const noteLW = laneL(4) - 34;
+  const ly = pos.plan.top + 6;
+  txt(s, 24, ly, 'BACK TO PLAN', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
+  wrapText(s, 24, ly + 20, 'You approve the changed plan.', noteLW, { size: 12, fill: C('ink-2'), lh: 16 });
+
+  // Fit the canvas
+  const H = bottom + 34;
   s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('height', H);
   s.querySelector(':scope > rect').setAttribute('height', H - 1);
 }
