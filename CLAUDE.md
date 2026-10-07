@@ -21,3 +21,10 @@ A public template of a multi-agent workflow for Claude Code, plus its project pa
 - The two loop diagrams (horizontal ≥1140px, vertical below) are inline SVG inside `index.html` between
   `<!-- diagram:h -->` / `<!-- diagram:v -->` markers. Stage details live in the `.stage-detail` articles below them.
 - Check it at 375px and 1440px, light and dark, before calling a change done.
+
+## README diagrams
+
+- Source: `docs/assets/diagrams.html` (drawn from data in its script). Edit the data, not coordinates.
+- Render each `#loop`, `#team`, `#workspace` svg at device scale 2, light and `?theme=dark`, to
+  `docs/assets/<name>-<theme>.png`, then compress (palette PNG). Look at every image before committing.
+- The README shows them with `<picture>` so GitHub picks light or dark. Keep the alt text in step with the image.

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diagram sources</title>
+<!--
+  Source for the README diagrams. Each figure is drawn from the data below, so edit the data, not coordinates.
+  Render (any headless Chrome works; example with Playwright):
+    light: diagrams.html            dark: diagrams.html?theme=dark
+    screenshot each #loop / #team / #workspace element at device scale 2 → docs/assets/<name>-<theme>.png
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --board: #faf9f6; --surface: #ffffff; --ink: #15171a; --ink-2: #454a52; --ink-3: #6b7078;
+    --rule: #dcd8ce; --rule-2: #b9b4a8; --go: #16794a; --go-bg: #e8f3ec; --go-line: #8cc3a5;
+    --warn: #c2410c; --plate: #15171a; --plate-ink: #f3f1ec; --plate-ink-2: #a9a59c; --chip: #f1efe9;
+  }
+  html.dark {
+    --board: #11161b; --surface: #182027; --ink: #ebe8e2; --ink-2: #bcc0c5; --ink-3: #8d949b;
+    --rule: #26303a; --rule-2: #3b4652; --go: #4cc38a; --go-bg: #12291f; --go-line: #2f6b4c;
+    --warn: #ff7c47; --plate: #ebe8e2; --plate-ink: #111416; --plate-ink-2: #4c535a; --chip: #212a33;
+  }
+  body { margin: 0; padding: 24px; background: transparent; }
+  .fig { display: block; width: max-content; margin-bottom: 40px; }
+  svg { display: block; }
+  text { font-family: "IBM Plex Sans", system-ui, sans-serif; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .cond { font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif; }
+</style>
+</head>
+<body>
+<div class="fig" id="loop"></div>
+<div class="fig" id="team"></div>
+<div class="fig" id="workspace"></div>
+
+<script>
+if (/theme=dark/.test(location.search)) document.documentElement.classList.add('dark');
+const NS = 'http://www.w3.org/2000/svg';
+const C = (v) => `var(--${v})`;
+
+function svgRoot(host, w, h) {
+  const s = document.createElementNS(NS, 'svg');
+  s.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  s.setAttribute('width', w); s.setAttribute('height', h);
+  document.getElementById(host).appendChild(s);
+  const defs = el(s, 'defs');
+  for (const [id, col] of [['a-ink', 'ink'], ['a-warn', 'warn'], ['a-go', 'go']]) {
+    const m = el(defs, 'marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 8, markerHeight: 8, orient: 'auto-start-reverse', markerUnits: 'userSpaceOnUse' });
+    el(m, 'path', { d: 'M0 0L10 5L0 10z', fill: C(col) });
+  }
+  el(s, 'rect', { x: 0.5, y: 0.5, width: w - 1, height: h - 1, rx: 14, fill: C('board'), stroke: C('rule') });
+  return s;
+}
+function el(parent, tag, attrs = {}, text) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (text != null) n.textContent = text;
+  parent.appendChild(n);
+  return n;
+}
+function txt(p, x, y, s, o = {}) {
+  const cls = o.cls || '';
+  return el(p, 'text', {
+    x, y, class: cls, 'font-size': o.size || 13, 'font-weight': o.weight || 400,
+    fill: o.fill || C('ink'), 'text-anchor': o.anchor || 'start',
+    'letter-spacing': o.ls || 0, ...(o.extra || {}),
+  }, s);
+}
+function chip(p, x, y, s, o = {}) {
+  // pill with text; returns width. y is the pill's top.
+  const g = el(p, 'g');
+  const t = txt(g, 0, 0, s, { cls: 'mono', size: o.size || 11, fill: o.fill || C('ink-2'), weight: o.weight || 500 });
+  const w = t.getComputedTextLength() + (o.pad || 10) * 2, h = o.h || 20;
+  const left = o.anchor === 'end' ? x - w : x;
+  el(g, 'rect', { x: left, y, width: w, height: h, rx: h / 2, fill: o.bg || C('chip'), stroke: o.stroke || 'none' });
+  t.setAttribute('x', left + (o.pad || 10)); t.setAttribute('y', y + h / 2 + 4);
+  g.appendChild(t);
+  return w;
+}
+function warnOverflow(textNode, maxRight, label) {
+  const b = textNode.getBBox();
+  if (b.x + b.width > maxRight + 0.5) console.warn('overflow', label, Math.round(b.x + b.width - maxRight));
+}
+
+/* ───────────── 1. The loop, as swimlanes ───────────── */
+function drawLoop() {
+  const W = 940, H = 1084;
+  const s = svgRoot('loop', W, H);
+  const lane = { you: { x: 136, w: 150 }, orch: { x: 302, w: 210 }, help: { x: 528, w: 220 } };
+  const T0 = 92, P = 78, BH = 56, busA = 884, busB = 910;
+  const top = (i) => T0 + (i - 1) * P, mid = (i) => top(i) + BH / 2;
+  const cx = (l) => lane[l].x + lane[l].w / 2;
+
+  const stages = [
+    { lane: 'you',  name: 'Idea',             sub: 'In plain words' },
+    { lane: 'orch', name: 'Plan',             sub: 'Small tasks, each with a check' },
+    { lane: 'help', name: 'Plan review',      sub: 'Before any code exists', agent: 'reviewer', opt: true },
+    { lane: 'you',  name: 'Approve',          sub: 'Scope, risk and cost' },
+    { lane: 'help', name: 'Tests first',      sub: 'Must fail, then frozen', agent: 'test-writer', opt: true },
+    { lane: 'help', name: 'Build',            sub: 'One task in its own worktree', agent: 'implementer' },
+    { lane: 'orch', name: 'Check by command', sub: 'Tests, scope, frozen files' },
+    { lane: 'help', name: 'Code review',      sub: 'Sees the plan and diff only', agent: 'reviewer' },
+    { lane: 'orch', name: 'Open the PR',      sub: 'Full suite, one PR, CI green' },
+    { lane: 'you',  name: 'Merge',            sub: 'Merge = deploy' },
+    { lane: 'orch', name: 'Verify',           sub: 'Switch on for one account' },
+    { lane: 'orch', name: 'Learn',            sub: 'Update plan, propose rules' },
+  ];
+
+  // Lane headers
+  const heads = [['you', 'YOU', 'four decisions'], ['orch', 'ORCHESTRATOR', 'main session · Opus'], ['help', 'HELPERS', 'subagents · .claude/agents/']];
+  for (const [l, h, sub] of heads) {
+    txt(s, cx(l), 38, h, { cls: 'mono', size: 11.5, weight: 600, anchor: 'middle', ls: 1.4, fill: l === 'you' ? C('go') : C('ink') });
+    txt(s, cx(l), 56, sub, { size: 12, anchor: 'middle', fill: C('ink-3') });
+  }
+  el(s, 'line', { x1: 24, x2: W - 24, y1: 72, y2: 72, stroke: C('rule') });
+
+  // Phase markers (left column)
+  const phases = [[1, 4, ['DECIDE']], [5, 8, ['BUILD +', 'PROVE']], [9, 12, ['SHIP +', 'LEARN']]];
+  phases.forEach(([a, b, lines], k) => {
+    const y1 = top(a) - 2, y2 = top(b) + BH + 2;
+    el(s, 'line', { x1: 26, x2: 26, y1, y2, stroke: C('rule-2'), 'stroke-width': 2, 'stroke-linecap': 'round' });
+    txt(s, 38, y1 + 12, `0${k + 1}`, { cls: 'mono', size: 10.5, fill: C('ink-3') });
+    lines.forEach((ln, j) => txt(s, 38, y1 + 30 + j * 15, ln, { cls: 'mono', size: 11, weight: 600, ls: 0.8, fill: C('ink-2') }));
+  });
+
+  // Main-flow connectors (drawn first, under the boxes)
+  for (let i = 1; i < stages.length; i++) {
+    const a = stages[i - 1], b = stages[i];
+    const x1 = cx(a.lane), x2 = cx(b.lane), yb = top(i) + BH, yt = top(i + 1), ym = (yb + yt) / 2;
+    const d = x1 === x2 ? `M${x1} ${yb} V${yt - 1}` : `M${x1} ${yb} V${ym - 5} Q${x1} ${ym} ${x1 + Math.sign(x2 - x1) * 5} ${ym} H${x2 - Math.sign(x2 - x1) * 5} Q${x2} ${ym} ${x2} ${ym + 5} V${yt - 1}`;
+    el(s, 'path', { d, fill: 'none', stroke: C('ink-3'), 'stroke-width': 1.5, 'marker-end': 'url(#a-ink)' });
+  }
+
+  // Return paths
+  const R = 6;
+  const ret = (d, extra = {}) => {
+    el(s, 'path', { d, fill: 'none', stroke: C('board'), 'stroke-width': 7, ...extra.halo });
+    el(s, 'path', { d, fill: 'none', stroke: C('warn'), 'stroke-width': 1.75, 'marker-end': 'url(#a-warn)' });
+  };
+  const right = (l) => lane[l].x + lane[l].w;
+  const toBuild = (from, y) => `M${right(stages[from - 1].lane)} ${y} H${busA - R} Q${busA} ${y} ${busA} ${y - R} V${mid(6) + R} Q${busA} ${mid(6)} ${busA - R} ${mid(6)} H${right('help') + 2}`;
+  const toPlan = (from, y) => `M${right(stages[from - 1].lane)} ${y} H${busB - R} Q${busB} ${y} ${busB} ${y - R} V${mid(2) + R} Q${busB} ${mid(2)} ${busB - R} ${mid(2)} H${right('orch') + 2}`;
+  ret(toPlan(11, mid(11)));
+  ret(toPlan(8, mid(8) + 8));          // halo cuts a clean gap where it crosses the Build bus
+  ret(toBuild(9, mid(9)));
+  ret(toBuild(8, mid(8) - 8), { halo: { stroke: 'none' } });
+  ret(toBuild(7, mid(7)), { halo: { stroke: 'none' } });
+  const rl = (y, s1, below) => txt(s, busA - 12, below ? y + 15 : y - 6, s1, { size: 11.5, weight: 500, anchor: 'end', fill: C('warn') });
+  rl(mid(7), 'check fails · max 2 tries');
+  rl(mid(8) - 8, 'blocker in code');
+  rl(mid(8) + 8, 'blocker in design', true);
+  rl(mid(9), 'CI fails');
+  txt(s, busB - 12, mid(11) - 6, 'live check fails · switch off first', { size: 11.5, weight: 500, anchor: 'end', fill: C('warn') });
+
+  // Next feature: Learn → Idea, along the left
+  const lx = 118, y12 = mid(12), y1 = mid(1);
+  el(s, 'path', { d: `M${lane.orch.x} ${y12} H${lx + R} Q${lx} ${y12} ${lx} ${y12 - R} V${y1 + R} Q${lx} ${y1} ${lx + R} ${y1} H${lane.you.x - 2}`, fill: 'none', stroke: C('go'), 'stroke-width': 1.75, 'stroke-dasharray': '1 0', 'marker-end': 'url(#a-go)' });
+  txt(s, lx - 8, (mid(5) + mid(8)) / 2, 'next feature', { cls: 'mono', size: 11, weight: 500, anchor: 'middle', fill: C('go'), extra: { transform: `rotate(-90 ${lx - 8} ${(mid(5) + mid(8)) / 2})` } });
+
+  // Stage boxes
+  stages.forEach((st, i) => {
+    const L = lane[st.lane], y = top(i + 1), n = String(i + 1).padStart(2, '0');
+    const g = el(s, 'g');
+    let fill = C('surface'), stroke = C('rule-2'), ink = C('ink'), ink2 = C('ink-2'), ink3 = C('ink-3');
+    if (st.lane === 'orch') { fill = C('plate'); stroke = C('plate'); ink = C('plate-ink'); ink2 = C('plate-ink-2'); ink3 = C('plate-ink-2'); }
+    if (st.lane === 'you') { fill = C('go-bg'); stroke = C('go'); ink3 = C('go'); }
+    el(g, 'rect', { x: L.x, y, width: L.w, height: BH, rx: 7, fill, stroke, 'stroke-width': st.opt ? 1.4 : 1.2, ...(st.opt ? { 'stroke-dasharray': '5 4' } : {}) });
+    txt(g, L.x + 14, y + 23, n, { cls: 'mono', size: 11, weight: 500, fill: ink3 });
+    const name = txt(g, L.x + 38, y + 23, st.name, { cls: 'cond', size: 16.5, weight: 600, fill: ink });
+    const sub = txt(g, L.x + 14, y + 43, st.sub, { size: 12.5, fill: ink2 });
+    warnOverflow(sub, L.x + L.w - 10, st.name + ' sub');
+    if (st.agent) {
+      const t = txt(g, L.x + L.w - 12, y + 22, st.agent, { cls: 'mono', size: 10.5, weight: 500, anchor: 'end', fill: C('ink-3') });
+      if (t.getBBox().x < name.getBBox().x + name.getBBox().width + 8) console.warn('agent tag overlaps', st.name);
+    }
+    if (st.lane === 'you') txt(g, L.x + L.w - 12, y + 22, 'YOU', { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: 1, fill: C('go') });
+  });
+
+  // Legend
+  const ly = H - 30;
+  let x = 26;
+  const item = (draw, label) => { draw(x); x += 22; const t = txt(s, x, ly + 4, label, { size: 12, fill: C('ink-2') }); x += t.getComputedTextLength() + 26; };
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('go-bg'), stroke: C('go') }), 'your step');
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('plate') }), 'orchestrator');
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2') }), 'helper');
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2'), 'stroke-dasharray': '4 3' }), 'wide and closed work only');
+  item((x0) => el(s, 'line', { x1: x0, x2: x0 + 16, y1: ly - 1, y2: ly - 1, stroke: C('warn'), 'stroke-width': 2 }), 'return path');
+  el(s, 'line', { x1: 24, x2: W - 24, y1: ly - 26, y2: ly - 26, stroke: C('rule') });
+}
+
+/* ───────────── 2. The team ───────────── */
+function drawTeam() {
+  const W = 940, H = 676;
+  const s = svgRoot('team', W, H);
+
+  // You
+  const yx = 170, yw = 600, yy = 24, yh = 92;
+  el(s, 'rect', { x: yx, y: yy, width: yw, height: yh, rx: 10, fill: C('go-bg'), stroke: C('go') });
+  txt(s, yx + 20, yy + 30, 'YOU', { cls: 'mono', size: 11.5, weight: 600, ls: 1.4, fill: C('go') });
+  txt(s, yx + 62, yy + 30, 'decide four kinds of thing, nothing else', { size: 13, fill: C('ink-2') });
+  let cx0 = yx + 20;
+  for (const m of ['approve the plan', 'yes to Fable', 'run migrations', 'click merge']) {
+    cx0 += chip(s, cx0, yy + 50, m, { size: 12, h: 26, pad: 12, bg: C('surface'), stroke: C('go-line'), fill: C('ink') }) + 10;
+  }
+
+  // You ↔ orchestrator
+  const oy = 170;
+  el(s, 'path', { d: `M${W / 2 - 60} ${yy + yh} V${oy - 2}`, stroke: C('ink-3'), 'stroke-width': 1.5, 'marker-end': 'url(#a-ink)', fill: 'none' });
+  el(s, 'path', { d: `M${W / 2 + 60} ${oy} V${yy + yh + 2}`, stroke: C('ink-3'), 'stroke-width': 1.5, 'marker-end': 'url(#a-ink)', fill: 'none' });
+  txt(s, W / 2 - 72, 147, 'an idea, then a yes', { size: 12, anchor: 'end', fill: C('ink-3') });
+  txt(s, W / 2 + 72, 147, 'one plain plan, decisions batched', { size: 12, fill: C('ink-3') });
+
+  // Orchestrator plate
+  const ox = 140, ow = 660, oh = 104;
+  el(s, 'rect', { x: ox, y: oy, width: ow, height: oh, rx: 10, fill: C('plate') });
+  txt(s, ox + 22, oy + 36, 'Orchestrator', { cls: 'cond', size: 22, weight: 600, fill: C('plate-ink') });
+  txt(s, ox + ow - 22, oy + 34, 'main session · Opus 5.5 · high', { cls: 'mono', size: 11.5, anchor: 'end', fill: C('plate-ink-2') });
+  txt(s, ox + 22, oy + 64, 'Plans with you · writes short briefs · checks every result by command · opens one PR', { size: 13.5, fill: C('plate-ink') });
+  txt(s, ox + 22, oy + 86, 'Never writes product code. Never merges.', { size: 13, fill: C('plate-ink-2') });
+
+  // Groups
+  const gy = 352;
+  const groups = [
+    { x: 24, w: 296, head: 'BUILD', sub: 'write code in the build worktree', rows: [
+      ['implementer', 'Sonnet · high', 'Codes one small task'],
+      ['implementer-wide', 'Sonnet · xhigh', 'Wide or closed task; checks callers first'],
+      ['test-writer', 'Sonnet · high', 'Failing tests before the code exists'],
+    ] },
+    { x: 334, w: 316, head: 'REVIEW', sub: 'read-only · judge the plan or the diff', rows: [
+      ['reviewer', 'Opus · xhigh', 'Plans and code for wide or closed work'],
+      ['reviewer-light', 'Opus · high', 'The same review, sized for small work'],
+      ['adversarial-reviewer', 'Fable', 'Tries to break big work', 'needs your yes'],
+    ] },
+    { x: 664, w: 252, head: 'LOOK UP', sub: 'read-only · one question', rows: [
+      ['scout', 'Sonnet · medium', 'Answers with file:line evidence'],
+    ] },
+  ];
+  // fan-out from the plate
+  const busY = 318, stemX = W / 2;
+  el(s, 'path', { d: `M${stemX} ${oy + oh} V${busY}`, stroke: C('ink-3'), 'stroke-width': 1.5, fill: 'none' });
+  const gcx = groups.map((g) => g.x + g.w / 2);
+  el(s, 'path', { d: `M${gcx[0]} ${busY} H${gcx[2]}`, stroke: C('ink-3'), 'stroke-width': 1.5, fill: 'none' });
+  for (const x of gcx) el(s, 'path', { d: `M${x} ${busY} V${gy - 2}`, stroke: C('ink-3'), 'stroke-width': 1.5, fill: 'none', 'marker-end': 'url(#a-ink)' });
+  txt(s, stemX + 12, oy + oh + 24, 'brief: task · files allowed · Done when', { size: 12, fill: C('ink-3') });
+  txt(s, stemX - 12, oy + oh + 24, 'report back in a fixed format', { size: 12, anchor: 'end', fill: C('ink-3') });
+
+  const RH = 70, HH = 56;
+  for (const g of groups) {
+    const h = HH + g.rows.length * RH + 6;
+    el(s, 'rect', { x: g.x, y: gy, width: g.w, height: h, rx: 10, fill: C('surface'), stroke: C('rule-2') });
+    txt(s, g.x + 18, gy + 26, g.head, { cls: 'mono', size: 11.5, weight: 600, ls: 1.4 });
+    txt(s, g.x + 18, gy + 44, g.sub, { size: 12, fill: C('ink-3') });
+    g.rows.forEach(([name, model, job, flag], i) => {
+      const ry = gy + HH + i * RH;
+      el(s, 'line', { x1: g.x + 18, x2: g.x + g.w - 18, y1: ry, y2: ry, stroke: C('rule') });
+      txt(s, g.x + 18, ry + 25, name, { cls: 'mono', size: 13.5, weight: 600 });
+      chip(s, g.x + g.w - 18, ry + 11, model, { anchor: 'end', size: 10.5, h: 20 });
+      const j = txt(s, g.x + 18, ry + 50, job, { size: 12.5, fill: C('ink-2') });
+      warnOverflow(j, g.x + g.w - 14, name);
+      if (flag) {
+        const jw = j.getComputedTextLength();
+        chip(s, g.x + 18 + jw + 8, ry + 37, flag, { size: 10, h: 18, pad: 8, bg: C('go-bg'), fill: C('go'), weight: 600 });
+      }
+    });
+  }
+  txt(s, W / 2, H - 22, 'No helper can start another helper. Claude’s built-in helpers are blocked.', { cls: 'mono', size: 11.5, anchor: 'middle', fill: C('ink-3') });
+}
+
+/* ───────────── 3. How it fits in your project ───────────── */
+function drawWorkspace() {
+  const W = 940, H = 470;
+  const s = svgRoot('workspace', W, H);
+
+  // Workspace frame
+  const fx = 24, fy = 24, fw = 572, fh = 422;
+  el(s, 'rect', { x: fx, y: fy, width: fw, height: fh, rx: 12, fill: 'none', stroke: C('rule-2'), 'stroke-dasharray': '6 5' });
+  txt(s, fx + 20, fy + 30, 'your-workspace/', { cls: 'mono', size: 14, weight: 600 });
+  txt(s, fx + 20, fy + 50, 'open Claude Code here', { size: 12, fill: C('ink-3') });
+
+  const files = [
+    ['CLAUDE.md', 'shared rules'], ['ORCHESTRATOR.md', 'the playbook'], ['PLAN.md', 'Now · roadmap · decisions'],
+    ['.claude/', 'settings + 7 helpers'], ['backlog/', 'ideas, one file each'], ['ops/', 'production scripts', 'you only'],
+  ];
+  files.forEach(([f, d, flag], i) => {
+    const y = fy + 92 + i * 52;
+    el(s, 'line', { x1: fx + 20, x2: fx + 262, y1: y - 18, y2: y - 18, stroke: C('rule') });
+    txt(s, fx + 20, y + 2, f, { cls: 'mono', size: 13, weight: 600 });
+    const t = txt(s, fx + 20, y + 21, d, { size: 12, fill: C('ink-3') });
+    if (flag) chip(s, fx + 20 + t.getComputedTextLength() + 8, y + 9, flag, { size: 10, h: 17, pad: 7, bg: C('go-bg'), fill: C('go'), weight: 600 });
+  });
+
+  // Repos inside the workspace
+  const rx = 306, rw = 268;
+  const repo = (y, h, name, tag, lines, tone) => {
+    el(s, 'rect', { x: rx, y, width: rw, height: h, rx: 10, fill: tone === 'plate' ? C('plate') : C('surface'), stroke: tone === 'plate' ? C('plate') : C('rule-2') });
+    const ink = tone === 'plate' ? C('plate-ink') : C('ink'), ink2 = tone === 'plate' ? C('plate-ink-2') : C('ink-2');
+    txt(s, rx + 18, y + 30, name, { cls: 'mono', size: 14, weight: 600, fill: ink });
+    chip(s, rx + rw - 16, y + 15, tag, { anchor: 'end', size: 10.5, h: 20, bg: tone === 'plate' ? C('plate-ink-2') : C('chip'), fill: tone === 'plate' ? C('plate') : C('ink-2') });
+    lines.forEach((l, i) => txt(s, rx + 18, y + 56 + i * 19, l, { size: 12.5, fill: ink2 }));
+  };
+  repo(74, 116, 'app/', 'on main', ['your code repo, a fresh clone', 'agents only read it', 'updated with git pull'], 'surface');
+  repo(300, 132, '_worktrees/build', 'feat/<name>', ['second checkout of the same repo', 'helpers write code here', 'they commit; the orchestrator', 'pushes the branch'], 'plate');
+  el(s, 'path', { d: `M${rx + rw / 2} 190 V298`, stroke: C('ink-3'), 'stroke-width': 1.5, 'stroke-dasharray': '4 4', fill: 'none', 'marker-end': 'url(#a-ink)' });
+  txt(s, rx + rw / 2 + 10, 248, 'branch from origin/main', { size: 11.5, fill: C('ink-3') });
+
+  // GitHub column
+  const gx = 652, gw = 264;
+  el(s, 'rect', { x: gx, y: fy, width: gw, height: fh, rx: 12, fill: C('surface'), stroke: C('rule-2') });
+  txt(s, gx + 20, fy + 30, 'GitHub', { cls: 'mono', size: 14, weight: 600 });
+  txt(s, gx + 20, fy + 50, 'the walls live here', { size: 12, fill: C('ink-3') });
+  // Read bottom to top: the feature branch climbs to main.
+  const steps = [['main', 'protected · no bypass'], ['you merge', 'merge = deploy', 'go'], ['CI checks', 'must pass'], ['pull request', 'same template'], ['feat/<name>', 'feature branch']];
+  const sy0 = fy + 82, sp = 64, bh = 40;
+  steps.forEach(([n, d, tone], i) => {
+    const y = sy0 + i * sp;
+    const isGo = tone === 'go';
+    el(s, 'rect', { x: gx + 18, y, width: gw - 36, height: bh, rx: 7, fill: isGo ? C('go-bg') : C('board'), stroke: isGo ? C('go') : C('rule-2') });
+    txt(s, gx + 32, y + 25, n, { cls: 'mono', size: 12.5, weight: 600, fill: isGo ? C('go') : C('ink') });
+    if (d) txt(s, gx + gw - 32, y + 25, d, { size: 11, anchor: 'end', fill: C('ink-3') });
+    if (i > 0) el(s, 'path', { d: `M${gx + gw / 2} ${y} V${y - sp + bh + 1}`, stroke: C('ink-3'), 'stroke-width': 1.5, fill: 'none', 'marker-end': 'url(#a-ink)' });
+  });
+
+  // build → push → feature branch ; main → pull → app (straight, never crossing)
+  const pushY = sy0 + 4 * sp + bh / 2, pullY = sy0 + bh / 2;
+  el(s, 'path', { d: `M${rx + rw} ${pushY} H${gx + 16}`, stroke: C('ink-3'), 'stroke-width': 1.5, fill: 'none', 'marker-end': 'url(#a-ink)' });
+  txt(s, (rx + rw + gx + 18) / 2, pushY - 8, 'push', { cls: 'mono', size: 11, anchor: 'middle', fill: C('ink-3') });
+  el(s, 'path', { d: `M${gx + 18} ${pullY} H${rx + rw + 2}`, stroke: C('ink-3'), 'stroke-width': 1.5, 'stroke-dasharray': '4 4', fill: 'none', 'marker-end': 'url(#a-ink)' });
+  txt(s, (rx + rw + gx + 18) / 2, pullY - 8, 'pull', { cls: 'mono', size: 11, anchor: 'middle', fill: C('ink-3') });
+}
+
+// Load every face before measuring text; fonts.ready alone resolves before unused faces are fetched.
+Promise.all([
+  '400 12px "IBM Plex Sans"', '500 12px "IBM Plex Sans"', '600 12px "IBM Plex Sans"',
+  '400 12px "IBM Plex Mono"', '500 12px "IBM Plex Mono"', '600 12px "IBM Plex Mono"',
+  '600 12px "IBM Plex Sans Condensed"',
+].map((f) => document.fonts.load(f))).then(() => document.fonts.ready).then(() => { drawLoop(); drawTeam(); drawWorkspace(); document.body.dataset.ready = '1'; });
+</script>
+</body>
+</html>
