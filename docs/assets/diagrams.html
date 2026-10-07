@@ -16,12 +16,12 @@
   :root {
     --board: #faf9f6; --surface: #ffffff; --ink: #15171a; --ink-2: #454a52; --ink-3: #6b7078;
     --rule: #dcd8ce; --rule-2: #b9b4a8; --go: #16794a; --go-bg: #e8f3ec; --go-line: #8cc3a5;
-    --warn: #c2410c; --plate: #15171a; --plate-ink: #f3f1ec; --plate-ink-2: #a9a59c; --chip: #f1efe9;
+    --warn: #b93a0a; --warn-bg: #fcefe7; --warn-line: #efb99c; --plate: #15171a; --plate-ink: #f3f1ec; --plate-ink-2: #a9a59c; --chip: #f1efe9;
   }
   html.dark {
     --board: #11161b; --surface: #182027; --ink: #ebe8e2; --ink-2: #bcc0c5; --ink-3: #8d949b;
     --rule: #26303a; --rule-2: #3b4652; --go: #4cc38a; --go-bg: #12291f; --go-line: #2f6b4c;
-    --warn: #ff7c47; --plate: #ebe8e2; --plate-ink: #111416; --plate-ink-2: #4c535a; --chip: #212a33;
+    --warn: #ff8a5c; --warn-bg: #2b1a12; --warn-line: #6b3a24; --plate: #ebe8e2; --plate-ink: #111416; --plate-ink-2: #4c535a; --chip: #212a33;
   }
   body { margin: 0; padding: 24px; background: transparent; }
   .fig { display: block; width: max-content; margin-bottom: 40px; }
@@ -85,110 +85,127 @@ function warnOverflow(textNode, maxRight, label) {
   if (b.x + b.width > maxRight + 0.5) console.warn('overflow', label, Math.round(b.x + b.width - maxRight));
 }
 
-/* ───────────── 1. The loop, as swimlanes ───────────── */
-function drawLoop() {
-  const W = 940, H = 1084;
-  const s = svgRoot('loop', W, H);
-  const lane = { you: { x: 136, w: 150 }, orch: { x: 302, w: 210 }, help: { x: 528, w: 220 } };
-  const T0 = 92, P = 78, BH = 56, busA = 884, busB = 910;
-  const top = (i) => T0 + (i - 1) * P, mid = (i) => top(i) + BH / 2;
-  const cx = (l) => lane[l].x + lane[l].w / 2;
+/* ───────────── 1. The loop: three phases, read like lines of text ───────────── */
+function wrapText(p, x, y, str, maxW, o) {
+  // Writes str on as many lines as needed; returns the number of lines.
+  const lh = o.lh || 16, words = str.split(' ');
+  let line = '', n = 0, t = txt(p, x, y, '', o);
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    t.textContent = test;
+    if (t.getComputedTextLength() > maxW && line) {
+      t.textContent = line; n++;
+      t = txt(p, x + (o.indent || 0), y + n * lh, w, o); line = w;
+    } else line = test;
+  }
+  return n + 1;
+}
+function rounded(points, r = 8) {
+  // Orthogonal polyline with rounded corners.
+  let d = `M${points[0][0]} ${points[0][1]}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const [px, py] = points[i - 1], [x, y] = points[i], [nx, ny] = points[i + 1];
+    const ax = Math.sign(x - px) * r, ay = Math.sign(y - py) * r, bx = Math.sign(nx - x) * r, by = Math.sign(ny - y) * r;
+    d += ` L${x - ax} ${y - ay} Q${x} ${y} ${x + bx} ${y + by}`;
+  }
+  const [lx, ly] = points[points.length - 1];
+  return d + ` L${lx} ${ly}`;
+}
 
-  const stages = [
-    { lane: 'you',  name: 'Idea',             sub: 'In plain words' },
-    { lane: 'orch', name: 'Plan',             sub: 'Small tasks, each with a check' },
-    { lane: 'help', name: 'Plan review',      sub: 'Before any code exists', agent: 'reviewer', opt: true },
-    { lane: 'you',  name: 'Approve',          sub: 'Scope, risk and cost' },
-    { lane: 'help', name: 'Tests first',      sub: 'Must fail, then frozen', agent: 'test-writer', opt: true },
-    { lane: 'help', name: 'Build',            sub: 'One task in its own worktree', agent: 'implementer' },
-    { lane: 'orch', name: 'Check by command', sub: 'Tests, scope, frozen files' },
-    { lane: 'help', name: 'Code review',      sub: 'Sees the plan and diff only', agent: 'reviewer' },
-    { lane: 'orch', name: 'Open the PR',      sub: 'Full suite, one PR, CI green' },
-    { lane: 'you',  name: 'Merge',            sub: 'Merge = deploy' },
-    { lane: 'orch', name: 'Verify',           sub: 'Switch on for one account' },
-    { lane: 'orch', name: 'Learn',            sub: 'Update plan, propose rules' },
+function drawLoop() {
+  const W = 940, BX = [36, 260, 484, 708], BW = 196, BH = 104;
+  const s = svgRoot('loop', W, 2000);
+  const phases = [
+    { title: 'DECIDE', note: 'you approve the plan before any code exists', steps: [
+      { who: 'you', name: 'Idea', sub: 'Describe the feature you want, in plain words' },
+      { who: 'orch', name: 'Plan', sub: 'Small tasks, each with its files and a check' },
+      { who: 'help', agent: 'reviewer', opt: true, name: 'Plan review', sub: 'A fresh reviewer checks the plan before any code' },
+      { who: 'you', name: 'Approve', sub: 'Scope, proof, risk and cost, in plain words' },
+    ] },
+    { title: 'BUILD + PROVE', note: 'helpers do the work; the orchestrator proves it by command', steps: [
+      { who: 'help', agent: 'test-writer', opt: true, name: 'Tests first', sub: 'Tests that must fail now, then they are frozen' },
+      { who: 'help', agent: 'implementer', name: 'Build', sub: 'One task at a time, in its own checkout' },
+      { who: 'orch', name: 'Check by command', sub: 'Runs the tests and checks the scope itself', fail: ['fails → back to Build (max 2)'] },
+      { who: 'help', agent: 'reviewer', name: 'Code review', sub: 'Sees only the plan, the diff and the test output', fail: ['blocker in code → Build', 'blocker in design → Plan'] },
+    ] },
+    { title: 'SHIP + LEARN', note: 'you merge; the orchestrator verifies and learns', steps: [
+      { who: 'orch', name: 'Open the PR', sub: 'Runs the full suite, opens one PR, waits for CI', fail: ['CI fails → back to Build'] },
+      { who: 'you', name: 'Merge', sub: 'Merging is deploying' },
+      { who: 'orch', name: 'Verify', sub: 'Confirms the deploy; feature on for one account', fail: ['fails live → switch it off, then back to Plan'] },
+      { who: 'orch', name: 'Learn', sub: 'Updates the plan, proposes up to 2 new rules', next: 'then the next feature starts at Idea' },
+    ] },
   ];
 
-  // Lane headers
-  const heads = [['you', 'YOU', 'four decisions'], ['orch', 'ORCHESTRATOR', 'main session · Opus'], ['help', 'HELPERS', 'subagents · .claude/agents/']];
-  for (const [l, h, sub] of heads) {
-    txt(s, cx(l), 38, h, { cls: 'mono', size: 11.5, weight: 600, anchor: 'middle', ls: 1.4, fill: l === 'you' ? C('go') : C('ink') });
-    txt(s, cx(l), 56, sub, { size: 12, anchor: 'middle', fill: C('ink-3') });
-  }
-  el(s, 'line', { x1: 24, x2: W - 24, y1: 72, y2: 72, stroke: C('rule') });
+  const arrow = (d, col = 'ink-3') => el(s, 'path', { d, fill: 'none', stroke: C(col), 'stroke-width': 1.6, 'marker-end': `url(#a-${col === 'ink-3' ? 'ink' : col})` });
+  let y = 26, n = 0, prevMid = null;
 
-  // Phase markers (left column)
-  const phases = [[1, 4, ['DECIDE']], [5, 8, ['BUILD +', 'PROVE']], [9, 12, ['SHIP +', 'LEARN']]];
-  phases.forEach(([a, b, lines], k) => {
-    const y1 = top(a) - 2, y2 = top(b) + BH + 2;
-    el(s, 'line', { x1: 26, x2: 26, y1, y2, stroke: C('rule-2'), 'stroke-width': 2, 'stroke-linecap': 'round' });
-    txt(s, 38, y1 + 12, `0${k + 1}`, { cls: 'mono', size: 10.5, fill: C('ink-3') });
-    lines.forEach((ln, j) => txt(s, 38, y1 + 30 + j * 15, ln, { cls: 'mono', size: 11, weight: 600, ls: 0.8, fill: C('ink-2') }));
-  });
+  phases.forEach((ph, pi) => {
+    // Phase heading
+    const hy = y + 14;
+    const num = txt(s, BX[0], hy, `0${pi + 1}`, { cls: 'mono', size: 12, weight: 500, fill: C('ink-3') });
+    const ttl = txt(s, BX[0] + 28, hy, ph.title, { cls: 'mono', size: 12.5, weight: 600, ls: 1.2 });
+    txt(s, BX[0] + 28 + ttl.getComputedTextLength() + 14, hy, ph.note, { size: 13, fill: C('ink-3') });
+    const top = y + 34, mid = top + BH / 2;
 
-  // Main-flow connectors (drawn first, under the boxes)
-  for (let i = 1; i < stages.length; i++) {
-    const a = stages[i - 1], b = stages[i];
-    const x1 = cx(a.lane), x2 = cx(b.lane), yb = top(i) + BH, yt = top(i + 1), ym = (yb + yt) / 2;
-    const d = x1 === x2 ? `M${x1} ${yb} V${yt - 1}` : `M${x1} ${yb} V${ym - 5} Q${x1} ${ym} ${x1 + Math.sign(x2 - x1) * 5} ${ym} H${x2 - Math.sign(x2 - x1) * 5} Q${x2} ${ym} ${x2} ${ym + 5} V${yt - 1}`;
-    el(s, 'path', { d, fill: 'none', stroke: C('ink-3'), 'stroke-width': 1.5, 'marker-end': 'url(#a-ink)' });
-  }
-
-  // Return paths
-  const R = 6;
-  const ret = (d, extra = {}) => {
-    el(s, 'path', { d, fill: 'none', stroke: C('board'), 'stroke-width': 7, ...extra.halo });
-    el(s, 'path', { d, fill: 'none', stroke: C('warn'), 'stroke-width': 1.75, 'marker-end': 'url(#a-warn)' });
-  };
-  const right = (l) => lane[l].x + lane[l].w;
-  const toBuild = (from, y) => `M${right(stages[from - 1].lane)} ${y} H${busA - R} Q${busA} ${y} ${busA} ${y - R} V${mid(6) + R} Q${busA} ${mid(6)} ${busA - R} ${mid(6)} H${right('help') + 2}`;
-  const toPlan = (from, y) => `M${right(stages[from - 1].lane)} ${y} H${busB - R} Q${busB} ${y} ${busB} ${y - R} V${mid(2) + R} Q${busB} ${mid(2)} ${busB - R} ${mid(2)} H${right('orch') + 2}`;
-  ret(toPlan(11, mid(11)));
-  ret(toPlan(8, mid(8) + 8));          // halo cuts a clean gap where it crosses the Build bus
-  ret(toBuild(9, mid(9)));
-  ret(toBuild(8, mid(8) - 8), { halo: { stroke: 'none' } });
-  ret(toBuild(7, mid(7)), { halo: { stroke: 'none' } });
-  const rl = (y, s1, below) => txt(s, busA - 12, below ? y + 15 : y - 6, s1, { size: 11.5, weight: 500, anchor: 'end', fill: C('warn') });
-  rl(mid(7), 'check fails · max 2 tries');
-  rl(mid(8) - 8, 'blocker in code');
-  rl(mid(8) + 8, 'blocker in design', true);
-  rl(mid(9), 'CI fails');
-  txt(s, busB - 12, mid(11) - 6, 'live check fails · switch off first', { size: 11.5, weight: 500, anchor: 'end', fill: C('warn') });
-
-  // Next feature: Learn → Idea, along the left
-  const lx = 118, y12 = mid(12), y1 = mid(1);
-  el(s, 'path', { d: `M${lane.orch.x} ${y12} H${lx + R} Q${lx} ${y12} ${lx} ${y12 - R} V${y1 + R} Q${lx} ${y1} ${lx + R} ${y1} H${lane.you.x - 2}`, fill: 'none', stroke: C('go'), 'stroke-width': 1.75, 'stroke-dasharray': '1 0', 'marker-end': 'url(#a-go)' });
-  txt(s, lx - 8, (mid(5) + mid(8)) / 2, 'next feature', { cls: 'mono', size: 11, weight: 500, anchor: 'middle', fill: C('go'), extra: { transform: `rotate(-90 ${lx - 8} ${(mid(5) + mid(8)) / 2})` } });
-
-  // Stage boxes
-  stages.forEach((st, i) => {
-    const L = lane[st.lane], y = top(i + 1), n = String(i + 1).padStart(2, '0');
-    const g = el(s, 'g');
-    let fill = C('surface'), stroke = C('rule-2'), ink = C('ink'), ink2 = C('ink-2'), ink3 = C('ink-3');
-    if (st.lane === 'orch') { fill = C('plate'); stroke = C('plate'); ink = C('plate-ink'); ink2 = C('plate-ink-2'); ink3 = C('plate-ink-2'); }
-    if (st.lane === 'you') { fill = C('go-bg'); stroke = C('go'); ink3 = C('go'); }
-    el(g, 'rect', { x: L.x, y, width: L.w, height: BH, rx: 7, fill, stroke, 'stroke-width': st.opt ? 1.4 : 1.2, ...(st.opt ? { 'stroke-dasharray': '5 4' } : {}) });
-    txt(g, L.x + 14, y + 23, n, { cls: 'mono', size: 11, weight: 500, fill: ink3 });
-    const name = txt(g, L.x + 38, y + 23, st.name, { cls: 'cond', size: 16.5, weight: 600, fill: ink });
-    const sub = txt(g, L.x + 14, y + 43, st.sub, { size: 12.5, fill: ink2 });
-    warnOverflow(sub, L.x + L.w - 10, st.name + ' sub');
-    if (st.agent) {
-      const t = txt(g, L.x + L.w - 12, y + 22, st.agent, { cls: 'mono', size: 10.5, weight: 500, anchor: 'end', fill: C('ink-3') });
-      if (t.getBBox().x < name.getBBox().x + name.getBBox().width + 8) console.warn('agent tag overlaps', st.name);
+    // Wrap arrow from the previous row's last box into this row's first box
+    if (prevMid) {
+      const wy = y - 14;
+      arrow(rounded([[BX[3] + BW, prevMid.y], [W - 18, prevMid.y], [W - 18, wy], [16, wy], [16, mid], [BX[0] - 2, mid]]));
     }
-    if (st.lane === 'you') txt(g, L.x + L.w - 12, y + 22, 'YOU', { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: 1, fill: C('go') });
+    let tabMax = 0;
+    ph.steps.forEach((st, i) => {
+      n++;
+      const x = BX[i];
+      let fill = C('surface'), stroke = C('rule-2'), ink = C('ink'), ink2 = C('ink-2'), ink3 = C('ink-3');
+      if (st.who === 'orch') { fill = C('plate'); stroke = C('plate'); ink = C('plate-ink'); ink2 = C('plate-ink-2'); ink3 = C('plate-ink-2'); }
+      if (st.who === 'you') { fill = C('go-bg'); stroke = C('go'); ink3 = C('go'); }
+
+      // Failure note under the box (drawn first so the box edge sits on top)
+      let tabH = 0;
+      const tabX = x + 10, tabW = BW - 20;
+      if (st.fail || st.next) {
+        const g = el(s, 'g');
+        const bg = el(g, 'rect', { x: tabX, y: top + BH - 8, width: tabW, height: 10, rx: 7, fill: st.next ? C('go-bg') : C('warn-bg'), stroke: st.next ? C('go-line') : C('warn-line') });
+        let ly = top + BH + 15, lines = 0;
+        for (const f of st.fail || [st.next]) {
+          const k = wrapText(g, tabX + 12, ly, (st.next ? '↻ ' : '✕ ') + f, tabW - 24, { size: 12, weight: 500, fill: st.next ? C('go') : C('warn'), lh: 16, indent: 13 });
+          ly += k * 16; lines += k;
+        }
+        tabH = 14 + lines * 16;
+        bg.setAttribute('height', tabH);
+        tabMax = Math.max(tabMax, tabH);
+      }
+
+      el(s, 'rect', { x, y: top, width: BW, height: BH, rx: 9, fill, stroke, 'stroke-width': st.opt ? 1.4 : 1.2, ...(st.opt ? { 'stroke-dasharray': '5 4' } : {}) });
+      if (st.opt) chip(s, x + 12, top - 10, 'wide + closed only', { size: 9.5, h: 18, pad: 7, bg: C('board'), stroke: C('rule-2'), fill: C('ink-3'), weight: 600 });
+      txt(s, x + 16, top + 26, String(n).padStart(2, '0'), { cls: 'mono', size: 11.5, weight: 500, fill: ink3 });
+      const who = st.who === 'you' ? 'YOU' : st.who === 'orch' ? 'ORCHESTRATOR' : st.agent;
+      txt(s, x + BW - 14, top + 26, who, { cls: 'mono', size: st.who === 'help' ? 11 : 10, weight: 600, anchor: 'end', ls: st.who === 'help' ? 0 : 0.8, fill: st.who === 'help' ? C('ink-3') : ink3 });
+      txt(s, x + 16, top + 54, st.name, { cls: 'cond', size: 20, weight: 600, fill: ink });
+      const k = wrapText(s, x + 16, top + 76, st.sub, BW - 30, { size: 12.5, fill: ink2, lh: 16 });
+      if (k > 2) console.warn('sub wraps to', k, 'lines:', st.name);
+
+      if (i > 0) arrow(`M${BX[i - 1] + BW} ${mid} H${x - 2}`);
+    });
+    prevMid = { y: mid };
+    y = top + BH + tabMax + 46;
   });
 
   // Legend
-  const ly = H - 30;
-  let x = 26;
-  const item = (draw, label) => { draw(x); x += 22; const t = txt(s, x, ly + 4, label, { size: 12, fill: C('ink-2') }); x += t.getComputedTextLength() + 26; };
+  const ly = y + 4;
+  el(s, 'line', { x1: 24, x2: W - 24, y1: ly - 24, y2: ly - 24, stroke: C('rule') });
+  let x = BX[0];
+  const item = (draw, label) => { draw(x); x += 22; const t = txt(s, x, ly + 4, label, { size: 12.5, fill: C('ink-2') }); x += t.getComputedTextLength() + 26; };
   item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('go-bg'), stroke: C('go') }), 'your step');
   item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('plate') }), 'orchestrator');
   item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2') }), 'helper');
-  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2'), 'stroke-dasharray': '4 3' }), 'wide and closed work only');
-  item((x0) => el(s, 'line', { x1: x0, x2: x0 + 16, y1: ly - 1, y2: ly - 1, stroke: C('warn'), 'stroke-width': 2 }), 'return path');
-  el(s, 'line', { x1: 24, x2: W - 24, y1: ly - 26, y2: ly - 26, stroke: C('rule') });
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('surface'), stroke: C('rule-2'), 'stroke-dasharray': '4 3' }), 'skipped for small work');
+  item((x0) => el(s, 'rect', { x: x0, y: ly - 7, width: 16, height: 12, rx: 3, fill: C('warn-bg'), stroke: C('warn-line') }), 'what happens when a check fails');
+
+  // Fit the canvas to the content
+  const H = ly + 30;
+  s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('height', H);
+  s.querySelector(':scope > rect').setAttribute('height', H - 1);
 }
 
 /* ───────────── 2. The team ───────────── */
