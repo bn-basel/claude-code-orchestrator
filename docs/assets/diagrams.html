@@ -48,7 +48,7 @@ function svgRoot(host, w, h) {
   document.getElementById(host).appendChild(s);
   const defs = el(s, 'defs');
   for (const [id, col] of [['a-ink', 'ink'], ['a-warn', 'warn'], ['a-go', 'go']]) {
-    const m = el(defs, 'marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 8, markerHeight: 8, orient: 'auto-start-reverse', markerUnits: 'userSpaceOnUse' });
+    const m = el(defs, 'marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 10, markerHeight: 10, orient: 'auto-start-reverse', markerUnits: 'userSpaceOnUse' });
     el(m, 'path', { d: 'M0 0L10 5L0 10z', fill: C(col) });
   }
   el(s, 'rect', { x: 0.5, y: 0.5, width: w - 1, height: h - 1, rx: 14, fill: C('board'), stroke: C('rule') });
@@ -109,34 +109,34 @@ function rounded(points, r = 8) {
 }
 
 function drawLoop() {
-  const W = 940, CX = 470, BW = 300, BH = 56, GW = 188, GH = 50, GAP = 24;
+  const W = 940, CX = 470, BW = 300, BH = 56, GW = 200, GH = 38, GAP = 26;
   const BL = CX - BW / 2, BR = CX + BW / 2;
-  const laneL = (k) => BL - 46 * k, laneR = (k) => BR + 46 * k;
+  const railR = BR + 80, railL = BL - 80, nextX = BL - 150;
   const s = svgRoot('loop', W, 2000);
 
-  // Main spine, top to bottom. Gates are yes/no questions; "no" loops back.
+  // Main line, top to bottom. Checks are yes/no questions; "no" goes back along a rail.
   const items = [
     { box: 'prompt', who: 'you', name: 'Your prompt', sub: 'Describe the feature in plain words' },
     { box: 'plan', who: 'orch', name: 'Plan', sub: 'Small tasks, each with a check' },
-    { gate: 'You approve?', who: 'you', no: [{ side: 'L', to: 'plan', lane: 1, label: 'no: change it' }] },
+    { gate: 'You approve?', who: 'you', no: [{ side: 'L', label: 'no: change it' }] },
     { box: 'build', who: 'help', tag: 'HELPERS', name: 'Build', sub: 'Tests first if risky, then code' },
     { box: 'check', who: 'orch', name: 'Check by command', sub: 'Runs the tests, checks the files' },
-    { gate: 'All checks pass?', no: [{ side: 'R', to: 'build', lane: 1, label: 'no: fix it' }] },
+    { gate: 'All checks pass?', no: [{ side: 'R', label: 'no: fix it' }] },
     { box: 'review', who: 'help', tag: 'HELPER · reviewer', name: 'Code review', sub: 'Sees only the plan and the diff' },
-    { gate: 'Review clean?', no: [{ side: 'R', to: 'build', lane: 2, label: 'code problem' }, { side: 'L', to: 'plan', lane: 2, label: 'design problem' }] },
+    { gate: 'Review clean?', no: [{ side: 'R', label: 'code problem' }, { side: 'L', label: 'design problem' }] },
     { box: 'pr', who: 'orch', name: 'Open the pull request', sub: 'Full test suite, one PR per feature' },
-    { gate: 'CI green?', no: [{ side: 'R', to: 'build', lane: 3, label: 'no: fix it' }] },
+    { gate: 'CI green?', no: [{ side: 'R', label: 'no: fix it' }] },
     { box: 'merge', who: 'you', name: 'Merge', sub: 'Merging is deploying' },
     { box: 'verify', who: 'orch', name: 'Verify', sub: 'Feature on for one account first' },
-    { gate: 'Works live?', no: [{ side: 'L', to: 'plan', lane: 3, label: 'no: switch it off' }] },
+    { gate: 'Works live?', no: [{ side: 'L', label: 'no: switch it off' }] },
     { box: 'learn', who: 'orch', name: 'Learn', sub: 'Update the plan, propose new rules' },
   ];
+  const target = { L: 'plan', R: 'build' };
 
-  // Title
   txt(s, 28, 40, 'ONE FEATURE, FROM PROMPT TO LIVE', { cls: 'mono', size: 12, weight: 600, ls: 1.2, fill: C('ink-2') });
 
   // Layout
-  let y = 64;
+  let y = 70;
   const pos = {};
   for (const it of items) {
     it.top = y; it.h = it.box ? BH : GH; it.mid = y + it.h / 2;
@@ -145,37 +145,34 @@ function drawLoop() {
   }
   const bottom = y - GAP;
 
-  // Entry points on the target boxes: outer lanes enter higher, so nothing crosses.
-  const loops = [];
-  items.forEach((it) => (it.no || []).forEach((n) => loops.push({ ...n, from: it })));
-  loops.push({ side: 'L', to: 'prompt', lane: 4, label: 'next feature', from: pos.learn, next: true });
-  for (const side of ['L', 'R']) {
-    const byTarget = {};
-    loops.filter((l) => l.side === side).forEach((l) => (byTarget[l.to] = byTarget[l.to] || []).push(l));
-    for (const [to, ls] of Object.entries(byTarget)) {
-      ls.sort((a, b) => b.lane - a.lane);
-      ls.forEach((l, i) => (l.entryY = pos[to].top + ((i + 1) * pos[to].h) / (ls.length + 1)));
-    }
-  }
-
-  // Spine arrows
+  // Main-line arrows
   items.forEach((it, i) => {
     if (i === items.length - 1) return;
     const y1 = it.top + it.h, y2 = items[i + 1].top;
-    el(s, 'path', { d: `M${CX} ${y1} V${y2 - 1}`, stroke: C('ink-3'), 'stroke-width': 1.6, fill: 'none', 'marker-end': 'url(#a-ink)' });
-    if (it.gate) txt(s, CX + 9, y1 + 16, 'yes', { cls: 'mono', size: 11, weight: 600, fill: C('go') });
+    el(s, 'path', { d: `M${CX} ${y1} V${y2 - 1}`, stroke: C('ink-3'), 'stroke-width': 1.8, fill: 'none', 'marker-end': 'url(#a-ink)' });
+    if (it.gate) txt(s, CX + 10, y1 + 17, 'yes', { cls: 'mono', size: 11.5, weight: 600, fill: C('go') });
   });
 
-  // Loops (drawn before the shapes so shapes sit on top)
-  for (const l of loops) {
-    const col = l.next ? 'go' : 'warn';
-    const lx = l.side === 'L' ? laneL(l.lane) : laneR(l.lane);
-    const sx = l.next ? BL : l.side === 'L' ? CX - GW / 2 : CX + GW / 2;
-    const ex = l.side === 'L' ? BL - 2 : BR + 2;
-    el(s, 'path', { d: rounded([[sx, l.from.mid], [lx, l.from.mid], [lx, l.entryY], [ex, l.entryY]]), fill: 'none', stroke: C(col), 'stroke-width': 1.8, 'marker-end': `url(#a-${col})` });
-    const lblX = l.side === 'L' ? sx - 10 : sx + 10;
-    txt(s, lblX, l.from.mid - 8, l.label, { size: 12, weight: 600, anchor: l.side === 'L' ? 'end' : 'start', fill: C(col) });
+  // Rails: every "no" joins one line per side, which ends in a single arrow into the target box.
+  for (const side of ['L', 'R']) {
+    const rail = side === 'L' ? railL : railR;
+    const exits = items.filter((it) => (it.no || []).some((n) => n.side === side));
+    const tgt = pos[target[side]], tipX = side === 'L' ? CX - GW / 2 : CX + GW / 2, edge = side === 'L' ? BL - 2 : BR + 2;
+    const low = exits[exits.length - 1];
+    el(s, 'path', { d: rounded([[rail, low.mid - 10], [rail, tgt.mid], [edge, tgt.mid]], 10), fill: 'none', stroke: C('warn'), 'stroke-width': 2, 'marker-end': 'url(#a-warn)' });
+    for (const g of exits) {
+      const n = g.no.find((k) => k.side === side);
+      const last = g === low;
+      el(s, 'path', { d: last ? rounded([[tipX, g.mid], [rail, g.mid], [rail, g.mid - 12]], 10) : `M${tipX} ${g.mid} H${rail}`, fill: 'none', stroke: C('warn'), 'stroke-width': 2 });
+      if (!last) el(s, 'circle', { cx: rail, cy: g.mid, r: 4, fill: C('warn') });
+      txt(s, side === 'L' ? tipX - 12 : tipX + 12, g.mid - 9, n.label, { size: 12, weight: 600, anchor: side === 'L' ? 'end' : 'start', fill: C('warn') });
+    }
   }
+
+  // Next feature: Learn back to a new prompt, on the outside
+  const L = pos.learn, P = pos.prompt;
+  el(s, 'path', { d: rounded([[BL, L.mid], [nextX, L.mid], [nextX, P.mid], [BL - 2, P.mid]], 10), fill: 'none', stroke: C('go'), 'stroke-width': 2, 'marker-end': 'url(#a-go)' });
+  txt(s, BL - 12, L.mid - 9, 'next feature', { size: 12, weight: 600, anchor: 'end', fill: C('go') });
 
   // Shapes
   for (const it of items) {
@@ -190,23 +187,19 @@ function drawLoop() {
       txt(s, BR - 16, it.top + 23, tag, { cls: 'mono', size: 10, weight: 600, anchor: 'end', ls: 0.6, fill: tagc });
     } else {
       const isYou = it.who === 'you';
-      const { top, mid } = it;
-      el(s, 'path', { d: `M${CX - GW / 2} ${mid} L${CX} ${top} L${CX + GW / 2} ${mid} L${CX} ${top + GH} Z`, fill: isYou ? C('go-bg') : C('board'), stroke: isYou ? C('go') : C('ink-3'), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
-      txt(s, CX, mid + 4.5, it.gate, { size: 13, weight: 600, anchor: 'middle', fill: isYou ? C('go') : C('ink') });
+      el(s, 'rect', { x: CX - GW / 2, y: it.top, width: GW, height: GH, rx: GH / 2, fill: isYou ? C('go-bg') : C('surface'), stroke: isYou ? C('go') : C('ink-3'), 'stroke-width': 1.5 });
+      txt(s, CX, it.mid + 4.5, it.gate, { size: 13.5, weight: 600, anchor: 'middle', fill: isYou ? C('go') : C('ink') });
     }
   }
 
   // Side notes
-  const noteR = laneR(3) + 26, noteW = W - 24 - noteR;
-  const ry = pos.build.top + 6;
-  txt(s, noteR, ry, 'BACK TO BUILD', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
-  wrapText(s, noteR, ry + 20, 'At most 2 fixes per task and 2 review rounds. Then you decide.', noteW, { size: 12, fill: C('ink-2'), lh: 16 });
-  const noteLW = laneL(4) - 34;
-  const ly = pos.plan.top + 6;
-  txt(s, 24, ly, 'BACK TO PLAN', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
-  wrapText(s, 24, ly + 20, 'You approve the changed plan.', noteLW, { size: 12, fill: C('ink-2'), lh: 16 });
+  const noteR = railR + 30, noteW = W - 24 - noteR;
+  txt(s, noteR, pos.build.top + 8, 'BACK TO BUILD', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
+  wrapText(s, noteR, pos.build.top + 28, 'At most 2 fixes per task and 2 review rounds. Then you decide.', noteW, { size: 12, fill: C('ink-2'), lh: 16 });
+  const noteLW = nextX - 24 - 16;
+  txt(s, 24, pos.plan.top + 8, 'BACK TO PLAN', { cls: 'mono', size: 10.5, weight: 600, ls: 1, fill: C('warn') });
+  wrapText(s, 24, pos.plan.top + 28, 'You approve the changed plan.', noteLW, { size: 12, fill: C('ink-2'), lh: 16 });
 
-  // Fit the canvas
   const H = bottom + 34;
   s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('height', H);
   s.querySelector(':scope > rect').setAttribute('height', H - 1);
