@@ -4,6 +4,10 @@
 {{CODE_DIR}}/
 _worktrees/
 
+# Setup notes and backups (old settings files can contain tokens)
+_setup/
+_setup-done/
+
 # Secrets and local-only settings
 .env
 .env.*
