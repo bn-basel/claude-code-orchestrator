@@ -43,7 +43,7 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.2</span></p>
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.0</span></p>
       <h1 id="hero-title">Claude Code Orchestrator</h1>
       <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
       <div class="hero-actions">
@@ -484,35 +484,18 @@
     <div class="sec-head">
       <p class="sec-num">07</p>
       <h2 id="changelog-title">Lessons from real use</h2>
-      <p class="sec-intro">Field-tested on a live production SaaS. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
+      <p class="sec-intro">Lessons from private use that shaped version 1. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
       <li>
-        <div class="log-meta"><span class="log-ver">v1.2</span><span class="log-date">Oct 2026</span></div>
-        <ul>
-          <li>A seventh helper, <code>scout</code>, takes simple lookups, so reviewers only do real reviews.</li>
-          <li>You decide four kinds of thing: wording, product behaviour, production and money, scope. The orchestrator decides the rest and logs it.</li>
-          <li>Every decision brought to you starts with a concrete scenario, then a recommendation.</li>
-          <li>New tests are judged against main, also in fix rounds.</li>
-          <li>Published as a template with an install prompt.</li>
-        </ul>
-      </li>
-      <li>
-        <div class="log-meta"><span class="log-ver">v1.1</span><span class="log-date">Oct 2026</span></div>
-        <ul>
-          <li>Feature branches are created with <code>--no-track</code>, so a push can never aim at main.</li>
-          <li>Ask rules don't stop helpers from starting, so Fable's gate is a written rule plus a log.</li>
-          <li>Each helper costs about 20k tokens just to start, so small tasks are grouped.</li>
-          <li>Checks for old wording search for one distinctive word.</li>
-          <li>No AI attribution lines in commits.</li>
-        </ul>
-      </li>
-      <li>
         <div class="log-meta"><span class="log-ver">v1.0</span><span class="log-date">Oct 2026</span></div>
         <ul>
-          <li>Installed the playbook, six helpers, safety settings and branch protection.</li>
-          <li>Moved production secrets out of the project.</li>
-          <li>Shipped the first feature through the full loop.</li>
+          <li>A cheap, read-only <code>scout</code> takes simple lookups, so reviewers only do real reviews.</li>
+          <li>You decide four kinds of thing: wording, product behaviour, production and money, scope. The orchestrator decides the rest and logs it.</li>
+          <li>Ask rules don't stop helpers from starting, so Fable's gate is a written rule plus a log.</li>
+          <li>Feature branches are created with <code>--no-track</code>, so a push can never aim at main.</li>
+          <li>New tests are judged against main, also in fix rounds.</li>
+          <li>Each helper costs about 20k tokens just to start, so small tasks are grouped.</li>
         </ul>
       </li>
     </ol>
