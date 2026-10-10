@@ -470,6 +470,13 @@ section { padding: 72px 0; }
 .steps li + li { margin-left: 26px; position: relative; }
 .steps li + li::after { content: ""; position: absolute; left: -22px; top: 50%; width: 18px; height: 1.5px; background: var(--ink-3); }
 .install-note { margin-top: 14px; color: var(--ink-3); font-size: 0.95rem; }
+.alt { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--rule); }
+.alt h3 { font: 600 1.2rem var(--cond); margin: 0 0 8px; color: var(--ink); }
+.alt p { color: var(--ink-2); max-width: 64ch; margin: 0; }
+.alt-cmp { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+.alt-cmp li { padding: 14px 16px; border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); }
+.alt-cmp strong { display: block; margin-bottom: 4px; color: var(--ink); font-weight: 600; }
+@media (min-width: 720px) { .alt-cmp { grid-template-columns: 1fr 1fr; gap: 16px; } }
 @media (min-width: 960px) { .install-in { grid-template-columns: 120px minmax(0, 1fr); } .install-in > div:first-child { grid-column: 1 / -1; display: grid; grid-template-columns: 120px 1fr; } .install-in > div:first-child .sec-num { padding-top: 0.7rem; } .install-in > div:last-child { grid-column: 2; } }
 
 /* ---------- Footer ---------- */

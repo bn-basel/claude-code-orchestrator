@@ -76,6 +76,9 @@ Change nothing except writing `_setup/AUDIT.md`. Find and report:
 - **Known flaky tests**, if CI history or the docs mention any.
 
 End with: the proposed layout (Step 3), a table of proposed placeholder values, and open questions.
+If the project is a self-contained GitHub repo and I'd rather work in the cloud, also say whether Claude Code
+**Projects** (public beta, Pro and Max) would suit me better than this template. It can't adopt local sessions and
+gives every thread the same model, so recommend it only if neither matters here. I decide whether to continue.
 
 ## Step 3. Adapt the rules to this project
 

@@ -495,6 +495,7 @@
           <li>On 1M-context models auto-compaction only starts at about 967k tokens, so the template sets it to about 600k as a safety net.</li>
           <li>A hook prints the plan's <strong>Now</strong> block right after a compaction, so the state comes straight back.</li>
           <li>A helper's prompt cache lasts 5 minutes, so a helper resumed later pays for its whole history again. Resume quickly, or start fresh.</li>
+          <li>Claude Code Projects now covers part of this ground. It suits self-contained repos and cloud work; this template stays for local work and a per-helper model split.</li>
         </ul>
       </li>
       <li>
@@ -524,6 +525,14 @@
         <li>Backs up</li><li>Audits</li><li>Adapts the rules</li><li>Installs</li><li>Tests</li>
       </ol>
       <p class="install-note">One approved step at a time.</p>
+      <div class="alt" aria-labelledby="alt-title">
+        <h3 id="alt-title">Or use Claude Code Projects</h3>
+        <p>Projects (public beta on Pro and Max) is Claude Code's built-in version of the same idea: one coordinator conversation, one thread per task, shared instructions and memory, and threads that run in the cloud by default.</p>
+        <ul class="alt-cmp">
+          <li><strong>Projects fits</strong>A self-contained GitHub repo, and work you're happy to run in the cloud.</li>
+          <li><strong>This orchestrator fits</strong>Local work and a different model per helper. Projects can't adopt a local session, gives every thread the same model (all Opus uses plan limits faster), and is still a beta.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>

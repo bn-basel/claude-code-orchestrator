@@ -84,6 +84,15 @@ The orchestrator runs long sessions, so the template guards its context:
 - **Fresh helpers beat cold ones.** A helper's cache lasts 5 minutes, so the orchestrator resumes one only within
   that window; otherwise it starts a fresh helper with a short brief.
 
+## Orchestrator or Projects?
+
+Claude Code **Projects** (public beta on Pro and Max) is the built-in version of the same idea: one coordinator
+conversation, one thread per task, shared instructions and memory, and threads that run in the cloud by default.
+
+- **Use Projects** for a self-contained GitHub repo, when you're happy for the work to run in the cloud.
+- **Use this orchestrator** for local work and a different model per helper. Projects can't adopt a local session,
+  gives every thread the same model (all Opus by default, which uses plan limits faster), and is still a beta.
+
 ## License
 
 [MIT](LICENSE)

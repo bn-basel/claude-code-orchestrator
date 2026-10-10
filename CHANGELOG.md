@@ -10,6 +10,7 @@ app, so most entries come from something that went wrong or cost too much.
 - `"autoCompactWindow": 600000` in `.claude/settings.json`.
 - A SessionStart hook (matcher `compact`) in `.claude/hooks/`, in a PowerShell and a bash version.
 - A playbook rule for resuming helpers, and the optional longer helper cache.
+- *Orchestrator or Projects?* in the README, the site and the install audit.
 
 **Lessons**
 - **On 1M-context models, auto-compaction only starts at about 967k tokens.** A long orchestrator session never
@@ -24,6 +25,10 @@ app, so most entries come from something that went wrong or cost too much.
   more than 5 idle minutes pays for its whole history again, so resume only within that window and otherwise start
   fresh with a short brief. A 1-hour helper cache (`subagentPromptCacheTtl`, or `experimental: cacheTtl: 1h` in one
   helper's frontmatter) only pays off for helpers resumed after 5 to 60 idle minutes, because 1-hour writes cost more.
+- **Claude Code Projects now covers part of this ground** (public beta, Pro and Max): a coordinator, one thread per
+  task, shared instructions and memory, cloud by default. It suits self-contained GitHub repos and cloud work. It
+  can't adopt local sessions, gives every thread the same model (so it uses plan limits faster than a Sonnet-heavy
+  split), and is a beta. This template stays the choice for local work and a per-helper model split.
 
 ## v1.0 · 2026-10-07 · first published version
 
