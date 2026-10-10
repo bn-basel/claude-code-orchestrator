@@ -43,7 +43,7 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.0</span></p>
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.1</span></p>
       <h1 id="hero-title">Claude Code Orchestrator</h1>
       <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
       <div class="hero-actions">
@@ -457,7 +457,7 @@
           <div><dt>CLAUDE.md</dt><dd>shared rules, every agent</dd></div>
           <div><dt>ORCHESTRATOR.md</dt><dd>playbook, orchestrator only</dd></div>
           <div><dt>PLAN.md</dt><dd>Now · Roadmap · Current feature · Decisions log</dd></div>
-          <div><dt>.claude/</dt><dd>settings.json + agents/</dd></div>
+          <div><dt>.claude/</dt><dd>settings.json + agents/ + hooks/</dd></div>
           <div><dt>app/</dt><dd>your code repo, always on main</dd></div>
           <div><dt>ops/</dt><dd>production scripts, human only</dd></div>
           <div><dt>_worktrees/build</dt><dd>where helpers code</dd></div>
@@ -472,7 +472,8 @@
         <ul class="ticks">
           <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, so any fresh session can pick up where the last one stopped.</li>
           <li>Start a fresh session after a merge once the context passes about half.</li>
-          <li>Never go past about 700k tokens.</li>
+          <li>Never go past about 700k tokens. As a safety net, the template sets auto-compaction to about 600k; on 1M-context models it would otherwise wait until about 967k.</li>
+          <li>After any compaction, a hook prints the <strong>Now</strong> block back into the conversation, so the current state is never lost.</li>
         </ul>
       </div>
     </div>
@@ -484,9 +485,16 @@
     <div class="sec-head">
       <p class="sec-num">07</p>
       <h2 id="changelog-title">Lessons from real use</h2>
-      <p class="sec-intro">Lessons from private use that shaped version 1. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
+      <p class="sec-intro">What each version changed, and why. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.1</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>On 1M-context models auto-compaction only starts at about 967k tokens, so the template sets it to about 600k as a safety net.</li>
+          <li>A hook prints the plan's <strong>Now</strong> block right after a compaction, so the state comes straight back.</li>
+        </ul>
+      </li>
       <li>
         <div class="log-meta"><span class="log-ver">v1.0</span><span class="log-date">Oct 2026</span></div>
         <ul>

@@ -155,9 +155,9 @@ Budget used: fixes <n>/<max> · review rounds <n>/2
 
 Any fresh session must be able to continue from **Now** alone. **Commit `PLAN.md`** in the workspace repo after each update.
 
-**If the conversation was compacted (summarised), re-read this file before doing anything else.**
+**If the conversation was compacted (summarised), re-read this file before doing anything else.** A hook prints the Now section into the new context to help (§12).
 
-**Rotation:** after a merge, if the conversation is long (about 50% of context or more), suggest a fresh session. Never go past about 700k tokens.
+**Rotation:** after a merge, if the conversation is long (about 50% of context or more), suggest a fresh session. Never go past about 700k tokens. Auto-compaction at about 600k is only the safety net (§12).
 
 ## 9. Plan template (in PLAN.md → Current feature)
 
@@ -202,3 +202,18 @@ Report back in the format from your agent file.
 - Use targeted tests per task and the full suite once, before the PR.
 - Keep `PLAN.md` short: move finished features to an archive file monthly.
 - Keep `CLAUDE.md` under 200 lines. Every agent loads it every time, so every extra line costs tokens on every run. Prune the rules every ~5 features.
+
+## 12. Context and cache management
+
+**Rotation is the main method** (§8). After a merge, once the conversation passes about half the context, suggest a
+fresh session. It resumes from the Now section of `PLAN.md`. Never go past about 700k tokens.
+
+**Auto-compaction is the safety net.** On 1M-context models, Claude Code compacts on its own only at about 967k
+tokens, well past the 700k limit. So `.claude/settings.json` sets `"autoCompactWindow": 600000`: if a rotation is
+missed, the session compacts at about 600k instead. Other ways to set the same thing:
+- `/autocompact 600k` in a session (saved per model in the owner's user settings);
+- the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=600000` (a plain number: `600k` is read as 600).
+
+**After a compaction.** A SessionStart hook (matcher `compact`) prints the Now section of `PLAN.md` into the new
+context, with a reminder. Then re-read this file before doing anything else. The hook can only print what Now says,
+so keep Now current at every stage change (§8).

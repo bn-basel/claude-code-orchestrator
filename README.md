@@ -72,6 +72,16 @@ The install prompt walks you through these:
 
 No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules.
 
+## Long sessions
+
+The orchestrator runs long sessions, so the template guards its context:
+
+- **Rotate first.** After a merge, past about half the context, start a fresh session. The Now block in `PLAN.md`
+  carries the state over.
+- **Auto-compact at about 600k as a backup.** On 1M-context models Claude Code would otherwise wait until about
+  967k. The template sets `"autoCompactWindow": 600000`; `/autocompact 600k` does the same for one model.
+- **Nothing lost on compaction.** A hook prints the Now block back into the conversation right after a compaction.
+
 ## License
 
 [MIT](LICENSE)

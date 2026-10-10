@@ -3,6 +3,23 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## v1.1 · 2026-10-10 · context and cache management
+
+**Added**
+- `ORCHESTRATOR.md` §12, *Context and cache management*.
+- `"autoCompactWindow": 600000` in `.claude/settings.json`.
+- A SessionStart hook (matcher `compact`) in `.claude/hooks/`, in a PowerShell and a bash version.
+
+**Lessons**
+- **On 1M-context models, auto-compaction only starts at about 967k tokens.** A long orchestrator session never
+  compacts on its own before the 700k limit. Rotation via the Now block stays the main method; an auto-compact
+  window of about 600k is the safety net.
+- **The setting and the environment variable take a plain number.** `/autocompact 600k` works, but in
+  `CLAUDE_CODE_AUTO_COMPACT_WINDOW` the value `600k` is read as 600.
+- **A compaction can drop the current state.** A hook that prints the Now block right after compacting brings it
+  straight back, with a reminder to re-read the playbook.
+- **Hooks have no per-system switch.** The template ships both versions and the install keeps the one that fits.
+
 ## v1.0 · 2026-10-07 · first published version
 
 The setup as I use it, made generic: placeholders instead of product details, and an install prompt that backs up,
