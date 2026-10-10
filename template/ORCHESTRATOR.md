@@ -84,7 +84,7 @@ After approval, create the branch in the build worktree: `cd _worktrees/build &&
 - frozen test files are untouched;
 - the type check or lint passes where relevant: `{{CHECK_COMMAND}}`.
 
-A failure goes back to the same helper with the evidence: the command, the output, and file:line. Max 2 tries, then ask {{OWNER}}.
+A failure goes back to the helper with the evidence: the command, the output, and file:line. Resume the same helper only within about 5 minutes; otherwise start a fresh one of the same type (§12). Max 2 tries, then ask {{OWNER}}.
 
 **7. Code review.** Send the reviewer for the label (§4) **only** the plan, the diff (`origin/{{MAIN_BRANCH}}...HEAD`) and the test output. **Never** send the helper's own report. Every review brief also asks: "Does this change make any statement in `docs/ARCHITECTURE.md` untrue? If so, name the section." The map edit then belongs in this PR. Triage the findings:
 - **Blocker, code** → back to Build, that task only, with evidence and scope ("fix only X"). The re-review covers **only the fix**.
@@ -217,3 +217,18 @@ missed, the session compacts at about 600k instead. Other ways to set the same t
 **After a compaction.** A SessionStart hook (matcher `compact`) prints the Now section of `PLAN.md` into the new
 context, with a reminder. Then re-read this file before doing anything else. The hook can only print what Now says,
 so keep Now current at every stage change (§8).
+
+**Helpers and the prompt cache.** Claude Code caches a conversation so the next turn doesn't pay for the whole
+history again. On a subscription the main session's cache lasts 1 hour, but a helper's lasts only 5 minutes.
+A helper resumed after more than 5 idle minutes pays for its entire history again.
+- **Resume a helper only within about 5 minutes** of its last reply, e.g. a fix round straight after its report.
+- **Otherwise start a fresh helper of the same type** with a short brief: the task, the files, and what failed
+  (command, output, file:line). A 300-word brief costs far less than a cold history of tens of thousands of tokens.
+- **Optional, longer helper cache:** `"subagentPromptCacheTtl": "1h"` in settings (all helpers), or one helper's
+  frontmatter:
+  ```yaml
+  experimental:
+    cacheTtl: 1h
+  ```
+  Worth it only for helpers you regularly resume after 5 to 60 idle minutes. Writing a 1-hour cache costs more than
+  a 5-minute one, so for helpers that run once it's a loss. It's also ignored while the plan is using usage credits.

@@ -474,6 +474,7 @@
           <li>Start a fresh session after a merge once the context passes about half.</li>
           <li>Never go past about 700k tokens. As a safety net, the template sets auto-compaction to about 600k; on 1M-context models it would otherwise wait until about 967k.</li>
           <li>After any compaction, a hook prints the <strong>Now</strong> block back into the conversation, so the current state is never lost.</li>
+          <li>A helper's cache lasts only 5 minutes. Resume a helper within that window; otherwise start a fresh one with a short brief.</li>
         </ul>
       </div>
     </div>
@@ -493,6 +494,7 @@
         <ul>
           <li>On 1M-context models auto-compaction only starts at about 967k tokens, so the template sets it to about 600k as a safety net.</li>
           <li>A hook prints the plan's <strong>Now</strong> block right after a compaction, so the state comes straight back.</li>
+          <li>A helper's prompt cache lasts 5 minutes, so a helper resumed later pays for its whole history again. Resume quickly, or start fresh.</li>
         </ul>
       </li>
       <li>

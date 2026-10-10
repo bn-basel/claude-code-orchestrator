@@ -9,6 +9,7 @@ app, so most entries come from something that went wrong or cost too much.
 - `ORCHESTRATOR.md` §12, *Context and cache management*.
 - `"autoCompactWindow": 600000` in `.claude/settings.json`.
 - A SessionStart hook (matcher `compact`) in `.claude/hooks/`, in a PowerShell and a bash version.
+- A playbook rule for resuming helpers, and the optional longer helper cache.
 
 **Lessons**
 - **On 1M-context models, auto-compaction only starts at about 967k tokens.** A long orchestrator session never
@@ -19,6 +20,10 @@ app, so most entries come from something that went wrong or cost too much.
 - **A compaction can drop the current state.** A hook that prints the Now block right after compacting brings it
   straight back, with a reminder to re-read the playbook.
 - **Hooks have no per-system switch.** The template ships both versions and the install keeps the one that fits.
+- **A helper's prompt cache lasts 5 minutes, the main session's 1 hour** (on a subscription). A helper resumed after
+  more than 5 idle minutes pays for its whole history again, so resume only within that window and otherwise start
+  fresh with a short brief. A 1-hour helper cache (`subagentPromptCacheTtl`, or `experimental: cacheTtl: 1h` in one
+  helper's frontmatter) only pays off for helpers resumed after 5 to 60 idle minutes, because 1-hour writes cost more.
 
 ## v1.0 · 2026-10-07 · first published version
 
