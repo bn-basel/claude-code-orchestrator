@@ -55,6 +55,10 @@ Write it to `_upgrade/PLAN.md` and show me the list, numbered, most important fi
 ## Step 3. Apply what I approve, one change at a time
 
 For each approved change: edit, show me the diff, check it, and record it in `_upgrade/PROGRESS.md`.
+- Your workspace's own rules ask before edits to `CLAUDE.md`, `ORCHESTRATOR.md` and `.claude/`, and Claude Code protects
+  every `.claude` folder. If you can't write a file, write the new version to `_upgrade/drafts/` (`dot-claude/` for
+  `.claude` files), check it there, and give me **one** copy command that puts all drafts in place and moves replaced
+  files to `_setup/moved/`. I run it.
 - `settings.json`: merge rule lists entry by entry. Keep rules I added; never widen an allow rule without saying so.
   It must still parse as JSON.
 - New files (e.g. a new helper): fill in the placeholders from my existing values.

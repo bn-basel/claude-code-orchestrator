@@ -104,6 +104,9 @@ app, so most entries come from something that went wrong or cost too much.
   talking rules a little differently. An output style is sent with every request, so the shapes hold from the first
   message and through compaction. It's still an instruction, not a guarantee, so the test compares sessions with and
   without it.
+- **The upgrade keeps what you adapted.** Tested on a simulated v1.1 install with three changes of the owner's own,
+  one of them in a paragraph v1.2 also changes: the upgrade found all three, merged the overlapping one, and the result
+  matched the v1.2 template exactly apart from those three changes.
 - **A dry run of the new-project install found four rough edges**, now in the install text: the clone sits outside your
   folder, so Claude asks before reading it; Claude Code protects every `.claude` folder, so drafts go in
   `_setup/drafts/dot-claude/`; writing the real `.claude/` needs a click on an approval prompt, so a session that can't
