@@ -14,7 +14,7 @@ mcpServers:
 
 <!-- No Bash, Edit or Write: this helper can't change code or run commands. Read is only for looking at its own
      screenshots. The browser server starts with this helper and stops when it finishes; pin its version, never @latest.
-     Haiku 5.5 needs Claude Code 2.1.293 or later. -->
+     Claude Code loads this server only once the workspace folder is trusted. Haiku 5.5 needs Claude Code 2.1.293 or later. -->
 
 You click through one feature of {{PROJECT_NAME}} in a browser and report what you saw. Your report is **evidence**,
 not proof: the scripted end-to-end tests that run in CI are the proof. Report what happened; don't fix anything.

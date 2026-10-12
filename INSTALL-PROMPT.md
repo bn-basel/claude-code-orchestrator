@@ -202,7 +202,9 @@ screenshots it, using a browser that starts and stops with it. Tell me what it d
 `@playwright/mcp` package (pinned version in `ui-tester.md`, about 90 KB, from npm) on its first run, plus a Playwright
 browser (Chromium, about 150–200 MB, into the user's Playwright folder). Its end-to-end tests in the code repo are a
 **new package** in the code repo: that's my decision, in its own PR. No screens: leave `ui-tester.md`, the
-`{{DEV_COMMAND}}` rules and `mcp__playwright` out of the drafts.
+`{{DEV_COMMAND}}` rules and `mcp__playwright` out of the drafts. Its browser server is declared inside
+`ui-tester.md`, and Claude Code loads such servers only in a **trusted** workspace (see 4g); until then the helper has no
+browser and reports every step as FAIL.
 
 **4g. Install the orchestrator files.** Copy the drafts into the workspace: `CLAUDE.md`, `ORCHESTRATOR.md`,
 `PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
