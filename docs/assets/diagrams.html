@@ -120,7 +120,7 @@ function drawLoop() {
     { box: 'plan', who: 'orch', name: 'Plan', sub: 'Small tasks, each with a check' },
     { gate: 'You approve?', who: 'you', no: [{ side: 'L', label: 'no: change it' }] },
     { box: 'build', who: 'help', tag: 'HELPERS', name: 'Build', sub: 'Tests first if risky, then code' },
-    { box: 'check', who: 'orch', name: 'Check by command', sub: 'Runs the tests, checks the files' },
+    { box: 'check', who: 'orch', name: 'Check by command', sub: 'Tests, files, and a click-through' },
     { gate: 'All checks pass?', no: [{ side: 'R', label: 'no: fix it' }] },
     { box: 'review', who: 'help', tag: 'HELPER · reviewer', name: 'Code review', sub: 'Sees only the plan and the diff' },
     { gate: 'Review clean?', no: [{ side: 'R', label: 'code problem' }, { side: 'L', label: 'design problem' }] },
@@ -248,8 +248,9 @@ function drawTeam() {
       ['reviewer-light', 'Opus · high', 'The same review, sized for small work'],
       ['adversarial-reviewer', 'Fable', 'Tries to break big work', 'needs your yes'],
     ] },
-    { x: 664, w: 252, head: 'LOOK UP', sub: 'read-only · one question', rows: [
-      ['scout', 'Sonnet · medium', 'Answers with file:line evidence'],
+    { x: 664, w: 252, head: 'LOOK AND CLICK', sub: 'read-only · one job each', rows: [
+      ['scout', 'Haiku · medium', 'Answers with file:line evidence'],
+      ['ui-tester', 'Haiku · medium', 'Clicks a screen on localhost'],
     ] },
   ];
   // fan-out from the plate
@@ -296,7 +297,7 @@ function drawWorkspace() {
 
   const files = [
     ['CLAUDE.md', 'shared rules'], ['ORCHESTRATOR.md', 'the playbook'], ['PLAN.md', 'Now · roadmap · decisions'],
-    ['.claude/', 'settings + 7 helpers'], ['backlog/', 'ideas, one file each'], ['ops/', 'production scripts', 'you only'],
+    ['.claude/', 'settings + 8 helpers'], ['backlog/', 'ideas, one file each'], ['ops/', 'production scripts', 'you only'],
   ];
   files.forEach(([f, d, flag], i) => {
     const y = fy + 92 + i * 52;

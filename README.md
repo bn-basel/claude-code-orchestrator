@@ -15,7 +15,7 @@ problems: every hand-off was a chance for something to get lost or misread.
 So I gave the job of the go-between to a single **orchestrator** session. It talks to me, delegates to helpers,
 checks their work itself, and only comes back to me for the decisions that are really mine.
 
-This is **version 1**. It's my personal setup, published in case it helps someone else, and it will keep changing
+This is **version 1.2**. It's my personal setup, published in case it helps someone else, and it will keep changing
 as my own workflow improves.
 
 ## How it works
@@ -23,7 +23,7 @@ as my own workflow improves.
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/loop-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/loop-light.png">
-  <img alt="Flowchart from your prompt to live. Your prompt, then Plan, then a yes/no check: you approve? No goes back to Plan. Then Build, Check by command, and: all checks pass? No goes back to Build. Code review, then: review clean? A code problem goes back to Build, a design problem back to Plan. Open the pull request, then: CI green? No goes back to Build. You merge, the orchestrator verifies, then: works live? No switches it off and goes back to Plan. Finally Learn, and the next feature starts at a new prompt." src="docs/assets/loop-light.png" width="100%">
+  <img alt="Flowchart from your prompt to live. Your prompt, then Plan, then a yes/no check: you approve? No goes back to Plan. Then Build, Check by command (tests, files and a click-through), and: all checks pass? No goes back to Build. Code review, then: review clean? A code problem goes back to Build, a design problem back to Plan. Open the pull request, then: CI green? No goes back to Build. You merge, the orchestrator verifies, then: works live? No switches it off and goes back to Plan. Finally Learn, and the next feature starts at a new prompt." src="docs/assets/loop-light.png" width="100%">
 </picture>
 
 Every task gets a label from one question: *if this goes wrong, how hard is it to undo?* **Small** work takes the
@@ -36,7 +36,7 @@ Every review finding has to come with evidence, such as a command and its output
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/team-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/team-light.png">
-  <img alt="You decide four things: approve the plan, say yes to Fable, run migrations, click merge. The orchestrator (Opus) plans, briefs, checks and opens PRs, and never writes product code. It briefs seven helpers in three groups: Build (implementer, implementer-wide, test-writer), Review (reviewer, reviewer-light, adversarial-reviewer, which needs your yes) and Look up (scout)." src="docs/assets/team-light.png" width="100%">
+  <img alt="You decide four things: approve the plan, say yes to Fable, run migrations, click merge. The orchestrator (Opus) plans, briefs, checks and opens PRs, and never writes product code. It briefs eight helpers in three groups: Build (implementer, implementer-wide, test-writer), Review (reviewer, reviewer-light, adversarial-reviewer, which needs your yes) and Look and click (scout and ui-tester, both on Haiku)." src="docs/assets/team-light.png" width="100%">
 </picture>
 
 Each helper is one file in `.claude/agents/` with a fixed model and tool list. No helper can start another.
