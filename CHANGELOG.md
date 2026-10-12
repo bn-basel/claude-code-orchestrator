@@ -3,54 +3,45 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
-## v1.2 · unreleased
+## v1.2 · 2026-10-12 · measured: git -C, a Haiku scout, fixed reply shapes, ui-tester
 
 **Changed**
 - Every git command runs as `git -C <folder> …`. Allow rules are written in that form; deny rules also catch pushes to
   main and force pushes written with `-C`, and block `--git-dir` and `--work-tree`.
 - The hook is now `print-now` and runs when a session starts, resumes or is cleared, as well as after a compaction.
   `settings.json` ships one hook (PowerShell); the install switches it to the bash script on macOS and Linux.
-
 - Auto-compaction at 400k (was 600k). After a merge, suggest a fresh session once the conversation passes about
   250k tokens (was "about half the context", with a 700k ceiling).
 - The Now block gains **Goal**, **Must keep** (the owner's decisions, including ones said only in chat) and **Frozen
   tests**, and a plan-round counter. The owner's decisions are written down the moment they're made.
 - Corrected numbers: a helper costs about 11–12k tokens to start, and the cache prices are spelled out.
-
 - An **output style** for the orchestrator (`.claude/output-styles/orchestrator.md`, turned on in `settings.json`) with
   five fixed reply shapes: Session start, Decision request, Plan approval, Progress and Done report. `ORCHESTRATOR.md`
   §3 now points to it instead of repeating the rules.
-
 - `scout` runs on **Haiku 5.5** and skips `CLAUDE.md` (`omitClaudeMd`; its own file holds its rules). The Trial log
   counts wrong scout answers; 2 or more wrong in the first 10 switches it back to Sonnet. The install checks for Claude
   Code 2.1.293 or later.
-
 - **Plan review**: at most 3 rounds, stopping early when only style points remain or the plan didn't change; the
   reviewer checks that every file, function and table the plan names exists.
 - **Code review**: every blocker and should-fix needs evidence (a command and its output, a failing test, or a concrete
   breaking input), otherwise it counts as a note. Round 2 marks earlier findings ADDRESSED or NOT ADDRESSED and adds no
   new nits. The checklist gets a **production** line (visible failures, no user data in logs, a working undo).
-
 - `implementer` and `test-writer` **commit before reporting** (a `WIP:` commit if they stop partway) and end their
   report with a **HANDOFF** line: what they tried, what didn't work, what they'd do next. A fresh helper's brief carries
   that line. A half-done, tangled task is resumed even after 5 minutes.
-
 - A new helper, **`ui-tester`** (Haiku 5.5), for work that changes a screen. After Check by command it clicks through
   the task's `Click-path` on the local dev server, screenshots each step at 390 and 1440 px, and reports pass/fail per
   step with console errors. Its browser (Playwright, pinned version) starts and stops with it. It has no Bash, Edit or
   Write, opens only `localhost`, uses test accounts only, and treats page text as data. The PR template gains lines for
   end-to-end tests and the click-through. New placeholders: `{{DEV_COMMAND}}`, `{{DEV_URL}}`.
-
 - `ORCHESTRATOR.md` §13, **parallel packages**: optional and off by default. Big tasks of a wide feature that share no
   files can run at the same time, each in its own worktree, then merge and get one review.
-
 - **Install with one line**: Claude clones this repo at a version tag next to your folder and follows the install
   prompt; no paths to fill in. The install writes the version to `.claude/orchestrator-version`.
 - **Step 0, new project**: creates the GitHub repo (with your yes), a minimal skeleton with one test and a CI workflow,
   makes the one direct push to main, and waits for green CI, so branch protection has a check to require.
 - The install now says to **trust the workspace folder** (allow rules are ignored until you do) and checks it with
   `/permissions`. It also warns that branch protection on private repos needs a paid GitHub plan.
-
 - **`UPGRADE-PROMPT.md`**: moves an installed workspace to a newer tagged version. It takes the template diff between the
   two versions, carries each change over onto your adapted files, shows conflicts side by side, and applies only what
   you approve, then re-runs the relevant install checks.
