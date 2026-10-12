@@ -68,7 +68,38 @@
     <div class="sec-head">
       <p class="sec-num">01</p>
       <h2 id="loop-title">The loop</h2>
-      <p class="sec-intro" id="loop-desc">Twelve stages from idea to live feature. Three are yours. Work runs clockwise along the track; when a gate fails, it goes back along a siding. Small work skips the two dashed stages. Select any stage for details.</p>
+      <p class="sec-intro" id="loop-desc">Twelve stages from idea to live feature. Three are yours. Work runs clockwise along the track; when a gate fails, it goes back along a siding. Small work skips the two dashed stages. Watch one feature run, or select any stage on the map below for details.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="run" id="run">
+      <h3 class="vh" id="run-title">One feature running through the loop</h3>
+      <p class="vh" id="run-desc">A ticket moves from your idea through plan, plan review, your approval, tests, build, check by command, click-through, code review, pull request, merge, verify and learn. Its plan is sent back once by plan review and its build once by a failed check, then it goes clean to live. The text below the diagram describes each step.</p>
+      <div class="run-top">
+        <div class="run-ctrl" role="group" aria-label="Playback">
+          <button type="button" class="run-btn run-play" data-run="play" aria-pressed="false"><span class="run-ico" aria-hidden="true"></span><span class="lbl">Play</span></button>
+          <button type="button" class="run-btn" data-run="restart"><span class="run-ico-re" aria-hidden="true">↺</span>Restart</button>
+          <div class="run-speed" role="group" aria-label="Speed">
+            <button type="button" class="run-btn" data-speed="0.5" aria-pressed="false">0.5×</button>
+            <button type="button" class="run-btn" data-speed="1" aria-pressed="true">1×</button>
+            <button type="button" class="run-btn" data-speed="2" aria-pressed="false">2×</button>
+          </div>
+        </div>
+        <ul class="run-legend" aria-label="Legend">
+          <li><span class="sw sw-live" aria-hidden="true"></span>In progress</li>
+          <li><span class="sw sw-back" aria-hidden="true"></span>Sent back</li>
+          <li><span class="sw sw-done" aria-hidden="true"></span>Approved</li>
+        </ul>
+      </div>
+      <div class="run-stage"></div>
+      <div class="run-bar" aria-hidden="true"><i></i></div>
+      <div class="run-cap">
+        <p class="run-cap-kick"></p>
+        <p class="run-cap-title"></p>
+        <p class="run-cap-text"></p>
+      </div>
+      <ol class="run-stops" aria-label="Jump to a stage"></ol>
     </div>
   </div>
 
@@ -585,5 +616,6 @@
 </footer>
 
 <script src="script.js"></script>
+<script src="run.js"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@
   --track: #15171a;
   --go: #16794a;
   --warn: #bf3c0b;
+  --live: #2f55d4;
   --plate: #15171a;
   --plate-ink: #f3f1ec;
   --plate-ink-2: #b4b0a6;
@@ -39,6 +40,7 @@
     --track: #d9d6cf;
     --go: #4cc38a;
     --warn: #ff7c47;
+    --live: #86a6ff;
     --plate: #ebe8e2;
     --plate-ink: #111416;
     --plate-ink-2: #4c535a;
@@ -486,4 +488,67 @@ section { padding: 72px 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ── Watch one feature run (run.js) ─────────────────────────────────────────── */
+.run { background: var(--board); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; margin-bottom: 40px; }
+@media (min-width: 720px) { .run { padding: 20px 24px; } }
+.run-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.run-ctrl, .run-speed { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.run-speed { margin-left: 4px; }
+.run-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 5px 11px;
+  font: 500 0.8rem var(--mono); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--rule-strong); border-radius: var(--radius); cursor: pointer;
+}
+.run-btn:hover { border-color: var(--ink-3); }
+.run-speed .run-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.run-play { min-width: 92px; background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.run-ico { width: 10px; height: 10px; display: inline-block; background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.run-play[aria-pressed="true"] .run-ico { clip-path: polygon(0 0, 35% 0, 35% 100%, 0 100%, 0 0, 65% 0, 100% 0, 100% 100%, 65% 100%, 65% 0); }
+.run-ico-re { font-size: 1rem; line-height: 1; }
+.run-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font: 500 0.76rem var(--mono); color: var(--ink-2); }
+.run-legend li { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 18px; height: 4px; border-radius: 2px; display: inline-block; }
+.sw-live { background: var(--live); } .sw-back { background: var(--warn); } .sw-done { background: var(--go); }
+.run-stage svg { display: block; width: 100%; height: auto; overflow: visible; }
+.run-stage .is-narrow { max-width: 420px; margin-inline: auto; }
+.run-fwd { fill: none; stroke: var(--rule-strong); stroke-width: 3; stroke-linecap: round; }
+.run-fwd.is-live { stroke: var(--live); }
+.run-fwd.is-done { stroke: var(--go); }
+.run-ret { fill: none; stroke: var(--rule-strong); stroke-width: 1.5; stroke-dasharray: 4 5; opacity: 0.75; }
+.run-ret.is-live { stroke: var(--warn); stroke-dasharray: none; stroke-width: 2.6; opacity: 1; }
+.run-ret.is-was { stroke: var(--warn); opacity: 0.5; }
+.run-ret-lab { font: 500 11px var(--mono); fill: var(--ink-3); }
+.run-ret-lab.is-on { fill: var(--warn); }
+.run-dot { fill: var(--surface); stroke: var(--ink-3); stroke-width: 2.5; }
+.who-you .run-dot { stroke: var(--ink); }
+.is-opt .run-dot { stroke-dasharray: 3 3; }
+.run-node.is-live .run-dot { fill: var(--live); stroke: var(--live); stroke-dasharray: none; }
+.run-node.is-done .run-dot { fill: var(--go); stroke: var(--go); stroke-dasharray: none; }
+.run-node.is-back .run-dot { stroke: var(--warn); stroke-dasharray: none; }
+.run-t { font: 600 14px var(--cond); fill: var(--ink); }
+.run-s { font: 400 11.5px var(--mono); fill: var(--ink-3); }
+.who-you .run-s { fill: var(--go); font-weight: 500; }
+.run-ticket rect { fill: var(--live); }
+.run-ticket text { font: 600 11px var(--mono); fill: var(--bg); }
+.run-ticket.is-back rect { fill: var(--warn); }
+.run-bar { height: 2px; background: var(--rule); margin: 6px 0 14px; overflow: hidden; }
+.run-bar i { display: block; height: 100%; background: var(--live); transform-origin: 0 50%; transform: scaleX(0); }
+.run-cap { border-left: 3px solid var(--live); padding: 2px 0 2px 14px; min-height: 7.4em; }
+.run.cap-back .run-cap { border-left-color: var(--warn); }
+.run-cap-kick { font: 500 0.76rem var(--mono); color: var(--ink-3); }
+.run.cap-back .run-cap-kick { color: var(--warn); }
+.run-cap-title { font: 600 1.25rem/1.2 var(--cond); margin: 2px 0 4px; }
+.run-cap-text { color: var(--ink-2); max-width: 72ch; }
+.run-stops { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.run-stops button {
+  font: 500 0.74rem var(--mono); color: var(--ink-2); background: transparent; cursor: pointer;
+  border: 1px solid var(--rule-strong); border-radius: 999px; padding: 5px 10px; min-height: 30px;
+}
+.run-stops button:hover { border-color: var(--ink-3); color: var(--ink); }
+.run-stops button[aria-current="step"] { border-color: var(--live); color: var(--live); }
+.run-stop-n { color: var(--ink-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .run-dot, .run-fwd, .run-ret, .run-ret-lab, .run-ticket rect { transition: fill 0.3s, stroke 0.3s, opacity 0.3s; }
 }
