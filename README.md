@@ -70,7 +70,7 @@ The install prompt walks you through these:
 - **Review** the deny list in `.claude/settings.json`, and add your own production scripts to it.
 - **Keep** the core: the loop, the labels, checking by command, and one PR per feature.
 
-No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules.
+No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules and point the hook at `print-now.sh` (the install does both).
 
 ## Long sessions
 
@@ -80,7 +80,8 @@ The orchestrator runs long sessions, so the template guards its context:
   carries the state over.
 - **Auto-compact at about 600k as a backup.** On 1M-context models Claude Code would otherwise wait until about
   967k. The template sets `"autoCompactWindow": 600000`; `/autocompact 600k` does the same for one model.
-- **Nothing lost on compaction.** A hook prints the Now block back into the conversation right after a compaction.
+- **Nothing lost on compaction.** A hook prints the Now block into the conversation when a session starts and
+  right after a compaction.
 - **Fresh helpers beat cold ones.** A helper's cache lasts 5 minutes, so the orchestrator resumes one only within
   that window; otherwise it starts a fresh helper with a short brief.
 

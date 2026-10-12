@@ -24,7 +24,7 @@ I approve the plan and click merge. The template has:
 
 - `CLAUDE.md`: shared rules every agent loads · `ORCHESTRATOR.md`: the orchestrator's playbook · `PLAN.md`: the living record
 - `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, and a hook ·
-  `.claude/agents/`: the seven helpers · `.claude/hooks/`: the after-compaction hook (Windows and macOS/Linux versions)
+  `.claude/agents/`: the seven helpers · `.claude/hooks/`: the "print Now" hook (Windows and macOS/Linux versions)
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
 - `gitignore`: becomes the workspace's `.gitignore`
 
@@ -126,10 +126,11 @@ Build the Roadmap from the backlog or open issues, and propose a small, safe fir
 there is none). Add deny rules for any other production script by name. Keep `"attribution": {"commit": "", "pr": ""}`
 unless I want AI attribution lines.
 
-**The after-compaction hook.** `settings.json` has two SessionStart hooks: one runs `now-after-compact.ps1`
-(Windows PowerShell), the other `now-after-compact.sh` (bash). Claude Code has no per-system switch for hooks, so
-**keep exactly one**: the PowerShell one on Windows, the bash one on macOS or Linux. Leave the other script out of
-the drafts. Keep `"autoCompactWindow": 600000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
+**The "print Now" hook.** `settings.json` has one SessionStart hook. It runs `print-now.ps1` (Windows PowerShell)
+when a session starts, resumes or is cleared, and right after a compaction. Claude Code has no per-system switch for
+hooks, so on macOS or Linux replace that hook's `command` and `args` with
+`"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/print-now.sh\""`, and keep only the
+`.sh` script in the drafts. Keep `"autoCompactWindow": 600000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
 
 Write the results to `_setup/drafts/` (not into the project yet), then prove nothing is left:
 search the drafts for `{{` and `ADAPT:`, and check that `settings.json` parses as JSON.
@@ -174,9 +175,9 @@ In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`.
 - Run three tiny delegations: ask `implementer`, `reviewer-light` and `scout` to reply "OK" and do nothing else.
   I'll check each one's model and effort in the task list.
 - Try `gh pr merge --help`. It must be **blocked** by a deny rule.
-- Test the after-compaction hook: run its script once yourself, with `CLAUDE_PROJECT_DIR` set to the workspace. It
-  must print the Now section of `PLAN.md`. Then ask me to run `/hooks` and confirm a SessionStart hook with matcher
-  `compact` is listed.
+- Test the "print Now" hook: run its script once yourself with `{"source":"compact"}` piped in and
+  `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
+  "·" and "—" intact. This session's own start should already show the same Now section once (not twice).
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
 - Explain the Fable gate: the "ask" rule on `adversarial-reviewer` may **not** stop a helper from starting,
   so the real gate is the written rule in `ORCHESTRATOR.md` §7. Don't start it to test this.

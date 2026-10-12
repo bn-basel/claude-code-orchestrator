@@ -8,6 +8,13 @@ app, so most entries come from something that went wrong or cost too much.
 **Changed**
 - Every git command runs as `git -C <folder> …`. Allow rules are written in that form; deny rules also catch pushes to
   main and force pushes written with `-C`, and block `--git-dir` and `--work-tree`.
+- The hook is now `print-now` and runs when a session starts, resumes or is cleared, as well as after a compaction.
+  `settings.json` ships one hook (PowerShell); the install switches it to the bash script on macOS and Linux.
+
+**Fixed**
+- The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
+  It now writes UTF-8.
+- The template's `settings.json` registered both hooks, so a hand-copied install on Windows printed Now twice.
 
 **Lessons**
 - **`cd <folder> && git …` now asks for approval every time** (reverses the v1.0 lesson). Claude Code treats git in

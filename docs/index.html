@@ -473,7 +473,7 @@
           <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, so any fresh session can pick up where the last one stopped.</li>
           <li>Start a fresh session after a merge once the context passes about half.</li>
           <li>Never go past about 700k tokens. As a safety net, the template sets auto-compaction to about 600k; on 1M-context models it would otherwise wait until about 967k.</li>
-          <li>After any compaction, a hook prints the <strong>Now</strong> block back into the conversation, so the current state is never lost.</li>
+          <li>When a session starts and after any compaction, a hook prints the <strong>Now</strong> block into the conversation, so the current state is never lost.</li>
           <li>A helper's cache lasts only 5 minutes. Resume a helper within that window; otherwise start a fresh one with a short brief.</li>
         </ul>
       </div>

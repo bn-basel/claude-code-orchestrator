@@ -155,7 +155,7 @@ Budget used: fixes <n>/<max> · review rounds <n>/2
 
 Any fresh session must be able to continue from **Now** alone. **Commit `PLAN.md`** in the workspace repo after each update.
 
-**If the conversation was compacted (summarised), re-read this file before doing anything else.** A hook prints the Now section into the new context to help (§12).
+**If the conversation was compacted (summarised), re-read this file before doing anything else.** A hook prints the Now section into the new context to help (§12). It also prints it when a session starts.
 
 **Rotation:** after a merge, if the conversation is long (about 50% of context or more), suggest a fresh session. Never go past about 700k tokens. Auto-compaction at about 600k is only the safety net (§12).
 
@@ -214,7 +214,7 @@ missed, the session compacts at about 600k instead. Other ways to set the same t
 - `/autocompact 600k` in a session (saved per model in the owner's user settings);
 - the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=600000` (a plain number: `600k` is read as 600).
 
-**After a compaction.** A SessionStart hook (matcher `compact`) prints the Now section of `PLAN.md` into the new
+**At session start and after a compaction.** A SessionStart hook prints the Now section of `PLAN.md` into the
 context, with a reminder. Then re-read this file before doing anything else. The hook can only print what Now says,
 so keep Now current at every stage change (§8).
 
