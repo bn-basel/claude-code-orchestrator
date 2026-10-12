@@ -44,6 +44,13 @@ app, so most entries come from something that went wrong or cost too much.
 - `ORCHESTRATOR.md` §13, **parallel packages**: optional and off by default. Big tasks of a wide feature that share no
   files can run at the same time, each in its own worktree, then merge and get one review.
 
+- **Install with one line**: Claude clones this repo at a version tag next to your folder and follows the install
+  prompt; no paths to fill in. The install writes the version to `.claude/orchestrator-version`.
+- **Step 0, new project**: creates the GitHub repo (with your yes), a minimal skeleton with one test and a CI workflow,
+  makes the one direct push to main, and waits for green CI, so branch protection has a check to require.
+- The install now says to **trust the workspace folder** (allow rules are ignored until you do) and checks it with
+  `/permissions`. It also warns that branch protection on private repos needs a paid GitHub plan.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -62,6 +69,10 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **Allow rules do nothing in an untrusted folder.** Claude Code ignores a project's allow rules until the folder is
+  trusted, so a fresh workspace pops up on every command and the rules look broken. The install now says so.
+- **Branch protection needs a CI check to require, and a plan that allows it.** A brand-new project has neither until
+  its first CI run, and on a free GitHub account private repos can't be protected at all.
 - **Parallel helpers save time, not tokens.** One outside test measured 2.6–5.9× the tokens for parallel work, and
   Anthropic's own parallel-agents write-up found it only helps when the pieces are truly independent. So it's an
   option for file-disjoint tasks, never the default. Claude Code's built-in `isolation: worktree` copies the repo the

@@ -92,15 +92,16 @@
     }
   });
 
-  // Copy the start line
-  var copyBtn = document.querySelector('.copy');
-  if (copyBtn && navigator.clipboard && window.isSecureContext) {
-    copyBtn.hidden = false;
-    copyBtn.addEventListener('click', function () {
-      var text = document.getElementById(copyBtn.dataset.copy).textContent.trim();
-      navigator.clipboard.writeText(text).then(function () {
-        copyBtn.textContent = 'Copied';
-        setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600);
+  // Copy buttons (the install line and the start line)
+  if (navigator.clipboard && window.isSecureContext) {
+    document.querySelectorAll('.copy').forEach(function (copyBtn) {
+      copyBtn.hidden = false;
+      copyBtn.addEventListener('click', function () {
+        var text = document.getElementById(copyBtn.dataset.copy).textContent.trim();
+        navigator.clipboard.writeText(text).then(function () {
+          copyBtn.textContent = 'Copied';
+          setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600);
+        });
       });
     });
   }

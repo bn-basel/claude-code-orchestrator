@@ -48,19 +48,24 @@ that run in CI.
 
 ## Quick start
 
-1. Clone this repo next to your project.
-2. Open Claude Code in the folder that contains your project.
-3. Paste [`INSTALL-PROMPT.md`](INSTALL-PROMPT.md), with the path to `template/` filled in.
+Open Claude Code in the folder that contains your project (or an empty folder, for a new project) and type:
 
-It backs up, audits your project, adapts the rules, installs one approved step at a time, and ends with a small
-trial feature. After that, start every session with:
+```
+Install the Claude Code Orchestrator v1.2 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.2 next to this folder, then follow its INSTALL-PROMPT.md.
+```
+
+It clones this repo at a fixed version, then backs up, audits your project, adapts the rules, installs one approved step
+at a time, and ends with a small trial feature. No project yet? It creates the GitHub repo, a minimal skeleton with one
+test and a CI check, and then installs as usual. (To do it by hand: clone the repo and paste
+[`INSTALL-PROMPT.md`](INSTALL-PROMPT.md).) After that, start every session with:
 
 ```
 You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
 ```
 
-You need Claude Code 2.1.293 or later, your code on GitHub, the `gh` command-line tool, and access to Opus, Sonnet
-and Haiku.
+You need Claude Code 2.1.293 or later, a GitHub account with the `gh` command-line tool, and access to Opus, Sonnet
+and Haiku. Branch protection on a **private** repo needs GitHub Pro or a paid team plan; on a free account it works on
+public repos.
 
 ## Make it yours
 

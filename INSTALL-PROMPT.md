@@ -3,20 +3,26 @@
 This prompt installs the orchestrator workflow into **your** project, one approved step at a time. Claude does the work;
 you say "yes" at every step and do the few hands-on parts yourself (secrets, branch protection, merging).
 
-**Before you paste it**
+**Start it with one line.** Open Claude Code (version 2.1.293 or later) in the folder that **contains** your project
+folder, or in an empty folder for a new project. Use Opus at high effort, in the **default (ask) permission mode**, so
+you see every change. Then type:
 
-1. Clone this repo somewhere **outside** your project, e.g. next to it.
-2. Your code must be in a GitHub repo. The strongest safety layer (branch protection) lives on GitHub.
-3. Open Claude Code in the folder that **contains** your project folder (or in an empty folder that will become the
-   workspace). Use Opus at high effort, in the **default (ask) permission mode**, so you see every change.
-4. Replace `<PATH>` below with the path to this repo's `template/` folder, then paste everything below the line.
+```
+Install the Claude Code Orchestrator v1.2 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.2 next to this folder, then follow its INSTALL-PROMPT.md.
+```
 
-It takes about an hour, plus one feature for the trial. You can stop at any step: progress is saved in `_setup/PROGRESS.md`.
+Claude asks before it clones (a download), then reads this file and follows it from the line below. To do it by hand
+instead: clone the repo next to your project, at the tag you want, and paste everything below the line.
+
+You need the `gh` command-line tool, logged in to your GitHub account. If the project isn't on GitHub yet, Step 0
+creates the repo. It takes about an hour, plus one feature for the trial. You can stop at any step: progress is saved
+in `_setup/PROGRESS.md`.
 
 ---
 
 You are installing the **Claude Code Orchestrator** workflow into my project.
-Template folder: `<PATH>` (if this still says `<PATH>`, ask me for it before doing anything).
+Template folder: the `template/` folder next to this file, in the orchestrator clone. If you can't find it, ask me
+before doing anything. Note the clone's tag (`git -C <clone> describe --tags`): it's the installed version.
 
 **What it is:** one orchestrator session plans features with me in plain language, hands each small task to a
 specialised helper (subagent), checks every change by running commands, and opens one pull request per feature.
@@ -41,12 +47,35 @@ Read every file in the template folder first. Text like `{{PROJECT_NAME}}` is a 
 
 **Rules for this session:**
 - Never read or print `.env` files or secrets. You may list secret file **names**, never their contents.
-- Never push to the main branch, merge, force-push or rewrite history.
+- Never push to the main branch, merge, force-push or rewrite history. The one exception is the "Initial skeleton"
+  push in Step 0, for a brand-new repo, after my yes.
 - **Never delete anything.** Move files into `_setup/moved/` instead, and tell me.
 - Start no helpers (subagents) unless a step says so.
 - Run git as `git -C <folder> …`. Never `cd <folder> && git …` (Claude Code asks for approval every time) and never
   `cd` in one command with git in the next (the folder isn't kept, so git runs in the wrong repo).
 - If something doesn't match what the template expects: **stop and ask**. Don't guess.
+
+## Step 0. New project (only if there's no code repo yet)
+
+Skip this step if the project already has a GitHub repo.
+
+1. Ask me: the project's name, what it is (2 lines), the stack (offer 2–3 plain choices that suit it, e.g.
+   "Python with pytest" or "TypeScript with Vitest"), and which `gh` account to use (`gh auth status`).
+2. **Private or public.** Branch protection (Step 4f, the strongest safety layer) works on **public** repos with a free
+   GitHub account, but on **private** repos only with GitHub Pro or a paid team plan. Explain this, recommend one, and
+   let me choose.
+3. **Create the repo**, which publishes something under my account: show the exact command and wait for my yes.
+   `gh repo create <account>/<name> --private|--public --description "<one line>"`. Clone it into the workspace as
+   `{{CODE_DIR}}/`.
+4. **A minimal skeleton.** Show it before writing: one source file with one small function, **one test** for it, a
+   README (what it is, how to run the test), a `.gitignore` for the stack, and a CI workflow
+   (`.github/workflows/ci.yml`) that runs the tests on every pull request and on pushes to main. Use only the stack's
+   standard test runner; that's the one new package, and I approve it. Pin the workflow's actions to a version.
+5. Run the test locally. It must pass.
+6. **The one direct push to main.** No protection exists yet, so this is the only time: commit "Initial skeleton" and
+   push it, after my yes.
+7. Wait for the CI run on main to go green (`gh run list`, `gh run view`). Note the check's name: Step 4f requires it.
+8. Continue with Step 1. The audit will find this skeleton.
 
 ## Step 1. Backup
 
@@ -160,7 +189,9 @@ Set up its dependencies (this asks me) and run one test to prove it works.
 (merge it with any existing one) and `.github/pull_request_template.md`, commit, push the branch, and open the PR
 using the template. Wait for CI to pass, then tell me it's ready. **I merge.**
 
-**4f. Branch protection** (I click; you guide). Walk me through a GitHub ruleset on the main branch:
+**4f. Branch protection** (I click; you guide). On a private repo this needs GitHub Pro or a paid team plan; on a free
+account, say so plainly and let me choose (make the repo public, upgrade, or go on without this wall). Walk me through a
+GitHub ruleset on the main branch:
 - require a pull request, with **0 required approvals** (GitHub won't let me approve my own PR);
 - require the CI checks found in the audit;
 - block force pushes and deletion;
@@ -177,8 +208,15 @@ browser (Chromium, about 150–200 MB, into the user's Playwright folder). Its e
 `PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
 script you kept in `.claude/hooks/`, and
 `gitignore` as `.gitignore`. Run `git init` in the
-workspace and commit. Then tell me to **restart**: helpers and settings load only in a fresh session.
-In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`. The steps are in `<PATH>/../INSTALL-PROMPT.md`."*
+workspace and commit. Write the installed version (the clone's tag, e.g. `v1.2`) into `.claude/orchestrator-version`;
+the upgrade prompt reads it. Then tell me to **restart**: helpers and settings load only in a fresh session.
+
+**Trust the folder.** I open Claude Code in the workspace interactively and accept the trust dialog. Until a folder is
+trusted, Claude Code ignores the allow rules in its `settings.json` ("Ignoring N permissions.allow entries"), so every
+command would pop up and the rules would look broken.
+
+In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`. The steps are in `INSTALL-PROMPT.md`
+in the orchestrator clone next to this folder."*
 
 ## Step 5. Check that everything loaded (fresh session)
 
@@ -189,6 +227,8 @@ In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`.
 - Test the "print Now" hook: run its script once yourself with `{"source":"compact"}` piped in and
   `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
   "·" and "—" intact. This session's own start should already show the same Now section once (not twice).
+- Ask me to run `/permissions` and confirm the allow list shows the workspace's rules. If Claude Code reported
+  ignoring them, the folder isn't trusted yet.
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
 - Run `claude --version`: it must be **2.1.293 or later**, or `model: haiku` runs the older Haiku 4.5. In the scout's
   "OK" run, the task list must show Haiku 5.5. On Amazon Bedrock, Google Cloud or Microsoft Foundry, `haiku` can mean
