@@ -26,6 +26,8 @@
 ## Tests
 
 - Behaviour-defining work gets **tests first**.
+- **Screens:** behaviour on a screen is proven by scripted end-to-end tests (e.g. Playwright) that run in CI.
+  Screenshots from `ui-tester` are evidence for the PR, never a substitute for those tests.
 - **New tests must fail on `origin/{{MAIN_BRANCH}}`.** The orchestrator checks this. Helpers report the names of the tests they added.
 - **Mutation walls** for wide and closed work: break the guard on purpose, and the test that protects it must go red.
 - **Nothing is done until a real production path uses it.** A test calling it isn't enough. When you build a new write path for existing data, re-check every guard that protected the old one.

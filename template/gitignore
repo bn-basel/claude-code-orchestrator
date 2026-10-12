@@ -4,6 +4,9 @@
 {{CODE_DIR}}/
 _worktrees/
 
+# Screenshots from ui-tester
+_ui-evidence/
+
 # Setup notes and backups (old settings files can contain tokens)
 _setup/
 _setup-done/

@@ -25,7 +25,7 @@ I approve the plan and click merge. The template has:
 - `CLAUDE.md`: shared rules every agent loads · `ORCHESTRATOR.md`: the orchestrator's playbook · `PLAN.md`: the living record
 - `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, the output style and a hook ·
   `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes ·
-  `.claude/agents/`: the seven helpers · `.claude/hooks/`: the "print Now" hook (Windows and macOS/Linux versions)
+  `.claude/agents/`: the eight helpers · `.claude/hooks/`: the "print Now" hook (Windows and macOS/Linux versions)
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
 - `gitignore`: becomes the workspace's `.gitignore`
 
@@ -113,6 +113,8 @@ explain the trade-off and ask.
 | `{{GITHUB_ACCOUNT}}` | The `gh` account agents should use | `sam-dev` |
 | `{{TEST_COMMAND}}` | Runs one test file (the file is appended) | `npx vitest run` |
 | `{{FULL_TEST_COMMAND}}` | Runs the whole suite | `npm test` |
+| `{{DEV_COMMAND}}` | Starts the local dev server (screens only) | `npm run dev` |
+| `{{DEV_URL}}` | Where the dev server answers (localhost only) | `http://localhost:3000` |
 | `{{CHECK_COMMAND}}` | Type check or lint | `npm run typecheck` |
 | `{{SECRETS_DIR}}` | Folder outside the project that holds real keys. In settings `Read`/`Edit` rules write absolute paths as `//c/path` or `~/path` | `~/secrets` |
 | `{{MIGRATION_TOOL}}` | The command that applies migrations (blocked for agents) | `prisma migrate deploy` |
@@ -164,6 +166,13 @@ using the template. Wait for CI to pass, then tell me it's ready. **I merge.**
 - block force pushes and deletion;
 - an **empty bypass list**, so the rules bind my own login too. The agents use my login.
 
+**4f2. ui-tester (only if the project has screens).** It clicks through a changed screen on the local dev server and
+screenshots it, using a browser that starts and stops with it. Tell me what it downloads and ask first: the
+`@playwright/mcp` package (pinned version in `ui-tester.md`, about 90 KB, from npm) on its first run, plus a Playwright
+browser (Chromium, about 150–200 MB, into the user's Playwright folder). Its end-to-end tests in the code repo are a
+**new package** in the code repo: that's my decision, in its own PR. No screens: leave `ui-tester.md`, the
+`{{DEV_COMMAND}}` rules and `mcp__playwright` out of the drafts.
+
 **4g. Install the orchestrator files.** Copy the drafts into the workspace: `CLAUDE.md`, `ORCHESTRATOR.md`,
 `PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
 script you kept in `.claude/hooks/`, and
@@ -173,7 +182,7 @@ In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`.
 
 ## Step 5. Check that everything loaded (fresh session)
 
-- Tell me which helper types you can use. They must be exactly the seven custom ones; Claude's built-in helpers are blocked.
+- Tell me which helper types you can use. They must be exactly the custom ones (eight, or seven without `ui-tester`); Claude's built-in helpers are blocked.
 - Run three tiny delegations: ask `implementer`, `reviewer-light` and `scout` to reply "OK" and do nothing else.
   I'll check each one's model and effort in the task list.
 - Try `gh pr merge --help`. It must be **blocked** by a deny rule.

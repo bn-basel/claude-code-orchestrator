@@ -19,6 +19,7 @@ Owner: **{{OWNER}}**. They make the decisions. Explain things in plain language 
 | `backlog/` | Feature ideas, one file each | read |
 | `{{CODE_DIR}}/` | **Code repo** (own git, branch `{{MAIN_BRANCH}}`) | read only. **All code work happens in `_worktrees/build`** |
 | `_worktrees/build` | The permanent build worktree of `{{CODE_DIR}}` | work here, on the branch you were given |
+| `_ui-evidence/` | Screenshots from `ui-tester` | read |
 | `ops/` | Production scripts | **never run, never edit** |
 <!-- ADAPT: add folders agents must not read without asking (business documents, archives). -->
 

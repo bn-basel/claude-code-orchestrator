@@ -34,8 +34,9 @@
       "PowerShell(git -C _worktrees/build worktree add --detach ../check *)", "PowerShell(git -C _worktrees/build worktree remove --force ../check)",
       "PowerShell(git -C _worktrees/check checkout feat/*)", "PowerShell(git -C _worktrees/check status*)",
 
-      "Bash({{TEST_COMMAND}} *)", "Bash({{FULL_TEST_COMMAND}})", "Bash({{CHECK_COMMAND}})",
-      "PowerShell({{TEST_COMMAND}} *)", "PowerShell({{FULL_TEST_COMMAND}})", "PowerShell({{CHECK_COMMAND}})",
+      "Bash({{TEST_COMMAND}} *)", "Bash({{FULL_TEST_COMMAND}})", "Bash({{CHECK_COMMAND}})", "Bash({{DEV_COMMAND}})",
+      "PowerShell({{TEST_COMMAND}} *)", "PowerShell({{FULL_TEST_COMMAND}})", "PowerShell({{CHECK_COMMAND}})", "PowerShell({{DEV_COMMAND}})",
+      "mcp__playwright",
 
       "Bash(gh auth status *)", "Bash(gh pr create *)", "Bash(gh pr view *)", "Bash(gh pr checks *)",
       "Bash(gh pr diff *)", "Bash(gh run list *)", "Bash(gh run view *)",

@@ -39,6 +39,7 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 | Implementer | `implementer` (Sonnet, high) | `implementer-wide` (Sonnet, xhigh) | recommend (usually Opus); {{OWNER}} decides |
 | Check by command | ✓ | ✓ | ✓ |
 | Code review | `reviewer-light` (Opus, high) | `reviewer` (Opus, xhigh) | `reviewer` (offer Fable) |
+| Click-through (tasks that change a screen) | `ui-tester` (Haiku 5.5, medium) | `ui-tester` | `ui-tester` |
 | Lookups and probes (any label) | `scout` (Haiku 5.5, medium) | `scout` | `scout` |
 
 **Scout vs reviewer:** any simple investigation (where is X, what does Y do, which files mention Z, what a helper receives, a read-only probe) goes to `scout`: one question, a brief answer with file:line evidence. Reviewers are only for plan reviews and code reviews.
@@ -88,6 +89,13 @@ After approval, create the branch in the build worktree: `git -C _worktrees/buil
 - frozen test files are untouched;
 - the type check or lint passes where relevant: `{{CHECK_COMMAND}}`.
 
+**6b. Click-through** (only tasks whose Done when has a `Click-path:` line, i.e. work that changes a screen). Start
+the dev server in the build worktree in the background (`cd _worktrees/build && {{DEV_COMMAND}}`), wait until
+`{{DEV_URL}}` answers, and brief `ui-tester` with: the start URL (localhost only), the click-path steps with what each
+should show, and the test account to use (made-up, from the test setup). Stop the server afterwards. A FAIL is a failed
+check, like any other. The report is **evidence**: the **proof** is the end-to-end tests that `test-writer` writes and
+CI runs. Never point it at a staging or production address.
+
 A failure goes back to the helper with the evidence: the command, the output, and file:line. Resume the same helper only within about 5 minutes; otherwise start a fresh one of the same type and put the first helper's HANDOFF line in its brief (§12). Max 2 tries, then ask {{OWNER}}.
 
 **7. Code review.** Send the reviewer for the label (§4) **only** the plan, the diff (`origin/{{MAIN_BRANCH}}...HEAD`) and the test output. **Never** send the helper's own report. Every review brief also asks: "Does this change make any statement in `docs/ARCHITECTURE.md` untrue? If so, name the section." The map edit then belongs in this PR. Triage the findings:
@@ -100,7 +108,7 @@ A failure goes back to the helper with the evidence: the command, the output, an
 
 **8. Ready.**
 - Update the branch from `origin/{{MAIN_BRANCH}}`: `git -C _worktrees/build fetch`, then `git -C _worktrees/build merge origin/{{MAIN_BRANCH}}`.
-- Run the **full** test suite: `cd _worktrees/build && {{FULL_TEST_COMMAND}}`.
+- Run the **full** test suite, end-to-end tests included: `cd _worktrees/build && {{FULL_TEST_COMMAND}}`.
 - Push the branch (`git -C _worktrees/build push -u origin feat/<name>`) and open the PR. Fill in every section of `.github/pull_request_template.md` and pass it as the PR body.
 - Watch CI. If it fails, go back to Build automatically (within budget).
 
@@ -185,6 +193,7 @@ Tasks:
 T1 <title>, <label>, helper: <agent>, effort: <x>
    Files allowed: <paths>
    Done when: <tests that pass> · <only these files changed> · <other checks>
+   Click-path (screens only): <start URL> → <step> → <what it should show> → …
 T2 ...
 
 Helper runs: <list> · Retry budget: 2 fixes per task, 2 review rounds

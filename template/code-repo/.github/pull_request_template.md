@@ -12,6 +12,8 @@
 ## How we know it works
 - New tests: <!-- names --> · they fail on `origin/{{MAIN_BRANCH}}`: yes
 - Full test suite: pass · CI: pass
+- End-to-end tests: <!-- names --> · pass | n/a
+- Click-through (ui-tester, evidence only): <!-- n/n --> steps pass at phone and desktop width · screenshots: `_ui-evidence/` · console errors: none | <!-- list --> | n/a
 - Hands-on check needed: no | yes: <!-- steps for the owner -->
 - Architecture map: no change needed | updated (sections)
 

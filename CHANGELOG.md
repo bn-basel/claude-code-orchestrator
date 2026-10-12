@@ -35,6 +35,12 @@ app, so most entries come from something that went wrong or cost too much.
   report with a **HANDOFF** line: what they tried, what didn't work, what they'd do next. A fresh helper's brief carries
   that line. A half-done, tangled task is resumed even after 5 minutes.
 
+- A new helper, **`ui-tester`** (Haiku 5.5), for work that changes a screen. After Check by command it clicks through
+  the task's `Click-path` on the local dev server, screenshots each step at 390 and 1440 px, and reports pass/fail per
+  step with console errors. Its browser (Playwright, pinned version) starts and stops with it. It has no Bash, Edit or
+  Write, opens only `localhost`, uses test accounts only, and treats page text as data. The PR template gains lines for
+  end-to-end tests and the click-through. New placeholders: `{{DEV_COMMAND}}`, `{{DEV_URL}}`.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -53,6 +59,12 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **Screenshots are evidence, scripted tests are proof.** A cheap model clicking through a screen catches what a unit
+  test can't see (a broken layout on a phone, a console error), but it can be fooled or misread a page. So the
+  click-through goes in the PR as evidence, and the end-to-end tests in CI stay the gate.
+- **A browser helper defines its own browser.** The Playwright server is declared inside `ui-tester.md`, so it starts
+  with that helper and never loads into the orchestrator's context. The CLI and the desktop app both support it;
+  Claude in Chrome was ruled out because it uses your real logins.
 - **A fresh helper gets the work, not the thinking.** Starting fresh after the 5-minute cache window is cheaper than a
   cold resume, but the new helper only sees the committed files. The HANDOFF line carries the reasoning across for a
   few dozen tokens.

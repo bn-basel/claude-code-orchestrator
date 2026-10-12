@@ -41,6 +41,11 @@ Every review finding has to come with evidence, such as a command and its output
 
 Each helper is one file in `.claude/agents/` with a fixed model and tool list. No helper can start another.
 
+For work that changes a screen, an eighth helper, **`ui-tester`** (Haiku 5.5), clicks through the change on your local
+dev server and screenshots it at phone and desktop width. It can't edit code or run commands, only opens `localhost`,
+and uses test accounts only. Its screenshots are evidence for the PR; the proof is still the scripted end-to-end tests
+that run in CI.
+
 ## Quick start
 
 1. Clone this repo next to your project.
