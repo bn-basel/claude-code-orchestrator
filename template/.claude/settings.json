@@ -99,6 +99,8 @@
 
   "attribution": { "commit": "", "pr": "" },
 
+  "outputStyle": "Orchestrator",
+
   "hooks": {
     "SessionStart": [
       {

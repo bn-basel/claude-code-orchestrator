@@ -81,6 +81,9 @@ The orchestrator runs long sessions, so the template guards its context:
 - **Auto-compact at 400k as a backup.** On 1M-context models Claude Code would otherwise wait until about 967k, and
   every message re-sends the whole conversation. The template sets `"autoCompactWindow": 400000`; `/autocompact 400k`
   does the same for one model.
+- **Same shape every session.** An output style (`.claude/output-styles/orchestrator.md`) fixes how the orchestrator
+  replies: session start, decision request, plan approval, progress, done report. It's part of every request, so a new
+  session or a compacted one answers the same way.
 - **Nothing lost on compaction.** A hook prints the Now block into the conversation when a session starts and
   right after a compaction.
 - **Fresh helpers beat cold ones.** A helper costs about 11–12k tokens to start. Its cache lasts 5 minutes, so the

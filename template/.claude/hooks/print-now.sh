@@ -17,7 +17,7 @@ plan="${CLAUDE_PROJECT_DIR:-.}/PLAN.md"
 if [ "$source" = "compact" ]; then
   echo "The conversation was just compacted. Before doing anything else, re-read ORCHESTRATOR.md."
 else
-  echo "If you are the orchestrator: read ORCHESTRATOR.md before your first reply, then report where we are, what is next and anything blocking, in 3 lines or fewer."
+  echo "If you are the orchestrator: read ORCHESTRATOR.md before your first reply, and make that reply the Session start shape (where we are, next, blocking)."
 fi
 echo "Current state, from PLAN.md:"
 echo

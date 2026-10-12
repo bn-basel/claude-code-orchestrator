@@ -23,7 +23,8 @@ specialised helper (subagent), checks every change by running commands, and open
 I approve the plan and click merge. The template has:
 
 - `CLAUDE.md`: shared rules every agent loads · `ORCHESTRATOR.md`: the orchestrator's playbook · `PLAN.md`: the living record
-- `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, and a hook ·
+- `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, the output style and a hook ·
+  `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes ·
   `.claude/agents/`: the seven helpers · `.claude/hooks/`: the "print Now" hook (Windows and macOS/Linux versions)
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
 - `gitignore`: becomes the workspace's `.gitignore`
@@ -164,7 +165,8 @@ using the template. Wait for CI to pass, then tell me it's ready. **I merge.**
 - an **empty bypass list**, so the rules bind my own login too. The agents use my login.
 
 **4g. Install the orchestrator files.** Copy the drafts into the workspace: `CLAUDE.md`, `ORCHESTRATOR.md`,
-`PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, the one hook script you kept in `.claude/hooks/`, and
+`PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
+script you kept in `.claude/hooks/`, and
 `gitignore` as `.gitignore`. Run `git init` in the
 workspace and commit. Then tell me to **restart**: helpers and settings load only in a fresh session.
 In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`. The steps are in `<PATH>/../INSTALL-PROMPT.md`."*
@@ -179,6 +181,9 @@ In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`.
   `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
   "·" and "—" intact. This session's own start should already show the same Now section once (not twice).
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
+- Check the output style: your first reply in this session must have been the **Session start** shape (Where we are ·
+  Next · Blocking). If it wasn't, check `"outputStyle": "Orchestrator"` in `settings.json` and that the style file is
+  in `.claude/output-styles/`.
 - Explain the Fable gate: the "ask" rule on `adversarial-reviewer` may **not** stop a helper from starting,
   so the real gate is the written rule in `ORCHESTRATOR.md` §7. Don't start it to test this.
 

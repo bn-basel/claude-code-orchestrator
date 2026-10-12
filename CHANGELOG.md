@@ -17,6 +17,10 @@ app, so most entries come from something that went wrong or cost too much.
   tests**, and a plan-round counter. The owner's decisions are written down the moment they're made.
 - Corrected numbers: a helper costs about 11–12k tokens to start, and the cache prices are spelled out.
 
+- An **output style** for the orchestrator (`.claude/output-styles/orchestrator.md`, turned on in `settings.json`) with
+  five fixed reply shapes: Session start, Decision request, Plan approval, Progress and Done report. `ORCHESTRATOR.md`
+  §3 now points to it instead of repeating the rules.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -35,6 +39,10 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **A playbook says what to do; it doesn't hold the shape of the replies.** Each new orchestrator session read the
+  talking rules a little differently. An output style is sent with every request, so the shapes hold from the first
+  message and through compaction. It's still an instruction, not a guarantee, so the test compares sessions with and
+  without it.
 - **When one form is blocked, helpers find another.** Both a Sonnet and a Haiku scout got past the block with
   `git --git-dir=…`. A deny rule now closes that route, and the rules say which form to use instead.
 
