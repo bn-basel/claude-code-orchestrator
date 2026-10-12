@@ -104,6 +104,10 @@ app, so most entries come from something that went wrong or cost too much.
   talking rules a little differently. An output style is sent with every request, so the shapes hold from the first
   message and through compaction. It's still an instruction, not a guarantee, so the test compares sessions with and
   without it.
+- **A dry run of the new-project install found four rough edges**, now in the install text: the clone sits outside your
+  folder, so Claude asks before reading it; Claude Code protects every `.claude` folder, so drafts go in
+  `_setup/drafts/dot-claude/`; writing the real `.claude/` needs a click on an approval prompt, so a session that can't
+  show one hands you the copy command; and the desktop app's Claude Code version can differ from the terminal's.
 - **Allow rules match the text, so the path has to be written the same way.** In testing, reviewers and a scout wrote
   `git -C C:\…\_worktrees\build …` with a full path; it didn't match `git -C _worktrees/build …` and was blocked. The
   rules now say to write folders relative and with forward slashes. Likewise `; echo $?` made Claude Code ask for

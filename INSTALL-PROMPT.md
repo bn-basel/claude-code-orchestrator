@@ -11,7 +11,8 @@ you see every change. Then type:
 Install the Claude Code Orchestrator v1.2 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.2 next to this folder, then follow its INSTALL-PROMPT.md.
 ```
 
-Claude asks before it clones (a download), then reads this file and follows it from the line below. To do it by hand
+Claude asks before it clones (a download) and before it reads the clone (it's outside your folder), then reads this
+file and follows it from the line below. To do it by hand
 instead: clone the repo next to your project, at the tag you want, and paste everything below the line.
 
 You need the `gh` command-line tool, logged in to your GitHub account. If the project isn't on GitHub yet, Step 0
@@ -70,7 +71,8 @@ Skip this step if the project already has a GitHub repo.
 4. **A minimal skeleton.** Show it before writing: one source file with one small function, **one test** for it, a
    README (what it is, how to run the test), a `.gitignore` for the stack, and a CI workflow
    (`.github/workflows/ci.yml`) that runs the tests on every pull request and on pushes to main. Use only the stack's
-   standard test runner; that's the one new package, and I approve it. Pin the workflow's actions to a version.
+   standard test runner; that's the one new package, and I approve it. Pin the workflow's actions to a version, using the
+   newest major version of each (older ones run on a retired Node.js and print warnings).
 5. Run the test locally. It must pass.
 6. **The one direct push to main.** No protection exists yet, so this is the only time: commit "Initial skeleton" and
    push it, after my yes.
@@ -164,7 +166,8 @@ hooks, so on macOS or Linux replace that hook's `command` and `args` with
 `"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/print-now.sh\""`, and keep only the
 `.sh` script in the drafts. Keep `"autoCompactWindow": 400000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
 
-Write the results to `_setup/drafts/` (not into the project yet), then prove nothing is left:
+Write the results to `_setup/drafts/` (not into the project yet). Claude Code protects every folder named `.claude`,
+even inside `_setup/`, so put the drafts of `.claude/` files in `_setup/drafts/dot-claude/`. Then prove nothing is left:
 search the drafts for `{{` and `ADAPT:`, and check that `settings.json` parses as JSON.
 
 ## Step 4. Install, one sub-step at a time (a separate "yes" for each)
@@ -210,7 +213,8 @@ browser and reports every step as FAIL.
 `PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
 script you kept in `.claude/hooks/`, and
 `gitignore` as `.gitignore`. Run `git init` in the
-workspace and commit. Write the installed version (the clone's tag, e.g. `v1.2`) into `.claude/orchestrator-version`;
+workspace and commit. Writing into `.claude/` needs my click on an approval prompt (an approval in chat doesn't count). If
+this session can't show one, give me the exact copy command for `_setup/drafts/dot-claude/` and I'll run it. Write the installed version (the clone's tag, e.g. `v1.2`) into `.claude/orchestrator-version`;
 the upgrade prompt reads it. Then tell me to **restart**: helpers and settings load only in a fresh session.
 
 **Trust the folder.** I open Claude Code in the workspace interactively and accept the trust dialog. Until a folder is
@@ -232,7 +236,8 @@ in the orchestrator clone next to this folder."*
 - Ask me to run `/permissions` and confirm the allow list shows the workspace's rules. If Claude Code reported
   ignoring them, the folder isn't trusted yet.
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
-- Run `claude --version`: it must be **2.1.293 or later**, or `model: haiku` runs the older Haiku 4.5. In the scout's
+- Check the Claude Code version: **2.1.293 or later**. The desktop app has its own copy; if I also start sessions from a
+  terminal, `claude --version` there must pass too, or `model: haiku` runs the older Haiku 4.5. In the scout's
   "OK" run, the task list must show Haiku 5.5. On Amazon Bedrock, Google Cloud or Microsoft Foundry, `haiku` can mean
   an older model: pin `model: claude-haiku-5-5` if your provider offers it, otherwise keep the scout on `sonnet`.
 - Check the output style: your first reply in this session must have been the **Session start** shape (Where we are ·
