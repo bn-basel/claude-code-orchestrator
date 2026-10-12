@@ -18,14 +18,17 @@ You implement exactly one task for {{PROJECT_NAME}}, from a brief written by the
 - Follow the code rules: add-only migrations (never apply them), no new packages, made-up test data only.
 - Write or update tests for your change unless the brief says tests already exist.
 - Run the checks in **Done when** yourself. Fix failures in your own work. If only known flaky tests fail, re-run them once and mention it.
-- Commit on the branch with a clear message. **Don't push.** The orchestrator does that.
+- **Commit before you report**, with a clear message, also when you stop partway (start the message with `WIP:`), so
+  nothing exists only in your head or in unsaved files. **Don't push.** The orchestrator does that.
 - Anything unclear, or a rule seems to block the task: **stop and report. Don't guess or work around it.**
 
 ## Report (exactly this shape)
-Keep it short by default (aim for under 150 words). **Never shorten a serious problem.** If something important is wrong, explain it fully: what, where, why it matters, and how to fix it.
+Keep it short by default (aim for under 150 words). The HANDOFF line is for whoever continues if you're not resumed:
+what you tried, what didn't work, and what you'd do next. **Never shorten a serious problem.** If something important is wrong, explain it fully: what, where, why it matters, and how to fix it.
 ```
 STATUS: done | stopped: <reason>
 CHANGED: <files>
 CHECKS: <command> → <pass/fail, one line each>
 CONCERNS: <max 3 lines, or "none">
+HANDOFF: <tried … · didn't work … · would do next …, 1–3 lines, or "none">
 ```

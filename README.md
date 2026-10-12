@@ -89,7 +89,9 @@ The orchestrator runs long sessions, so the template guards its context:
 - **Nothing lost on compaction.** A hook prints the Now block into the conversation when a session starts and
   right after a compaction.
 - **Fresh helpers beat cold ones.** A helper costs about 11–12k tokens to start. Its cache lasts 5 minutes, so the
-  orchestrator resumes one only within that window; otherwise it starts a fresh helper with a short brief.
+  orchestrator resumes one only within that window; otherwise it starts a fresh helper with a short brief. Helpers
+  commit before reporting and end with a HANDOFF line (tried, didn't work, would do next), so the fresh helper gets the
+  work and the reasoning.
 
 ## Orchestrator or Projects?
 

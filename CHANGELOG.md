@@ -31,6 +31,10 @@ app, so most entries come from something that went wrong or cost too much.
   breaking input), otherwise it counts as a note. Round 2 marks earlier findings ADDRESSED or NOT ADDRESSED and adds no
   new nits. The checklist gets a **production** line (visible failures, no user data in logs, a working undo).
 
+- `implementer` and `test-writer` **commit before reporting** (a `WIP:` commit if they stop partway) and end their
+  report with a **HANDOFF** line: what they tried, what didn't work, what they'd do next. A fresh helper's brief carries
+  that line. A half-done, tangled task is resumed even after 5 minutes.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -49,6 +53,9 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **A fresh helper gets the work, not the thinking.** Starting fresh after the 5-minute cache window is cheaper than a
+  cold resume, but the new helper only sees the committed files. The HANDOFF line carries the reasoning across for a
+  few dozen tokens.
 - **More review rounds stop paying off quickly.** Studies of repair loops find most of the gain in the first two
   rounds, and review loops without a stop rule run away. A cap of 3 plan rounds with an early stop keeps the benefit.
 - **Agreement between reviewers isn't proof.** Anthropic's own code review checks each candidate finding against the

@@ -15,7 +15,8 @@ You write tests **before** the feature is built. Someone else writes the code la
 4. Customer-facing text: test the exact text **through the real code path that sends it**, not against a copy of the string.
 5. Use made-up data only. Database tests only ever run on a throwaway local database.
 6. Your tests **must fail now**, because the feature doesn't exist yet. Run them and confirm. A test that already passes proves nothing, so fix the test.
-7. Commit on the branch. **Don't push.** Anything unclear: **stop and report.**
+7. **Commit before you report**, also when you stop partway (start the message with `WIP:`). **Don't push.** Anything
+   unclear: **stop and report.**
 
 ## Report
 Keep it short by default (aim for under 150 words). **Never shorten a serious problem**; explain it fully.
@@ -24,4 +25,5 @@ STATUS: done | stopped: <reason>
 TESTS: <file::test name → what it proves, one line each>
 FAILS NOW: yes, all | no: <which pass already and why>
 CONCERNS: <max 3 lines, or "none">
+HANDOFF: <tried … · didn't work … · would do next …, 1–3 lines, or "none">
 ```

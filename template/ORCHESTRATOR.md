@@ -88,7 +88,7 @@ After approval, create the branch in the build worktree: `git -C _worktrees/buil
 - frozen test files are untouched;
 - the type check or lint passes where relevant: `{{CHECK_COMMAND}}`.
 
-A failure goes back to the helper with the evidence: the command, the output, and file:line. Resume the same helper only within about 5 minutes; otherwise start a fresh one of the same type (§12). Max 2 tries, then ask {{OWNER}}.
+A failure goes back to the helper with the evidence: the command, the output, and file:line. Resume the same helper only within about 5 minutes; otherwise start a fresh one of the same type and put the first helper's HANDOFF line in its brief (§12). Max 2 tries, then ask {{OWNER}}.
 
 **7. Code review.** Send the reviewer for the label (§4) **only** the plan, the diff (`origin/{{MAIN_BRANCH}}...HEAD`) and the test output. **Never** send the helper's own report. Every review brief also asks: "Does this change make any statement in `docs/ARCHITECTURE.md` untrue? If so, name the section." The map edit then belongs in this PR. Triage the findings:
 - **Blocker, code** → back to Build, that task only, with evidence and scope ("fix only X"). The re-review gets **only the fix** and the earlier findings; the reviewer marks each ADDRESSED or NOT ADDRESSED and adds no new nits.
@@ -240,8 +240,12 @@ A helper resumed after more than 5 idle minutes pays for its entire history agai
 Prices behind the rule: writing to the cache costs 1.25× the normal input price (5-minute cache) or 2× (1-hour cache);
 reading from it costs 0.1× (0.05× on Opus and Sonnet 5.5).
 - **Resume a helper only within about 5 minutes** of its last reply, e.g. a fix round straight after its report.
-- **Otherwise start a fresh helper of the same type** with a short brief: the task, the files, and what failed
-  (command, output, file:line). A 300-word brief costs far less than a cold history of tens of thousands of tokens.
+- **Otherwise start a fresh helper of the same type** with a short brief: the task, the files, what failed (command,
+  output, file:line) and the first helper's **HANDOFF** line (what it tried, what didn't work, what it would do next).
+  Its work is committed, so the fresh helper reads the real files; the HANDOFF line carries the reasoning. A 300-word
+  brief costs far less than a cold history of tens of thousands of tokens.
+- **Exception:** if the task is half-done and too tangled to hand over in a brief, resume the same helper even after
+  5 minutes, pay the re-read, and say so in your summary. The 5-minute rule is about cost, never at the price of quality.
 - **Optional, longer helper cache:** `"subagentPromptCacheTtl": "1h"` in settings (all helpers), or one helper's
   frontmatter:
   ```yaml
