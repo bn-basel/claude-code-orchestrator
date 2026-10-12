@@ -49,7 +49,7 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 
 Effort is fixed inside each agent file and can't be changed per call, which is why there are two reviewer files. The **model** can be changed per call. For a **closed** task, use `implementer-wide` and pass `model: opus` when {{OWNER}} chooses Opus. For the most critical reviews, offer Fable (`adversarial-reviewer`) instead of max effort.
 
-Each helper costs roughly 20k tokens just to start. Group very small tasks into one brief instead of starting a helper for each.
+Each helper costs about 11–12k tokens just to start (measured). Group very small tasks into one brief instead of starting a helper for each. Helpers on the same model share most of that start-up text in the cache when one starts within 5 minutes of another, so run a batch of helpers back to back rather than spread out.
 
 ## 5. The loop
 
@@ -148,16 +148,23 @@ Update **Now** in `PLAN.md` at **every stage change**: Plan → Approved → Bui
 
 ```
 ## Now
+Goal: <one line, in {{OWNER}}'s words>
 Feature: <name> (<label>) · Branch: feat/<name> · Stage: <stage>
 Done: <tasks done> · Next: <next step> · Waiting on: <{{OWNER}} / CI / nothing>
-Budget used: fixes <n>/<max> · review rounds <n>/2
+Must keep: <{{OWNER}}'s decisions that limit this work, with dates, including ones said only in chat>
+Frozen tests: <files, or none>
+Budget used: fixes <n>/<max> · review rounds <n>/2 · plan rounds <n>/3
 ```
 
 Any fresh session must be able to continue from **Now** alone. **Commit `PLAN.md`** in the workspace repo after each update.
 
+**Write {{OWNER}}'s decisions down the moment they're made**, in Must keep and in the decisions log, then commit. A
+decision that lives only in the chat is lost at the next fresh session. (Tested: with Goal and Must keep in Now, a fresh
+session and a session compacted four times both recalled 9 of 9 facts; without them, 8 of 9.)
+
 **If the conversation was compacted (summarised), re-read this file before doing anything else.** A hook prints the Now section into the new context to help (§12). It also prints it when a session starts.
 
-**Rotation:** after a merge, if the conversation is long (about 50% of context or more), suggest a fresh session. Never go past about 700k tokens. Auto-compaction at about 600k is only the safety net (§12).
+**Rotation:** after a merge, if the conversation has passed about 250k tokens, suggest a fresh session. Auto-compaction at 400k is only the safety net (§12).
 
 ## 9. Plan template (in PLAN.md → Current feature)
 
@@ -205,14 +212,18 @@ Report back in the format from your agent file.
 
 ## 12. Context and cache management
 
-**Rotation is the main method** (§8). After a merge, once the conversation passes about half the context, suggest a
-fresh session. It resumes from the Now section of `PLAN.md`. Never go past about 700k tokens.
+**Rotation is the main method** (§8). After a merge, once the conversation passes about 250k tokens, suggest a fresh
+session. It resumes from the Now section of `PLAN.md`. Every message re-sends the whole conversation, so a smaller
+conversation makes every message cheaper.
 
-**Auto-compaction is the safety net.** On 1M-context models, Claude Code compacts on its own only at about 967k
-tokens, well past the 700k limit. So `.claude/settings.json` sets `"autoCompactWindow": 600000`: if a rotation is
-missed, the session compacts at about 600k instead. Other ways to set the same thing:
-- `/autocompact 600k` in a session (saved per model in the owner's user settings);
-- the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=600000` (a plain number: `600k` is read as 600).
+**Auto-compaction is the safety net.** On 1M-context models, Claude Code compacts on its own only at about 967k tokens.
+So `.claude/settings.json` sets `"autoCompactWindow": 400000`: if a rotation is missed, the session compacts at 400k
+instead. Other ways to set the same thing:
+- `/autocompact 400k` in a session (saved per model in the owner's user settings);
+- the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` (a plain number only: `400k` is not accepted).
+
+Claude never sees where the compaction point is (it only gets a fixed overall token budget), so a smaller window doesn't
+make it rush. What it can lose is anything that lives only in the chat, which is why Now carries the Goal and Must keep.
 
 **At session start and after a compaction.** A SessionStart hook prints the Now section of `PLAN.md` into the
 context, with a reminder. Then re-read this file before doing anything else. The hook can only print what Now says,
@@ -221,6 +232,8 @@ so keep Now current at every stage change (§8).
 **Helpers and the prompt cache.** Claude Code caches a conversation so the next turn doesn't pay for the whole
 history again. On a subscription the main session's cache lasts 1 hour, but a helper's lasts only 5 minutes.
 A helper resumed after more than 5 idle minutes pays for its entire history again.
+Prices behind the rule: writing to the cache costs 1.25× the normal input price (5-minute cache) or 2× (1-hour cache);
+reading from it costs 0.1× (0.05× on Opus and Sonnet 5.5).
 - **Resume a helper only within about 5 minutes** of its last reply, e.g. a fix round straight after its report.
 - **Otherwise start a fresh helper of the same type** with a short brief: the task, the files, and what failed
   (command, output, file:line). A 300-word brief costs far less than a cold history of tens of thousands of tokens.
@@ -230,5 +243,6 @@ A helper resumed after more than 5 idle minutes pays for its entire history agai
   experimental:
     cacheTtl: 1h
   ```
-  Worth it only for helpers you regularly resume after 5 to 60 idle minutes. Writing a 1-hour cache costs more than
-  a 5-minute one, so for helpers that run once it's a loss. It's also ignored while the plan is using usage credits.
+  Worth it only if most of a helper's resumes come after a 5 to 60 minute pause (roughly 6 in 10 or more): every
+  write in every run then costs 2× instead of 1.25×, so for helpers that run once it's a loss. It's also ignored while
+  the plan is using usage credits.

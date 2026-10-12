@@ -11,6 +11,12 @@ app, so most entries come from something that went wrong or cost too much.
 - The hook is now `print-now` and runs when a session starts, resumes or is cleared, as well as after a compaction.
   `settings.json` ships one hook (PowerShell); the install switches it to the bash script on macOS and Linux.
 
+- Auto-compaction at 400k (was 600k). After a merge, suggest a fresh session once the conversation passes about
+  250k tokens (was "about half the context", with a 700k ceiling).
+- The Now block gains **Goal**, **Must keep** (the owner's decisions, including ones said only in chat) and **Frozen
+  tests**, and a plan-round counter. The owner's decisions are written down the moment they're made.
+- Corrected numbers: a helper costs about 11–12k tokens to start, and the cache prices are spelled out.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -21,6 +27,14 @@ app, so most entries come from something that went wrong or cost too much.
   another folder as risky, because that folder's git hooks could run. In a test sandbox it blocked every helper commit.
   Splitting it into `cd`, then `git` in the next command, is worse: a helper's folder isn't kept between commands, so
   git ran in the wrong repo. `git -C <folder>` works without a prompt and in the right place.
+- **A helper costs about 11–12k tokens to start, not 20k.** Measured from the helpers' own transcripts in a test
+  sandbox (scout, implementer, test-writer, both reviewers). Helpers on the same model also share about 8k of cached
+  start-up text when they start within 5 minutes of each other.
+- **A smaller compaction window doesn't make Claude forget the goal, if the goal is written down.** With the old Now
+  block, an orchestrator compacted four times lost the goal, and a fresh session lost a decision the owner had only said
+  in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
+- **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
+  or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
 - **When one form is blocked, helpers find another.** Both a Sonnet and a Haiku scout got past the block with
   `git --git-dir=…`. A deny rule now closes that route, and the rules say which form to use instead.
 
@@ -76,6 +90,7 @@ audits, adapts and installs one approved step at a time.
   commit let a test that proved nothing slip through.
 - **Each code review asks whether the change makes the architecture map untrue.** The map update ships in the same PR.
 - **Each helper costs about 20k tokens just to start**, so very small tasks are grouped into one brief.
+  *(Measured in v1.2: about 11–12k.)*
 - **"Done" means *the* production path uses it**, not *a* production path. A new write path once skipped a guard
   the old one had.
 - **Shared test setup means running the whole suite.** Shared fixtures broke unrelated tests.

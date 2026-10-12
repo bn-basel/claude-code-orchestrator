@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "effortLevel": "high",
-  "autoCompactWindow": 600000,
+  "autoCompactWindow": 400000,
   "permissions": {
     "defaultMode": "acceptEdits",
     "disableBypassPermissionsMode": "disable",

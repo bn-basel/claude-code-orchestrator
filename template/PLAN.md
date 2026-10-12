@@ -1,8 +1,11 @@
 # PLAN
 
 ## Now
+Goal: —
 Feature: — · Branch: — · Stage: ready for the first trial
 Done: setup · Next: first trial (a small, safe change) · Waiting on: {{OWNER}} to start
+Must keep: —
+Frozen tests: none
 Budget used: —
 
 ## Vision

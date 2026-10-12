@@ -76,14 +76,15 @@ No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows?
 
 The orchestrator runs long sessions, so the template guards its context:
 
-- **Rotate first.** After a merge, past about half the context, start a fresh session. The Now block in `PLAN.md`
-  carries the state over.
-- **Auto-compact at about 600k as a backup.** On 1M-context models Claude Code would otherwise wait until about
-  967k. The template sets `"autoCompactWindow": 600000`; `/autocompact 600k` does the same for one model.
+- **Rotate first.** After a merge, past about 250k tokens, start a fresh session. The Now block in `PLAN.md`
+  carries the state over: the goal, the stage, the next step, and your decisions, written down as you make them.
+- **Auto-compact at 400k as a backup.** On 1M-context models Claude Code would otherwise wait until about 967k, and
+  every message re-sends the whole conversation. The template sets `"autoCompactWindow": 400000`; `/autocompact 400k`
+  does the same for one model.
 - **Nothing lost on compaction.** A hook prints the Now block into the conversation when a session starts and
   right after a compaction.
-- **Fresh helpers beat cold ones.** A helper's cache lasts 5 minutes, so the orchestrator resumes one only within
-  that window; otherwise it starts a fresh helper with a short brief.
+- **Fresh helpers beat cold ones.** A helper costs about 11–12k tokens to start. Its cache lasts 5 minutes, so the
+  orchestrator resumes one only within that window; otherwise it starts a fresh helper with a short brief.
 
 ## Orchestrator or Projects?
 

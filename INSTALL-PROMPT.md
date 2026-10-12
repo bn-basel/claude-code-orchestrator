@@ -130,7 +130,7 @@ unless I want AI attribution lines.
 when a session starts, resumes or is cleared, and right after a compaction. Claude Code has no per-system switch for
 hooks, so on macOS or Linux replace that hook's `command` and `args` with
 `"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/print-now.sh\""`, and keep only the
-`.sh` script in the drafts. Keep `"autoCompactWindow": 600000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
+`.sh` script in the drafts. Keep `"autoCompactWindow": 400000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
 
 Write the results to `_setup/drafts/` (not into the project yet), then prove nothing is left:
 search the drafts for `{{` and `ADAPT:`, and check that `settings.json` parses as JSON.

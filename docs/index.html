@@ -470,9 +470,9 @@
           <button class="copy" type="button" data-copy="startline-text" hidden>Copy</button>
         </div>
         <ul class="ticks">
-          <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, so any fresh session can pick up where the last one stopped.</li>
-          <li>Start a fresh session after a merge once the context passes about half.</li>
-          <li>Never go past about 700k tokens. As a safety net, the template sets auto-compaction to about 600k; on 1M-context models it would otherwise wait until about 967k.</li>
+          <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, with the goal and your decisions written down as you make them, so any fresh session can pick up where the last one stopped.</li>
+          <li>Start a fresh session after a merge once the conversation passes about 250k tokens.</li>
+          <li>As a safety net, the template sets auto-compaction to 400k; on 1M-context models it would otherwise wait until about 967k.</li>
           <li>When a session starts and after any compaction, a hook prints the <strong>Now</strong> block into the conversation, so the current state is never lost.</li>
           <li>A helper's cache lasts only 5 minutes. Resume a helper within that window; otherwise start a fresh one with a short brief.</li>
         </ul>
@@ -492,6 +492,8 @@
       <li>
         <div class="log-meta"><span class="log-ver">v1.2</span><span class="log-date">Oct 2026</span></div>
         <ul>
+          <li>Auto-compaction moves to 400k and sessions rotate after about 250k. Now carries the goal and your decisions: with them, a fresh session recalled 9 of 9 facts, without them 8.</li>
+          <li>A helper costs about 11–12k tokens to start (measured), not 20k.</li>
           <li>Git runs as <code>git -C &lt;folder&gt;</code>. Claude Code now asks before <code>cd</code> + git, and a separate <code>cd</code> made git run in the wrong repo.</li>
         </ul>
       </li>
@@ -512,7 +514,7 @@
           <li>Ask rules don't stop helpers from starting, so Fable's gate is a written rule plus a log.</li>
           <li>Feature branches are created with <code>--no-track</code>, so a push can never aim at main.</li>
           <li>New tests are judged against main, also in fix rounds.</li>
-          <li>Each helper costs about 20k tokens just to start, so small tasks are grouped.</li>
+          <li>Each helper costs tokens just to start (measured at about 11–12k in v1.2), so small tasks are grouped.</li>
         </ul>
       </li>
     </ol>
