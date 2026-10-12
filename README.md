@@ -53,7 +53,8 @@ trial feature. After that, start every session with:
 You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
 ```
 
-You need Claude Code, your code on GitHub, the `gh` command-line tool, and access to Opus and Sonnet.
+You need Claude Code 2.1.293 or later, your code on GitHub, the `gh` command-line tool, and access to Opus, Sonnet
+and Haiku.
 
 ## Make it yours
 

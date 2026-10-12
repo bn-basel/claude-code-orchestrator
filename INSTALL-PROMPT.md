@@ -181,6 +181,9 @@ In the new session I'll paste: *"Continue the install from `_setup/PROGRESS.md`.
   `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
   "·" and "—" intact. This session's own start should already show the same Now section once (not twice).
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
+- Run `claude --version`: it must be **2.1.293 or later**, or `model: haiku` runs the older Haiku 4.5. In the scout's
+  "OK" run, the task list must show Haiku 5.5. On Amazon Bedrock, Google Cloud or Microsoft Foundry, `haiku` can mean
+  an older model: pin `model: claude-haiku-5-5` if your provider offers it, otherwise keep the scout on `sonnet`.
 - Check the output style: your first reply in this session must have been the **Session start** shape (Where we are ·
   Next · Blocking). If it wasn't, check `"outputStyle": "Orchestrator"` in `settings.json` and that the style file is
   in `.claude/output-styles/`.

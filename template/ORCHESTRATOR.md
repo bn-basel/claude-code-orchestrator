@@ -39,11 +39,16 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 | Implementer | `implementer` (Sonnet, high) | `implementer-wide` (Sonnet, xhigh) | recommend (usually Opus); {{OWNER}} decides |
 | Check by command | ✓ | ✓ | ✓ |
 | Code review | `reviewer-light` (Opus, high) | `reviewer` (Opus, xhigh) | `reviewer` (offer Fable) |
-| Lookups and probes (any label) | `scout` (Sonnet, medium) | `scout` | `scout` |
+| Lookups and probes (any label) | `scout` (Haiku 5.5, medium) | `scout` | `scout` |
 
 **Scout vs reviewer:** any simple investigation (where is X, what does Y do, which files mention Z, what a helper receives, a read-only probe) goes to `scout`: one question, a brief answer with file:line evidence. Reviewers are only for plan reviews and code reviews.
 
 Effort is fixed inside each agent file and can't be changed per call, which is why there are two reviewer files. The **model** can be changed per call. For a **closed** task, use `implementer-wide` and pass `model: opus` when {{OWNER}} chooses Opus. For the most critical reviews, offer Fable (`adversarial-reviewer`) instead of max effort.
+
+**Checking the scout.** It runs on Haiku 5.5: about 13× cheaper than Sonnet, and in testing just as accurate on code
+lookups. Before you act on a scout answer, check its key file:line yourself (one read). Count wrong answers in the
+Trial log. If **2 or more of the first 10** are wrong, or one wrong answer caused rework, set `model: sonnet` in
+`scout.md` and log the switch.
 
 Each helper costs about 11–12k tokens just to start (measured). Group very small tasks into one brief instead of starting a helper for each. Helpers on the same model share most of that start-up text in the cache when one starts within 5 minutes of another, so run a batch of helpers back to back rather than spread out.
 

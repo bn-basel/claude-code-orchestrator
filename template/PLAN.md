@@ -27,5 +27,5 @@ Budget used: —
 - <!-- date --> · Moved to the orchestrator + helpers workflow · {{OWNER}}
 
 ## Trial log (first features only; delete after the look-back)
-| Feature | Task | Label | Helper / effort | Check passed 1st try | Review rounds | Pop-ups | Notes |
-|---|---|---|---|---|---|---|---|
+| Feature | Task | Label | Helper / effort | Check passed 1st try | Review rounds | Pop-ups | Scout answers wrong | Notes |
+|---|---|---|---|---|---|---|---|---|

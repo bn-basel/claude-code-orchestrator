@@ -21,6 +21,10 @@ app, so most entries come from something that went wrong or cost too much.
   five fixed reply shapes: Session start, Decision request, Plan approval, Progress and Done report. `ORCHESTRATOR.md`
   §3 now points to it instead of repeating the rules.
 
+- `scout` runs on **Haiku 5.5** and skips `CLAUDE.md` (`omitClaudeMd`; its own file holds its rules). The Trial log
+  counts wrong scout answers; 2 or more wrong in the first 10 switches it back to Sonnet. The install checks for Claude
+  Code 2.1.293 or later.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -39,6 +43,9 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **Haiku 5.5 is good enough for lookups.** Same 10 code questions with known answers (a trap question among them):
+  Sonnet 10 of 10, Haiku 10 of 10, about the same speed, Haiku about 13× cheaper per question.
+- **`model: haiku` depends on the Claude Code version.** On 2.1.292 it ran Haiku 4.5; from 2.1.293 it runs Haiku 5.5.
 - **A playbook says what to do; it doesn't hold the shape of the replies.** Each new orchestrator session read the
   talking rules a little differently. An output style is sent with every request, so the shapes hold from the first
   message and through compaction. It's still an instruction, not a guarantee, so the test compares sessions with and
