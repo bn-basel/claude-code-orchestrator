@@ -51,6 +51,10 @@ app, so most entries come from something that went wrong or cost too much.
 - The install now says to **trust the workspace folder** (allow rules are ignored until you do) and checks it with
   `/permissions`. It also warns that branch protection on private repos needs a paid GitHub plan.
 
+- **`UPGRADE-PROMPT.md`**: moves an installed workspace to a newer tagged version. It takes the template diff between the
+  two versions, carries each change over onto your adapted files, shows conflicts side by side, and applies only what
+  you approve, then re-runs the relevant install checks.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -69,6 +73,9 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **An upgrade must not overwrite what you adapted.** Copying new template files over an installed workspace would
+  undo every project-specific rule. Applying the template's *diff* between two tagged versions keeps them, and needs the
+  installed version written down, hence the version file.
 - **Allow rules do nothing in an untrusted folder.** Claude Code ignores a project's allow rules until the folder is
   trusted, so a fresh workspace pops up on every command and the rules look broken. The install now says so.
 - **Branch protection needs a CI check to require, and a plan that allows it.** A brand-new project has neither until

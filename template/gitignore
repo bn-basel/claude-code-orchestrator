@@ -10,6 +10,7 @@ _ui-evidence/
 # Setup notes and backups (old settings files can contain tokens)
 _setup/
 _setup-done/
+_upgrade/
 
 # Secrets and local-only settings
 .env

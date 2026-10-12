@@ -5,6 +5,8 @@ A public template of a multi-agent workflow for Claude Code, plus its project pa
 - `template/`: the files people install. Generic only: placeholders like `{{PROJECT_NAME}}`, never a real product,
   client, provider, path, phone number or email.
 - `INSTALL-PROMPT.md`: the prompt that installs `template/` into another project. Keep it in step with `template/`.
+- `UPGRADE-PROMPT.md`: the prompt that upgrades an installed workspace between tagged versions. Keep it in step too.
+- Releases are git tags (`v1.1`, `v1.2`, …). The install line and the upgrade prompt rely on them.
 - `docs/`: the project page (GitHub Pages, served from `/docs`). Plain HTML/CSS/JS, no build step, no trackers.
 - `CHANGELOG.md`: every change to the system, with the lesson behind it. The site's "Lessons" section mirrors it.
 

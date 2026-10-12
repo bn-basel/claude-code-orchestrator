@@ -4,7 +4,7 @@
 task to a specialised helper, proves every change by running commands, and opens one pull request. You approve the
 plan and click merge.
 
-[Install prompt](INSTALL-PROMPT.md) · [Changelog](CHANGELOG.md) · [Project page](https://bn-basel.github.io/claude-code-orchestrator/)
+[Install prompt](INSTALL-PROMPT.md) · [Upgrade prompt](UPGRADE-PROMPT.md) · [Changelog](CHANGELOG.md) · [Project page](https://bn-basel.github.io/claude-code-orchestrator/)
 
 ## Why I built this
 
@@ -85,6 +85,18 @@ The install prompt walks you through these:
   parallel, each in its own worktree. It saves waiting time, not tokens, so it's off by default.
 
 No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules and point the hook at `print-now.sh` (the install does both).
+
+## Upgrades
+
+The install records its version in `.claude/orchestrator-version`. To move to a newer version, open Claude Code in your
+workspace and type:
+
+```
+Upgrade the Claude Code Orchestrator here to v1.2: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+```
+
+It compares the two template versions and applies only the changes, one by one with your yes, onto your adapted files.
+Your own rules stay.
 
 ## Long sessions
 
