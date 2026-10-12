@@ -430,7 +430,7 @@
       </li>
       <li class="ly-bump">
         <span class="ly-kind">Speed bump</span>
-        <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets, migrations and the production scripts folder. They match command text, which is why the walls exist.</p></div>
+        <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets, migrations and the production scripts folder, also when git is pointed at another folder with <code>-C</code>. They match command text, which is why the walls exist.</p></div>
       </li>
       <li class="ly-bump">
         <span class="ly-kind">Speed bump</span>
@@ -489,6 +489,12 @@
       <p class="sec-intro">What each version changed, and why. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.2</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>Git runs as <code>git -C &lt;folder&gt;</code>. Claude Code now asks before <code>cd</code> + git, and a separate <code>cd</code> made git run in the wrong repo.</li>
+        </ul>
+      </li>
       <li>
         <div class="log-meta"><span class="log-ver">v1.1</span><span class="log-date">Oct 2026</span></div>
         <ul>

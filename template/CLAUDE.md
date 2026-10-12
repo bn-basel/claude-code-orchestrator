@@ -54,7 +54,10 @@ If a task seems to need any of the above: **stop and report**. Don't work around
 
 - Change files only with the **Edit and Write tools**. No `sed -i` and no ad-hoc scripts that rewrite files: those skip the permission rules and leave no clear record.
 - **Never run a command that waits for input without giving it any** (e.g. `cat > file` with nothing piped in). It hangs in the background for hours.
-- Run git as `cd <folder> && git …`, never `git -C <folder> …`. The allow list only matches commands that start with `git`.
+- **Run git as `git -C <folder> …`**, e.g. `git -C _worktrees/build status`. Never `cd <folder> && git …`: Claude Code
+  asks for approval every time, because git in another folder can run that folder's hooks. Never `cd` in one command and
+  git in the next: the folder isn't kept between commands, so git runs in the wrong repo. `--git-dir` and `--work-tree`
+  are blocked. Other commands may still use `cd <folder> && <command>`, e.g. to run tests.
 - If more than one GitHub account is logged in, `gh` can drift to the wrong one. The right one is **{{GITHUB_ACCOUNT}}**. Check with `gh auth status`.
 - To confirm a deploy, use **GitHub statuses**. A health endpoint usually can't show which version is live.
 <!-- ADAPT: add your own traps. Examples: "Windows shell: no heredocs." · "Set PYTHONIOENCODING=utf-8 before printing non-English text." · "The database stores UTC; the test store uses local time. Never mix them without converting." -->

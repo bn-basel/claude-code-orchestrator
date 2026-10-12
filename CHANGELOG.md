@@ -3,6 +3,20 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## v1.2 · unreleased
+
+**Changed**
+- Every git command runs as `git -C <folder> …`. Allow rules are written in that form; deny rules also catch pushes to
+  main and force pushes written with `-C`, and block `--git-dir` and `--work-tree`.
+
+**Lessons**
+- **`cd <folder> && git …` now asks for approval every time** (reverses the v1.0 lesson). Claude Code treats git in
+  another folder as risky, because that folder's git hooks could run. In a test sandbox it blocked every helper commit.
+  Splitting it into `cd`, then `git` in the next command, is worse: a helper's folder isn't kept between commands, so
+  git ran in the wrong repo. `git -C <folder>` works without a prompt and in the right place.
+- **When one form is blocked, helpers find another.** Both a Sonnet and a Haiku scout got past the block with
+  `git --git-dir=…`. A deny rule now closes that route, and the rules say which form to use instead.
+
 ## v1.1 · 2026-10-10 · context and cache management
 
 **Added**
@@ -62,6 +76,7 @@ audits, adapts and installs one approved step at a time.
 - **Never print HTTP error bodies or headers.** One leaked an API key into a transcript.
 - **A command waiting for input, given none, hung in the background for 1.5 hours.**
 - **`cd <dir> && git …`, not `git -C`.** Allow rules match the start of a command, so `-C` caused needless pop-ups.
+  *(Reversed in v1.2: Claude Code now asks before `cd` + git, so the rules are written for `git -C`.)*
 - **Confirm deploys from GitHub statuses.** A health endpoint couldn't show which version was live.
 - **Re-apply a migration that was edited after it was applied**, before the merge. Drift checks can't catch it afterwards.
 - **No AI attribution lines** in commits or PRs (set in `settings.json`).

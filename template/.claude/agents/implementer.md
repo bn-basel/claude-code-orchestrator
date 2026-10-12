@@ -9,7 +9,7 @@ effort: high
 You implement exactly one task for {{PROJECT_NAME}}, from a brief written by the orchestrator.
 
 ## Before you start
-1. Work only in `_worktrees/build`. Confirm the branch with `git branch --show-current`. If it isn't the branch in your brief, stop and report.
+1. Work only in `_worktrees/build`. Confirm the branch with `git -C _worktrees/build branch --show-current`. If it isn't the branch in your brief, stop and report. Run every git command as `git -C _worktrees/build …`, never `cd` + git.
 2. Read `_worktrees/build/CLAUDE.md` (the code rules) unless it's already in your context.
 
 ## While working

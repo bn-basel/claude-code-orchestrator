@@ -9,7 +9,7 @@ effort: high
 You write tests **before** the feature is built. Someone else writes the code later, and they can't edit your tests. So your tests define what "working" means.
 
 ## Rules
-1. Work only in `_worktrees/build`, on the branch in your brief (check with `git branch --show-current`). Read `_worktrees/build/CLAUDE.md` unless it's already in your context.
+1. Work only in `_worktrees/build`, on the branch in your brief (check with `git -C _worktrees/build branch --show-current`; run every git command as `git -C _worktrees/build …`). Read `_worktrees/build/CLAUDE.md` unless it's already in your context.
 2. Write tests **only**. Never change product code.
 3. Turn every "Done when" line into at least one test. Test behaviour that a user would notice, not internal details.
 4. Customer-facing text: test the exact text **through the real code path that sends it**, not against a copy of the string.

@@ -43,7 +43,8 @@ Read every file in the template folder first. Text like `{{PROJECT_NAME}}` is a 
 - Never push to the main branch, merge, force-push or rewrite history.
 - **Never delete anything.** Move files into `_setup/moved/` instead, and tell me.
 - Start no helpers (subagents) unless a step says so.
-- Run git as `cd <folder> && git …`, not `git -C`.
+- Run git as `git -C <folder> …`. Never `cd <folder> && git …` (Claude Code asks for approval every time) and never
+  `cd` in one command with git in the next (the folder isn't kept, so git runs in the wrong repo).
 - If something doesn't match what the template expects: **stop and ask**. Don't guess.
 
 ## Step 1. Backup
@@ -147,11 +148,11 @@ Afterwards, tell me how to confirm the tests still pass locally.
 **4c. Workspace.** Create the layout from Step 3: the fresh clone in `{{CODE_DIR}}/`, `backlog/`, `ops/`,
 `_worktrees/`. Move production scripts into `ops/` (move, never delete). Show me the final top-level tree.
 
-**4d. Build worktree.** `cd {{CODE_DIR}} && git fetch && git worktree add --detach ../_worktrees/build origin/{{MAIN_BRANCH}}`.
+**4d. Build worktree.** `git -C {{CODE_DIR}} fetch`, then `git -C {{CODE_DIR}} worktree add --detach ../_worktrees/build origin/{{MAIN_BRANCH}}`.
 Set up its dependencies (this asks me) and run one test to prove it works.
 
 **4e. First code-repo PR (docs only, no app code).** In `_worktrees/build`, create the branch with
-`git switch -c feat/orchestrator-rules --no-track origin/{{MAIN_BRANCH}}`, add the adapted `code-repo/CLAUDE.md`
+`git -C _worktrees/build switch -c feat/orchestrator-rules --no-track origin/{{MAIN_BRANCH}}`, add the adapted `code-repo/CLAUDE.md`
 (merge it with any existing one) and `.github/pull_request_template.md`, commit, push the branch, and open the PR
 using the template. Wait for CI to pass, then tell me it's ready. **I merge.**
 
