@@ -25,6 +25,12 @@ app, so most entries come from something that went wrong or cost too much.
   counts wrong scout answers; 2 or more wrong in the first 10 switches it back to Sonnet. The install checks for Claude
   Code 2.1.293 or later.
 
+- **Plan review**: at most 3 rounds, stopping early when only style points remain or the plan didn't change; the
+  reviewer checks that every file, function and table the plan names exists.
+- **Code review**: every blocker and should-fix needs evidence (a command and its output, a failing test, or a concrete
+  breaking input), otherwise it counts as a note. Round 2 marks earlier findings ADDRESSED or NOT ADDRESSED and adds no
+  new nits. The checklist gets a **production** line (visible failures, no user data in logs, a working undo).
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -43,6 +49,10 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **More review rounds stop paying off quickly.** Studies of repair loops find most of the gain in the first two
+  rounds, and review loops without a stop rule run away. A cap of 3 plan rounds with an early stop keeps the benefit.
+- **Agreement between reviewers isn't proof.** Anthropic's own code review checks each candidate finding against the
+  real code before reporting it. One reviewer that has to show evidence is cheaper than a panel of specialists.
 - **Haiku 5.5 is good enough for lookups.** Same 10 code questions with known answers (a trap question among them):
   Sonnet 10 of 10, Haiku 10 of 10, about the same speed, Haiku about 13× cheaper per question.
 - **`model: haiku` depends on the Claude Code version.** On 2.1.292 it ran Haiku 4.5; from 2.1.293 it runs Haiku 5.5.

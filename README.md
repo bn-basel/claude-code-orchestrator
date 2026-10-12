@@ -28,7 +28,8 @@ as my own workflow improves.
 
 Every task gets a label from one question: *if this goes wrong, how hard is it to undo?* **Small** work takes the
 light path. **Wide** and **closed** work also gets a review of the plan and tests written before the code. Every way
-back has a budget of two fixes per task and two review rounds; after that, you decide.
+back has a budget: two fixes per task, two code-review rounds and three plan-review rounds; after that, you decide.
+Every review finding has to come with evidence, such as a command and its output, or it doesn't send work back.
 
 ## The team
 

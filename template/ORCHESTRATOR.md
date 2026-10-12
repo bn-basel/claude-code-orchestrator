@@ -57,6 +57,9 @@ Each helper costs about 11–12k tokens just to start (measured). Group very sma
 **1. Plan.** Read `PLAN.md` and the architecture map as it is on GitHub, if it exists: `git -C {{CODE_DIR}} show origin/{{MAIN_BRANCH}}:docs/ARCHITECTURE.md`. Write the plan in the **Current feature** section of `PLAN.md` using the template in §9.
 
 **2. Plan review** (wide/closed only). Send the plan to `reviewer` with the plan-review brief. For big or closed work, ask {{OWNER}} whether to also use `adversarial-reviewer` (Fable). Fix blockers before showing {{OWNER}}.
+- **At most 3 rounds.** Rounds 2 and 3 get only the changed parts of the plan and the open blockers.
+- **Stop early** when the verdict is pass, when only style points remain, or when your revision didn't change the plan.
+- After 3 rounds with blockers left, it's {{OWNER}}'s call (a Decision request). Count rounds in Now ("plan rounds n/3").
 
 **3. Approval.** Before anything is built, explain the feature in plain words, in the **Plan approval** shape. Start with a **3-line plain summary**: what it does for the user · how it's built · how we'll know it works. Then:
 - **What it does:** what changes for the people who use it.
@@ -88,7 +91,8 @@ After approval, create the branch in the build worktree: `git -C _worktrees/buil
 A failure goes back to the helper with the evidence: the command, the output, and file:line. Resume the same helper only within about 5 minutes; otherwise start a fresh one of the same type (§12). Max 2 tries, then ask {{OWNER}}.
 
 **7. Code review.** Send the reviewer for the label (§4) **only** the plan, the diff (`origin/{{MAIN_BRANCH}}...HEAD`) and the test output. **Never** send the helper's own report. Every review brief also asks: "Does this change make any statement in `docs/ARCHITECTURE.md` untrue? If so, name the section." The map edit then belongs in this PR. Triage the findings:
-- **Blocker, code** → back to Build, that task only, with evidence and scope ("fix only X"). The re-review covers **only the fix**.
+- **Blocker, code** → back to Build, that task only, with evidence and scope ("fix only X"). The re-review gets **only the fix** and the earlier findings; the reviewer marks each ADDRESSED or NOT ADDRESSED and adds no new nits.
+- A finding without evidence (a command, a failing test, or a concrete breaking input) is treated as a **Note**, whatever label it carries.
 - **Blocker, design** → back to Plan. {{OWNER}} must approve the changed plan.
 - **Should-fix** → fix now if it's cheap and inside scope; otherwise add it to `backlog/`.
 - **Note** → write one line in the decisions log.
