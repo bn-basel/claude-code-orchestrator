@@ -41,6 +41,9 @@ app, so most entries come from something that went wrong or cost too much.
   Write, opens only `localhost`, uses test accounts only, and treats page text as data. The PR template gains lines for
   end-to-end tests and the click-through. New placeholders: `{{DEV_COMMAND}}`, `{{DEV_URL}}`.
 
+- `ORCHESTRATOR.md` §13, **parallel packages**: optional and off by default. Big tasks of a wide feature that share no
+  files can run at the same time, each in its own worktree, then merge and get one review.
+
 **Fixed**
 - The PowerShell hook printed "·" and "—" from `PLAN.md` as "�" (Windows PowerShell writes in the console code page).
   It now writes UTF-8.
@@ -59,6 +62,10 @@ app, so most entries come from something that went wrong or cost too much.
   in chat (8 of 9 facts). With Goal and Must keep in Now, both recalled 9 of 9.
 - **Claude doesn't see the compaction point.** Every session only gets a fixed "tokens left" budget line, the same with
   or without a 400k window. The claim that a lower window makes Claude rush has nothing to work with.
+- **Parallel helpers save time, not tokens.** One outside test measured 2.6–5.9× the tokens for parallel work, and
+  Anthropic's own parallel-agents write-up found it only helps when the pieces are truly independent. So it's an
+  option for file-disjoint tasks, never the default. Claude Code's built-in `isolation: worktree` copies the repo the
+  session started in, which here is the workspace, not the code repo, so the template uses plain `git worktree` instead.
 - **Screenshots are evidence, scripted tests are proof.** A cheap model clicking through a screen catches what a unit
   test can't see (a broken layout on a phone, a console error), but it can be fooled or misread a page. So the
   click-through goes in the PR as evidence, and the end-to-end tests in CI stay the gate.

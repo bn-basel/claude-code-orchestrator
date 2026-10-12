@@ -264,3 +264,22 @@ reading from it costs 0.1× (0.05× on Opus and Sonnet 5.5).
   Worth it only if most of a helper's resumes come after a 5 to 60 minute pause (roughly 6 in 10 or more): every
   write in every run then costs 2× instead of 1.25×, so for helpers that run once it's a loss. It's also ignored while
   the plan is using usage credits.
+
+## 13. Parallel packages (optional, off by default)
+
+Normally tasks run one after another in `_worktrees/build`. For a **wide** feature with two or more big tasks that
+touch **no common files**, you may propose running them at the same time, each in its own folder. It saves waiting
+time, not tokens: every package is one more helper start, one more folder and one more merge.
+
+- **Only when:** the tasks share no file (check the "Files allowed" lists), each is big enough that waiting matters,
+  and the label is wide. Never for closed work.
+- **In the plan:** say so in the Cost line ("2 packages in parallel"), so {{OWNER}}'s approval covers it.
+- **How:**
+  1. one folder per package: `git -C {{CODE_DIR}} worktree add ../_worktrees/pkg-a -b feat/<name>-a origin/{{MAIN_BRANCH}}`;
+  2. one implementer per package, its brief naming its own folder (`Work in: _worktrees/pkg-a`);
+  3. check each package by command in its own folder;
+  4. merge the package branches into `feat/<name>` in `_worktrees/build`, run the full checks once, then one code
+     review of the whole diff;
+  5. remove the package folders (`git -C {{CODE_DIR}} worktree remove ../_worktrees/pkg-a`).
+- A merge conflict means the tasks weren't independent: stop, finish the rest one after another, and log the lesson.
+- There are no allow rules for these commands on purpose: each one asks, so parallel work never starts by accident.

@@ -76,6 +76,8 @@ The install prompt walks you through these:
 - **Decide** the spots marked `<!-- ADAPT -->`: what counts as small, wide or closed in your code, and your product rules.
 - **Review** the deny list in `.claude/settings.json`, and add your own production scripts to it.
 - **Keep** the core: the loop, the labels, checking by command, and one PR per feature.
+- **Optional:** for a wide feature whose big tasks share no files, `ORCHESTRATOR.md` §13 describes running them in
+  parallel, each in its own worktree. It saves waiting time, not tokens, so it's off by default.
 
 No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules and point the hook at `print-now.sh` (the install does both).
 
