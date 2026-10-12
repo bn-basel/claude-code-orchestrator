@@ -6,6 +6,9 @@ BRIEF.md
 CLAUDE.local.md
 .claude/settings.local.json
 
+# Private research notes
+_research/
+
 # QA output and scratch
 shots/
 _worktrees/
