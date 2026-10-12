@@ -104,6 +104,10 @@ app, so most entries come from something that went wrong or cost too much.
   talking rules a little differently. An output style is sent with every request, so the shapes hold from the first
   message and through compaction. It's still an instruction, not a guarantee, so the test compares sessions with and
   without it.
+- **Allow rules match the text, so the path has to be written the same way.** In testing, reviewers and a scout wrote
+  `git -C C:\…\_worktrees\build …` with a full path; it didn't match `git -C _worktrees/build …` and was blocked. The
+  rules now say to write folders relative and with forward slashes. Likewise `; echo $?` made Claude Code ask for
+  approval, because it can't check a `$` variable.
 - **When one form is blocked, helpers find another.** Both a Sonnet and a Haiku scout got past the block with
   `git --git-dir=…`. A deny rule now closes that route, and the rules say which form to use instead.
 

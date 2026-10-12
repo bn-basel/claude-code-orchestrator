@@ -59,6 +59,11 @@ If a task seems to need any of the above: **stop and report**. Don't work around
   asks for approval every time, because git in another folder can run that folder's hooks. Never `cd` in one command and
   git in the next: the folder isn't kept between commands, so git runs in the wrong repo. `--git-dir` and `--work-tree`
   are blocked. Other commands may still use `cd <folder> && <command>`, e.g. to run tests.
+- **Write folders exactly as the rules do: relative to this workspace, with forward slashes** (`git -C _worktrees/build …`,
+  `git -C {{CODE_DIR}} …`). A full path (`C:\…`, `/c/…`) or backslashes don't match the allow list, so the command is
+  blocked or asks for approval.
+- Don't add `; echo $?` or other `$` variables to a command: Claude Code can't check them and asks for approval. The
+  tool already reports the exit code. Run one command per call rather than chaining several with `;`.
 - If more than one GitHub account is logged in, `gh` can drift to the wrong one. The right one is **{{GITHUB_ACCOUNT}}**. Check with `gh auth status`.
 - To confirm a deploy, use **GitHub statuses**. A health endpoint usually can't show which version is live.
 <!-- ADAPT: add your own traps. Examples: "Windows shell: no heredocs." · "Set PYTHONIOENCODING=utf-8 before printing non-English text." · "The database stores UTC; the test store uses local time. Never mix them without converting." -->
