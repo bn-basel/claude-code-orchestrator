@@ -524,6 +524,7 @@
           <li>Start a fresh session after a merge once the conversation passes about 250k tokens.</li>
           <li>As a safety net, the template sets auto-compaction to 400k; on 1M-context models it would otherwise wait until about 967k.</li>
           <li>Every reply follows one of five fixed shapes (an output style), from the first message of every session.</li>
+          <li>How the agents talk to you (length, tone, how decisions look, questions at a time, language) is chosen at install and stored in the project, so every chat in it follows your voice.</li>
           <li>When a session starts and after any compaction, a hook prints the <strong>Now</strong> block into the conversation, so the current state is never lost.</li>
           <li>A helper's cache lasts only 5 minutes. Resume a helper within that window; otherwise start a fresh one with a short brief that includes the first helper's handoff line: what it tried, what didn't work, what it would do next.</li>
         </ul>
@@ -544,6 +545,7 @@
         <div class="log-meta"><span class="log-ver">v1.3</span><span class="log-date">Oct 2026</span></div>
         <ul>
           <li>Hard limits: one table says which models each helper may use, and a guard hook enforces it before every launch. Effort stops at xhigh unless you say yes to max, in chat and then on a pop-up. A written limit is a wish; a hook is a limit.</li>
+          <li>Your voice belongs to the project: the install asks how you want to be spoken to, and every chat in that project follows it.</li>
         </ul>
       </li>
       <li>

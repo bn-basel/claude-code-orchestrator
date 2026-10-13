@@ -20,6 +20,11 @@ app, so most entries come from something that went wrong or cost too much.
   `effortLevel` stays `high`; the owner raises the main session with `/effort` when they want to.
 - This repo's own `.claude/settings.json` follows the same limits, with the template's guard: only two read-only built-in
   helpers (Explore, claude-code-guide), for research, with Sonnet or Haiku named in the launch.
+- **A per-project voice.** The output style gains a **Voice** section with the owner's preferences (plain short words,
+  answer first, a scenario for every decision, at most 3 options and 2 questions at a time, who does what, commands in
+  their own code block, say when unsure, push back, never ask for secrets in chat). `CLAUDE.md` gets a short "Talking
+  to the owner" section, so helpers and every other chat in the project follow it too. The install shows the defaults
+  as one list and asks which to change.
 
 **Fixed**
 - "Effort is fixed per agent file and can't be changed per call" was out of date: since Claude Code 2.1.292 the Agent
@@ -32,6 +37,8 @@ app, so most entries come from something that went wrong or cost too much.
   guard turns the table into something Claude Code enforces, and its message lets the orchestrator correct itself
   instead of stalling. Settings alone can't do it: `availableModels` is one list for every helper, and a deny rule
   can't tell scout from reviewer.
+- **The voice belongs to the project.** A global style follows the owner into every project, including ones where
+  someone else decides; kept in the project's files, it travels with the project and every chat in it uses it.
 
 ## v1.2 · 2026-10-12 · measured: git -C, a Haiku scout, fixed reply shapes, ui-tester
 

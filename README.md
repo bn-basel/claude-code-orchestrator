@@ -87,6 +87,8 @@ The install prompt walks you through these:
 
 - **Fill in** the placeholders like `{{PROJECT_NAME}}`, `{{MAIN_BRANCH}}` and your test commands.
 - **Decide** the spots marked `<!-- ADAPT -->`: what counts as small, wide or closed in your code, and your product rules.
+- **Choose the voice**: how every chat in the project talks to you (length, tone, how decisions look, questions at a
+  time, language). It's stored in the project, in the output style's Voice section and in `CLAUDE.md`, never globally.
 - **Review** the deny list in `.claude/settings.json`, and add your own production scripts to it.
 - **Check** `.claude/model-policy.md` if you change a helper's model; the install runs the guard's check mode, which
   fails if an agent file and the table disagree.

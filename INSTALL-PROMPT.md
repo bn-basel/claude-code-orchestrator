@@ -157,6 +157,12 @@ areas, the reviewer's product rules, the adversarial reviewer's attack angles, m
 test commands. Keep good rules from my existing `CLAUDE.md`. Ask me for the 3-line Vision in `PLAN.md`.
 Build the Roadmap from the backlog or open issues, and propose a small, safe first trial (one wording change, or one test).
 
+**Voice.** How every chat in this project should talk to me belongs to the project, not to my global settings. Show
+me the default list from the **Voice** section of `.claude/output-styles/orchestrator.md` as one list (it covers
+length, tone, how decisions look, how many questions at a time, and language) and ask: "Keep all of these, or which do
+you want to change?" Follow up only on what I change, at most two questions at a time. Write the result into that
+Voice section, and its 3–4 most important lines into "Talking to {{OWNER}}" in `CLAUDE.md`.
+
 **Settings.** Remove rules that don't apply (e.g. the PowerShell lines on macOS or Linux, the `{{PROD_CLI}}` line if
 there is none). Add deny rules for any other production script by name. Keep `"attribution": {"commit": "", "pr": ""}`
 unless I want AI attribution lines.

@@ -9,7 +9,15 @@ Code rules are in `{{CODE_DIR}}/CLAUDE.md`.
 <!-- ADAPT: say what a merge does. Example: "Merging to `main` deploys to production, where real customers use it." -->
 Merging to `{{MAIN_BRANCH}}` deploys to production.
 
-Owner: **{{OWNER}}**. They make the decisions. Explain things in plain language and define any technical term you use.
+Owner: **{{OWNER}}**. They make the decisions.
+
+## Talking to {{OWNER}}
+
+Every chat in this project follows the **Voice** section of `.claude/output-styles/orchestrator.md`. In short:
+<!-- ADAPT: the short version of the owner's Voice answers, 3–4 lines. -->
+- Plain, short English; define a technical term the first time you use it.
+- The answer or recommendation first, then a one-line reason. Say when you're unsure; never "done" without checking.
+- Never ask for a password, key or token in chat.
 
 ## Where things are
 
