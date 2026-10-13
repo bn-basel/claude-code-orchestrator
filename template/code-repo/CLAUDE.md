@@ -16,6 +16,13 @@
 - Customer-facing text lives in <!-- ADAPT: the strings file or translation folder -->, never inline in logic.
 <!-- ADAPT: anything that must hold for every change, e.g. "every webhook handler is idempotent". -->
 
+## Feature switches
+
+<!-- ADAPT: keep this section if the project has feature switches (flags); otherwise delete it. -->
+- A change to switches changes **one switch per action**. Never send the whole set: the server should refuse an update
+  that replaces every switch at once, so a stale copy can't silently switch others back.
+- Every switch change is logged: which switch, old → new value, who, when.
+
 ## Product rules (don't break these)
 
 <!-- ADAPT: the rules a reviewer must enforce, one line each. Examples:

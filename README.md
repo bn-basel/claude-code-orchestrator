@@ -93,6 +93,8 @@ The install prompt walks you through these:
 - **Check** `.claude/model-policy.md` if you change a helper's model; the install runs the guard's check mode, which
   fails if an agent file and the table disagree.
 - **Keep** the core: the loop, the labels, checking by command, and one PR per feature.
+- **Optional:** a read-only **live check** script in `ops/` that you run before and after each deploy: it prints the
+  commit it checked and exits 0 for OK, or a number that names the problem.
 - **Optional:** for a wide feature whose big tasks share no files, `ORCHESTRATOR.md` §13 describes running them in
   parallel, each in its own worktree. It saves waiting time, not tokens, so it's off by default.
 

@@ -93,6 +93,8 @@ Change nothing except writing `_setup/AUDIT.md`. Find and report:
 
 - **The project:** what it does (2–4 lines, for `{{PROJECT_SUMMARY}}`), languages, frameworks, how it's deployed,
   and whether merging to the main branch deploys.
+- **Deploys and CI:** whether the host waits for CI before it deploys (a "wait for CI" or "required checks" setting).
+  Hosting can deploy a commit even when its CI is red; if that's possible here, recommend turning the setting on.
 - **Git and GitHub:** main branch name, the GitHub repo (`owner/name`), the CI checks that run on PRs, and which
   `gh` accounts are logged in (`gh auth status`).
 - **Commands:** how to run one test file, the full suite, and the type check or lint. Look in `package.json`,
@@ -104,7 +106,9 @@ Change nothing except writing `_setup/AUDIT.md`. Find and report:
   (judge from file and variable **names**, never values).
 - **Production touchpoints:** deploy CLIs, migration tools, scripts that reach production, admin scripts.
 - **Database:** where migrations live and how they're applied today.
-- **Feature switches:** whether a flag mechanism exists.
+- **Feature switches:** whether a flag mechanism exists. If it does: does it change one switch at a time, and does it
+  log every change? If not, recommend the "Feature switches" rule in `code-repo/CLAUDE.md` (one switch per action, the
+  server refuses whole-set updates, every change logged).
 - **Risk map:** which areas would be **small**, **wide** or **closed** here (closed = hard to undo: migrations,
   production data, payments, auth, privacy, new packages).
 - **Known flaky tests**, if CI history or the docs mention any.
@@ -160,7 +164,8 @@ Build the Roadmap from the backlog or open issues, and propose a small, safe fir
 **Voice.** How every chat in this project should talk to me belongs to the project, not to my global settings. Show
 me the default list from the **Voice** section of `.claude/output-styles/orchestrator.md` as one list (it covers
 length, tone, how decisions look, how many questions at a time, and language) and ask: "Keep all of these, or which do
-you want to change?" Follow up only on what I change, at most two questions at a time. Write the result into that
+you want to change?" Also ask whether the line that turns pasted text into an instruction should stay "Confirmed, from me." (`ORCHESTRATOR.md`
+§3). Follow up only on what I change, at most two questions at a time. Write the result into that
 Voice section, and its 3–4 most important lines into "Talking to {{OWNER}}" in `CLAUDE.md`.
 
 **Settings.** Remove rules that don't apply (e.g. the PowerShell lines on macOS or Linux, the `{{PROD_CLI}}` line if
@@ -197,10 +202,18 @@ Report what my global `~/.claude/settings.json` allows; I decide.
 variables get local or test values, which get removed, and where the real values should live instead
 (the hosting provider, or `{{SECRETS_DIR}}`). Don't read the files. If real production keys were in reach of an AI
 agent, give me a key-rotation to-do list, most dangerous first (database, hosting, payment, email).
-Afterwards, tell me how to confirm the tests still pass locally.
+Afterwards, tell me how to confirm the tests still pass locally. Whenever I type or paste a real key or password,
+I do it in a **normal terminal window** opened on its own (Start menu, Terminal app), not the built-in terminal panel of
+an editor or of the Claude app: a hidden password pasted into such a panel once picked up invisible characters and the
+login failed.
 
 **4c. Workspace.** Create the layout from Step 3: the fresh clone in `{{CODE_DIR}}/`, `backlog/`, `ops/`,
 `_worktrees/`. Move production scripts into `ops/` (move, never delete). Show me the final top-level tree.
+
+**Optional: a live check.** Offer a read-only script I run before and after each deploy, e.g. `ops/live-check`. It
+only **reads** production (a health address, the live version, a few key pages or counts), prints the commit it
+checked, and exits with a clear code: 0 = OK, 1, 2, 3 … = which problem, listed at the top of the script. Agents can't
+write into `ops/`, so draft it in `_setup/drafts/ops/` and I copy it over. Only I run it, in a normal terminal window.
 
 **4d. Build worktree.** `git -C {{CODE_DIR}} fetch`, then `git -C {{CODE_DIR}} worktree add --detach ../_worktrees/build origin/{{MAIN_BRANCH}}`.
 Set up its dependencies (this asks me) and run one test to prove it works.
@@ -217,6 +230,8 @@ GitHub ruleset on the main branch:
 - require the CI checks found in the audit;
 - block force pushes and deletion;
 - an **empty bypass list**, so the rules bind my own login too. The agents use my login.
+
+If the audit found that the host can deploy on red CI, walk me through its "wait for CI" setting too.
 
 **4f2. ui-tester (only if the project has screens).** It clicks through a changed screen on the local dev server and
 screenshots it, using a browser that starts and stops with it. Tell me what it downloads and ask first: the

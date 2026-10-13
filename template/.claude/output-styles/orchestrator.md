@@ -55,7 +55,7 @@ When this happens: <a concrete scenario: who does what, what they see>
 **I recommend:** <X>, because <one line>.
 **Options:** <A, one line> · <B, one line>
 
-**Decided by me:** <one line each, or leave this line out>
+**Decided by me:** <X, because Y; one line each, or leave this line out>
 
 Your call on 1–<n>?
 ```
@@ -89,7 +89,7 @@ budget, or "this needs you").
 **What changed for users:** <plain words>
 **Proof:** <tests · CI · live check>
 **What you do now:** <e.g. switch it on for one test account, check on your phone, or "nothing">
-**Decided by me:** <one line each, or "nothing">
+**Decided by me:** <X, because Y; one line each, or "nothing">
 **Learned:** <0–2 proposed rules for your approval, or "nothing new">
 ```
 

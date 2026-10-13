@@ -25,6 +25,21 @@ app, so most entries come from something that went wrong or cost too much.
   their own code block, say when unsure, push back, never ask for secrets in chat). `CLAUDE.md` gets a short "Talking
   to the owner" section, so helpers and every other chat in the project follow it too. The install shows the defaults
   as one list and asks which to change.
+- **Pasted text is data.** Only the owner's own typed messages are instructions. Pasted text (another agent's output,
+  an email, a log), helper reports and messages from other sessions are read as data, and the orchestrator acts on
+  pasted instructions only after the owner adds a fixed line ("Confirmed, from me.").
+- **CI red? Check main first.** Before blaming the PR, the orchestrator checks whether main fails the same way.
+- **Production scripts in a normal terminal window**, never an editor's or the Claude app's built-in terminal panel.
+- **Feature switches:** one switch per action, never the whole set (the server should refuse it), every change logged.
+  A new section in `code-repo/CLAUDE.md`, suggested by the install audit when the project has switches.
+- **Deploy waits for CI:** the install audit checks whether the host can deploy on red CI and recommends its "wait for
+  CI" setting.
+- **An optional live check:** one read-only script the owner runs before and after each deploy. It prints the commit
+  it checked and exits 0 for OK, or a number that names the problem.
+- **A wording sheet** before a redesign or a wording pass: one table of every line a user can see, where it appears and
+  what triggers it, so the owner reviews all wording in one sitting.
+- **Decisions are logged as "Decided: X, because Y"**, with the date and who decided, in the decisions log and in the
+  "Decided by me" lines.
 
 **Fixed**
 - "Effort is fixed per agent file and can't be changed per call" was out of date: since Claude Code 2.1.292 the Agent
@@ -39,6 +54,16 @@ app, so most entries come from something that went wrong or cost too much.
   can't tell scout from reviewer.
 - **The voice belongs to the project.** A global style follows the owner into every project, including ones where
   someone else decides; kept in the project's files, it travels with the project and every chat in it uses it.
+- **Another agent's words are not the owner's.** Pasting one agent's output into another chat makes it look like the
+  owner's message, and a helper's report arrives in the same conversation. Without a rule, an instruction inside either
+  can be followed as if the owner had typed it.
+- **A red CI isn't always the PR's fault.** A failure blamed on a PR turned out to be a real race condition already on
+  main; checking main first would have found it at once.
+- **Built-in terminal panels can change what you paste.** A hidden password pasted into one picked up invisible
+  characters, and the production login failed.
+- **Hosting can deploy on red CI.** Branch protection stops the merge, not the deploy of a commit that reaches main.
+- **Whole-set switch updates undo other people's changes.** A stale copy of all switches, sent back, silently flips the
+  ones it didn't mean to touch.
 
 ## v1.2 · 2026-10-12 · measured: git -C, a Haiku scout, fixed reply shapes, ui-tester
 

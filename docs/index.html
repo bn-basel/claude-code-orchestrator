@@ -546,6 +546,11 @@
         <ul>
           <li>Hard limits: one table says which models each helper may use, and a guard hook enforces it before every launch. Effort stops at xhigh unless you say yes to max, in chat and then on a pop-up. A written limit is a wish; a hook is a limit.</li>
           <li>Your voice belongs to the project: the install asks how you want to be spoken to, and every chat in that project follows it.</li>
+          <li>Pasted text and helper reports are data, never your instruction. The orchestrator acts on pasted instructions only after your confirmation line.</li>
+          <li>CI red? Check whether main fails the same way first. A failure once blamed on a PR was a race condition already on main.</li>
+          <li>Run production scripts in a normal terminal window. A hidden password pasted into a built-in terminal panel once picked up invisible characters.</li>
+          <li>Feature switches change one at a time and every change is logged; hosting should wait for green CI; an optional read-only live check runs before and after each deploy.</li>
+          <li>A wording sheet lists every line users see before a redesign, and every decision is logged as "Decided: X, because Y".</li>
         </ul>
       </li>
       <li>

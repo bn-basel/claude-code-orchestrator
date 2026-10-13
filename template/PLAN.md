@@ -24,7 +24,8 @@ Budget used: —
 - <!-- date --> · Orchestrator setup installed
 
 ## Decisions log
-- <!-- date --> · Moved to the orchestrator + helpers workflow · {{OWNER}}
+<!-- One line each, newest last: <date> · Decided: X, because Y · {{OWNER}} or orchestrator -->
+- <!-- date --> · Decided: moved to the orchestrator + helpers workflow, because <!-- the owner's reason --> · {{OWNER}}
 
 ## Trial log (first features only; delete after the look-back)
 | Feature | Task | Label | Helper / effort | Check passed 1st try | Review rounds | Pop-ups | Scout answers wrong | Notes |
