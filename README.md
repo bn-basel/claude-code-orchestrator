@@ -39,7 +39,15 @@ Every review finding has to come with evidence, such as a command and its output
   <img alt="You decide four things: approve the plan, say yes to Fable, run migrations, click merge. The orchestrator (Opus) plans, briefs, checks and opens PRs, and never writes product code. It briefs eight helpers in three groups: Build (implementer, implementer-wide, test-writer), Review (reviewer, reviewer-light, adversarial-reviewer, which needs your yes) and Look and click (scout and ui-tester, both on Haiku)." src="docs/assets/team-light.png" width="100%">
 </picture>
 
-Each helper is one file in `.claude/agents/` with a fixed model and tool list. No helper can start another.
+Each helper is one file in `.claude/agents/` with a default model and effort and a fixed tool list. No helper can start
+another.
+
+**Hard limits on models and effort.** One table, `.claude/model-policy.md`, says which models each helper may use. A
+guard hook checks every helper launch against it, before the helper starts: a model the helper may not use, one of
+Claude's built-in helpers, or effort above `xhigh` is blocked, with a message that tells the orchestrator what's
+allowed so it can retry. Effort `max`, Opus on `implementer-wide` and every Fable review need your yes twice: in chat
+first, then on a pop-up at launch. The session can't raise its own effort or switch its own model, and the Workflow
+tool (which can start many helpers at once) is denied.
 
 For work that changes a screen, an eighth helper, **`ui-tester`** (Haiku 5.5), clicks through the change on your local
 dev server and screenshots it at phone and desktop width. It can't edit code or run commands, only opens `localhost`,
@@ -80,11 +88,14 @@ The install prompt walks you through these:
 - **Fill in** the placeholders like `{{PROJECT_NAME}}`, `{{MAIN_BRANCH}}` and your test commands.
 - **Decide** the spots marked `<!-- ADAPT -->`: what counts as small, wide or closed in your code, and your product rules.
 - **Review** the deny list in `.claude/settings.json`, and add your own production scripts to it.
+- **Check** `.claude/model-policy.md` if you change a helper's model; the install runs the guard's check mode, which
+  fails if an agent file and the table disagree.
 - **Keep** the core: the loop, the labels, checking by command, and one PR per feature.
 - **Optional:** for a wide feature whose big tasks share no files, `ORCHESTRATOR.md` §13 describes running them in
   parallel, each in its own worktree. It saves waiting time, not tokens, so it's off by default.
 
-No Fable access? Set `model: opus` in `adversarial-reviewer.md`. Not on Windows? Remove the `PowerShell(...)` rules and point the hook at `print-now.sh` (the install does both).
+No Fable access? Set `model: opus` in `adversarial-reviewer.md` and in its row of `.claude/model-policy.md`. Not on
+Windows? Remove the `PowerShell(...)` rules and point both hooks at their `.sh` scripts (the install does all of this).
 
 ## Upgrades
 

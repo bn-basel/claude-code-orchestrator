@@ -64,6 +64,10 @@
       "Agent(general-purpose)", "Agent(Explore)", "Agent(Plan)", "Agent(claude)",
       "Agent(claude-code-guide)", "Agent(statusline-setup)",
 
+      "Workflow",
+      "mcp__ccd_session_mgmt__set_session_effort", "mcp__ccd_session_mgmt__set_session_model",
+      "mcp__ccd_session_mgmt__set_session_fast_mode",
+
       "Read(**/.env)", "Read(**/.env.*)", "Edit(**/.env)", "Edit(**/.env.*)",
       "Bash(cat *.env*)", "PowerShell(Get-Content *.env*)", "PowerShell(type *.env*)",
 
@@ -110,6 +114,19 @@
             "type": "command",
             "command": "powershell.exe",
             "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PROJECT_DIR}/.claude/hooks/print-now.ps1"],
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-helpers.ps1"],
             "timeout": 30
           }
         ]

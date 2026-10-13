@@ -3,6 +3,36 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## v1.3 · unreleased
+
+**Changed**
+- **Hard limits on models and effort.** `.claude/model-policy.md` is the one table of which models each helper may use
+  (scout and ui-tester: Haiku · implementer, test-writer: Sonnet · implementer-wide: Sonnet, or Opus with the owner's yes ·
+  both reviewers: Opus · adversarial-reviewer: Fable only). A new **guard hook** (`guard-helpers.ps1` / `.sh`, PreToolUse
+  on `Agent`) checks every helper launch against it before the helper starts. It blocks a model the helper may not use,
+  a built-in or unknown helper, a helper with no model anywhere, and effort above `xhigh`, with a message that says what's
+  allowed. Effort `max`, Opus on `implementer-wide` and every Fable run show the owner a pop-up, after the orchestrator
+  has asked in chat. The guard also catches the environment variables that outrank a launch
+  (`CLAUDE_CODE_EFFORT_LEVEL`, a forced `CLAUDE_CODE_SUBAGENT_MODEL`), and blocks anything it can't read.
+- The guard's **check mode** (`-Check` / `--check`) fails if an agent file breaks the table. The install runs it in
+  Step 5, the upgrade prompt after applying changes, and this repo in `tests/guard/` (both versions, 30 cases).
+- Settings deny the **Workflow** tool and the three tools that let a session change its own effort, model or fast mode.
+  `effortLevel` stays `high`; the owner raises the main session with `/effort` when they want to.
+- This repo's own `.claude/settings.json` follows the same limits, with the template's guard: only two read-only built-in
+  helpers (Explore, claude-code-guide), for research, with Sonnet or Haiku named in the launch.
+
+**Fixed**
+- "Effort is fixed per agent file and can't be changed per call" was out of date: since Claude Code 2.1.292 the Agent
+  tool takes an `effort` per launch, as it already took a `model`. The agent files now hold defaults, and the table
+  holds the limits.
+
+**Lessons**
+- **A written limit is a wish; a hook is a limit.** Per-launch `effort` and `model` made the agent files' settings
+  easy to override, and the only thing between "use max" and a max run was the orchestrator's memory of a rule. The
+  guard turns the table into something Claude Code enforces, and its message lets the orchestrator correct itself
+  instead of stalling. Settings alone can't do it: `availableModels` is one list for every helper, and a deny rule
+  can't tell scout from reviewer.
+
 ## v1.2 · 2026-10-12 · measured: git -C, a Haiku scout, fixed reply shapes, ui-tester
 
 **Changed**

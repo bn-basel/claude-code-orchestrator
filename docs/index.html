@@ -454,7 +454,7 @@
         <span class="r-flags"><span class="flag">read-only</span></span>
       </li>
     </ul>
-    <p class="aside-note">No helper can start another helper, and Claude's built-in helpers are blocked.</p>
+    <p class="aside-note">No helper can start another helper. A guard checks every launch against one table of allowed models: Claude's built-in helpers, a wrong model or effort above xhigh are blocked.</p>
   </div>
 </section>
 
@@ -476,6 +476,10 @@
       </li>
       <li class="ly-bump">
         <span class="ly-kind">Speed bump</span>
+        <div><h3>Helper guard</h3><p>A hook checks every helper launch against one table of allowed models, before the helper starts. A wrong model, a built-in helper or effort above xhigh is blocked, with a message saying what's allowed. Effort max, Opus on the wide implementer and Fable show you a pop-up.</p></div>
+      </li>
+      <li class="ly-bump">
+        <span class="ly-kind">Speed bump</span>
         <div><h3>Deny rules</h3><p>They block pushing to main, merging, reading secrets, migrations and the production scripts folder, also when git is pointed at another folder with <code>-C</code>. They match command text, which is why the walls exist.</p></div>
       </li>
       <li class="ly-bump">
@@ -484,7 +488,7 @@
       </li>
       <li class="ly-rule">
         <span class="ly-kind">Written rule</span>
-        <div><h3>The playbook</h3><p>Fable only after a yes in chat. Nothing runs outside the approved plan. Anything unclear means stop and report.</p></div>
+        <div><h3>The playbook</h3><p>Fable and max effort only after a yes in chat, then on the pop-up. Nothing runs outside the approved plan. Anything unclear means stop and report.</p></div>
       </li>
     </ol>
   </div>
@@ -536,6 +540,12 @@
       <p class="sec-intro">What each version changed, and why. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.3</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>Hard limits: one table says which models each helper may use, and a guard hook enforces it before every launch. Effort stops at xhigh unless you say yes to max, in chat and then on a pop-up. A written limit is a wish; a hook is a limit.</li>
+        </ul>
+      </li>
       <li>
         <div class="log-meta"><span class="log-ver">v1.2</span><span class="log-date">Oct 2026</span></div>
         <ul>

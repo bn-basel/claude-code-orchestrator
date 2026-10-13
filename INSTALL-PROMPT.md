@@ -32,7 +32,8 @@ I approve the plan and click merge. The template has:
 - `CLAUDE.md`: shared rules every agent loads · `ORCHESTRATOR.md`: the orchestrator's playbook · `PLAN.md`: the living record
 - `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, the output style and a hook ·
   `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes ·
-  `.claude/agents/`: the eight helpers · `.claude/hooks/`: the "print Now" hook (Windows and macOS/Linux versions)
+  `.claude/agents/`: the eight helpers · `.claude/model-policy.md`: which models each helper may use ·
+  `.claude/hooks/`: the "print Now" hook and the helper guard (Windows and macOS/Linux versions of each)
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
 - `gitignore`: becomes the workspace's `.gitignore`
 
@@ -160,11 +161,22 @@ Build the Roadmap from the backlog or open issues, and propose a small, safe fir
 there is none). Add deny rules for any other production script by name. Keep `"attribution": {"commit": "", "pr": ""}`
 unless I want AI attribution lines.
 
-**The "print Now" hook.** `settings.json` has one SessionStart hook. It runs `print-now.ps1` (Windows PowerShell)
-when a session starts, resumes or is cleared, and right after a compaction. Claude Code has no per-system switch for
-hooks, so on macOS or Linux replace that hook's `command` and `args` with
-`"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/print-now.sh\""`, and keep only the
-`.sh` script in the drafts. Keep `"autoCompactWindow": 400000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md` §12 says why.
+**The hooks.** `settings.json` has two, both in Windows PowerShell:
+- **print Now** (SessionStart): runs `print-now.ps1` when a session starts, resumes or is cleared, and right after a
+  compaction;
+- **helper guard** (PreToolUse, matcher `Agent`): runs `guard-helpers.ps1` before every helper launch and checks it
+  against `.claude/model-policy.md`. It blocks a model the helper may not use, a built-in helper, or effort above
+  xhigh, and shows me a pop-up for effort max, Opus on `implementer-wide` and every Fable run.
+
+Claude Code has no per-system switch for hooks, so on macOS or Linux replace each hook's `command` and `args` with
+`"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.sh\""`, and keep only the `.sh`
+scripts in the drafts. The bash guard needs Perl (it ships with macOS and almost every Linux): check with
+`perl -MJSON::PP -e 1`. Keep `"autoCompactWindow": 400000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md`
+§12 says why. Keep `"effortLevel": "high"`, and the deny rules for the Workflow tool and for the three tools that would
+let a session change its own effort, model or fast mode.
+
+**Model policy.** If I change a helper's model (for example no Fable access, so `adversarial-reviewer` runs on Opus),
+change its agent file **and** its row in `.claude/model-policy.md`. Step 5 checks that the two agree.
 
 Write the results to `_setup/drafts/` (not into the project yet). Claude Code protects every folder named `.claude`,
 even inside `_setup/`, so put the drafts of `.claude/` files in `_setup/drafts/dot-claude/`. Then prove nothing is left:
@@ -210,8 +222,8 @@ browser (Chromium, about 150–200 MB, into the user's Playwright folder). Its e
 browser and reports every step as FAIL.
 
 **4g. Install the orchestrator files.** Copy the drafts into the workspace: `CLAUDE.md`, `ORCHESTRATOR.md`,
-`PLAN.md`, `.claude/settings.json`, `.claude/agents/*.md`, `.claude/output-styles/orchestrator.md`, the one hook
-script you kept in `.claude/hooks/`, and
+`PLAN.md`, `.claude/settings.json`, `.claude/model-policy.md`, `.claude/agents/*.md`,
+`.claude/output-styles/orchestrator.md`, the hook scripts you kept in `.claude/hooks/` (one per hook), and
 `gitignore` as `.gitignore`. Run `git init` in the
 workspace and commit. Writing into `.claude/` needs my click on an approval prompt (an approval in chat doesn't count). If
 this session can't show one, give me the exact copy command for `_setup/drafts/dot-claude/` and I'll run it. Write the installed version (the clone's tag, e.g. `v1.2`) into `.claude/orchestrator-version`;
@@ -229,6 +241,12 @@ in the orchestrator clone next to this folder."*
 - Tell me which helper types you can use. They must be exactly the custom ones (eight, or seven without `ui-tester`); Claude's built-in helpers are blocked.
 - Run three tiny delegations: ask `implementer`, `reviewer-light` and `scout` to reply "OK" and do nothing else.
   I'll check each one's model and effort in the task list.
+- **The helper guard.** Run its check mode:
+  `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/guard-helpers.ps1 -Check`
+  (macOS/Linux: `bash .claude/hooks/guard-helpers.sh --check`). It must print `OK: 8 agent files match` (7 without
+  `ui-tester`). Then launch `scout` with `model: opus`: it must be **blocked** before it starts, with a message naming
+  haiku. Don't test the pop-up cases (max, Opus, Fable): they would ask me for real.
+- Confirm the Workflow tool is not in your tool list: a deny rule naming a tool removes it.
 - Try `gh pr merge --help`. It must be **blocked** by a deny rule.
 - Test the "print Now" hook: run its script once yourself with `{"source":"compact"}` piped in and
   `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
@@ -243,8 +261,9 @@ in the orchestrator clone next to this folder."*
 - Check the output style: your first reply in this session must have been the **Session start** shape (Where we are ·
   Next · Blocking). If it wasn't, check `"outputStyle": "Orchestrator"` in `settings.json` and that the style file is
   in `.claude/output-styles/`.
-- Explain the Fable gate: the "ask" rule on `adversarial-reviewer` may **not** stop a helper from starting,
-  so the real gate is the written rule in `ORCHESTRATOR.md` §7. Don't start it to test this.
+- Explain the gates for Fable, effort max and Opus on `implementer-wide`: the orchestrator asks me in chat first
+  (`ORCHESTRATOR.md` §7), then the guard shows me a pop-up at launch. The older "ask" rule on `adversarial-reviewer`
+  alone may **not** stop a helper from starting. Don't start one to test this.
 
 ## Step 6. First trial
 

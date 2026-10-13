@@ -44,7 +44,18 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 
 **Scout vs reviewer:** any simple investigation (where is X, what does Y do, which files mention Z, what a helper receives, a read-only probe) goes to `scout`: one question, a brief answer with file:line evidence. Reviewers are only for plan reviews and code reviews.
 
-Effort is fixed inside each agent file and can't be changed per call, which is why there are two reviewer files. The **model** can be changed per call. For a **closed** task, use `implementer-wide` and pass `model: opus` when {{OWNER}} chooses Opus. For the most critical reviews, offer Fable (`adversarial-reviewer`) instead of max effort.
+**Model and effort.** Each agent file sets its helper's default model and effort (the table above). You can change
+both per launch (`model` and `effort` in the call), but only within `.claude/model-policy.md`: the one table of which
+models each helper may use. A guard hook checks every launch against it and blocks a model the helper may not use, a
+built-in helper, or effort above `xhigh`, with a message that says what's allowed. High or xhigh suits almost every
+task. Three launches need {{OWNER}}'s yes, **first in chat** (with the reason), **then on the pop-up** the guard shows
+at launch:
+- effort `max`, for any helper;
+- `implementer-wide` with `model: opus`, for a **closed** task when {{OWNER}} chooses Opus;
+- every `adversarial-reviewer` (Fable) run. For the most critical reviews, offer Fable rather than max effort.
+
+You can't change your own session's effort, model or fast mode (those tools are denied); ask {{OWNER}}, who uses
+`/effort` or `/model`.
 
 **Checking the scout.** It runs on Haiku 5.5: about 13× cheaper than Sonnet, and in testing just as accurate on code
 lookups. Before you act on a scout answer, check its key file:line yourself (one read). Count wrong answers in the
@@ -129,7 +140,7 @@ A failure goes back to the helper with the evidence: the command, the output, an
 **{{OWNER}} decides only these four kinds of thing.** Bring them batched, each with a scenario (§3):
 1. **Wording** any user will see.
 2. **Product behaviour**: what a user experiences.
-3. **Production, money or privacy**: migrations, production settings, paid runs, privacy changes, Fable (ask in chat first, §7), merging, switching a feature on.
+3. **Production, money or privacy**: migrations, production settings, paid runs, privacy changes, Fable, effort max or Opus on `implementer-wide` (ask in chat first, §7), merging, switching a feature on.
 4. **Scope**: new features, or changing what a feature does.
 
 **You decide everything else**, with your own recommendation. Record it in the decisions log and give it one line in your summary. That covers, for example:
@@ -151,7 +162,11 @@ Still {{OWNER}}'s, because other rules require it: going over the retry budget, 
 - Read or print secrets or `.env` files, or run anything in `ops/`.
 - Touch production data, or put real user data into any helper's context.
 - Use any helper that isn't defined in `.claude/agents/`.
-- Start `adversarial-reviewer` (Fable) without first asking {{OWNER}} in chat ("This feature needs a Fable review because …") and getting a yes. **Permission "ask" rules don't reliably stop helpers from starting, and neither does any session mode, so this written rule is the gate.** Log every Fable run in PLAN.md's decisions log, with the date and the approval.
+- Start `adversarial-reviewer` (Fable), give any helper effort `max`, or run `implementer-wide` on Opus without first
+  asking {{OWNER}} in chat ("This feature needs a Fable review because …") and getting a yes. The guard's pop-up at
+  launch is the second gate, never a replacement for asking: an "ask" rule in the settings alone has let a helper start
+  without a pop-up. Log every such run in PLAN.md's decisions log, with the date and the approval.
+- Change your own session's effort, model or fast mode, or use the Workflow tool. Settings deny them; ask {{OWNER}}.
 - Switch branches in `{{CODE_DIR}}/` itself; use `_worktrees/build`.
 - Search from the top folder for code; search inside `{{CODE_DIR}}/`.
 

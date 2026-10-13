@@ -60,17 +60,22 @@ For each approved change: edit, show me the diff, check it, and record it in `_u
   `.claude` files), check it there, and give me **one** copy command that puts all drafts in place and moves replaced
   files to `_setup/moved/`. I run it.
 - `settings.json`: merge rule lists entry by entry. Keep rules I added; never widen an allow rule without saying so.
-  It must still parse as JSON.
+  It must still parse as JSON. Hooks: keep my shell (PowerShell or bash) for every hook, the new ones included.
+- `.claude/model-policy.md`: keep the models I chose (for example `adversarial-reviewer` on Opus); add new rows.
 - New files (e.g. a new helper): fill in the placeholders from my existing values.
 - Afterwards, search the workspace for `{{` and for any `ADAPT:` the plan said would stay resolved.
 
 ## Step 4. Check and finish
 
-1. If helpers, settings, hooks or the output style changed, tell me to **restart**. Then, in the fresh session, run the
+1. Run the helper guard's check mode (from v1.3):
+   `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/guard-helpers.ps1 -Check`
+   (macOS/Linux: `bash .claude/hooks/guard-helpers.sh --check`). It must print OK; a FAIL line names the agent file
+   and the rule it breaks. Fix that before going on.
+2. If helpers, settings, hooks or the output style changed, tell me to **restart**. Then, in the fresh session, run the
    install's Step 5 checks that cover what changed.
-2. Write the target version into `.claude/orchestrator-version`, then commit in the workspace repo:
+3. Write the target version into `.claude/orchestrator-version`, then commit in the workspace repo:
    "Upgrade orchestrator <installed> → <target>".
-3. If a code-repo file changed (`code-repo/CLAUDE.md`, the PR template), open one docs-only PR for it, as in the
+4. If a code-repo file changed (`code-repo/CLAUDE.md`, the PR template), open one docs-only PR for it, as in the
    install's Step 4e. **I merge.**
-4. Report: what was applied, what was skipped and why, and anything I have to do by hand. Leave `_upgrade/` in place
+5. Report: what was applied, what was skipped and why, and anything I have to do by hand. Leave `_upgrade/` in place
    (it's gitignored) until I say it can go.

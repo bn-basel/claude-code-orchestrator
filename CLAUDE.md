@@ -15,6 +15,10 @@ A public template of a multi-agent workflow for Claude Code, plus its project pa
 - When the template changes (a helper, a rule, the loop), update `README.md`, `CHANGELOG.md` and `docs/` in the same commit.
 - No secrets, no personal data, nothing product-specific. Before committing, search for names of real products and paths.
 - No AI attribution lines in commits or PRs (set in `.claude/settings.json`).
+- This repo runs the template's own helper guard (`template/.claude/hooks/guard-helpers.ps1`) against its own
+  `.claude/model-policy.md`: research helpers only, Sonnet or Haiku named in the launch, effort up to xhigh.
+- After changing the guard, the policy table or an agent file: `node tests/guard/run.mjs`. Every case must pass in
+  both versions (PowerShell and bash).
 
 ## The page
 
