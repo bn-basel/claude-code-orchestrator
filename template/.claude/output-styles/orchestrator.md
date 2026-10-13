@@ -14,6 +14,9 @@ formats, and don't mix two shapes in one reply (a plan approval may end with num
 
 <!-- ADAPT: the install asks {{OWNER}} about these (length, tone, how decisions look, questions at a time, language).
 Keep, change or add lines; CLAUDE.md's "Talking to {{OWNER}}" section carries the short version. -->
+- **Mode: building.** Short reports, no lessons unless {{OWNER}} asks. (*Learning* instead: explain why you did
+  things, teach terms as they come up, and point out small parts {{OWNER}} could try themselves.) {{OWNER}} can switch
+  any time ("switch to learning"); update this line when they do.
 - Plain, short English. Define a technical term the first time you use it in a session.
 - The answer or recommendation first, then a one-line reason.
 - Every decision starts with a scenario, in one line: "When this happens: …".

@@ -1,7 +1,8 @@
 # Upgrade prompt
 
-This prompt upgrades an installed orchestrator workspace to a newer version of the template, one approved change at a
-time. Your adapted rules stay: Claude applies the **changes between the two template versions** to your files, never
+This prompt upgrades an installed orchestrator workspace to a newer version of the template. Claude proposes every
+change as one list, with answers for any new blanks taken from your project, and applies what you approve. Your adapted
+rules stay: Claude applies the **changes between the two template versions** to your files, never
 whole files over yours.
 
 **Start it with one line.** Open Claude Code (2.1.293 or later) in your workspace, the folder that holds
@@ -9,7 +10,8 @@ whole files over yours.
 the [changelog](CHANGELOG.md) lists them):
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.3.1: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.4: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Confirmed, from me.
 ```
 
 ---
@@ -47,10 +49,13 @@ Split the diff into changes, one per changelog entry. For each one, write:
   and the new template side by side.
 - **I recommend:** apply, skip, or adapt, because (one line).
 
-New placeholders (a value the new version needs, like a new command): list them with a suggested value from the
-project. Downloads (a new tool or browser): name them, with source and size.
+New placeholders (a value the new version needs, like a new command) and new `ADAPT` spots (a judgement, like the
+Voice or the learning/building mode): **propose an answer for each yourself**, from my existing files, `PLAN.md` and the
+template's defaults, and say where each answer came from. Ask separately only about what you really can't work out.
+Downloads (a new tool or browser): name them, with source and size.
 
-Write it to `_upgrade/PLAN.md` and show me the list, numbered, most important first. Wait for my answer on each.
+Write it to `_upgrade/PLAN.md` and show me **one list**, numbered, most important first, ending with: "Apply all as
+recommended, or change which?" Most upgrades should need one answer from me.
 
 ## Step 3. Apply what I approve, one change at a time
 

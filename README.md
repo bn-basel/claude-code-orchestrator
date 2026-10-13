@@ -15,7 +15,7 @@ problems: every hand-off was a chance for something to get lost or misread.
 So I gave the job of the go-between to a single **orchestrator** session. It talks to me, delegates to helpers,
 checks their work itself, and only comes back to me for the decisions that are really mine.
 
-This is **version 1.3.1**. It's my personal setup, published in case it helps someone else, and it will keep changing
+This is **version 1.4**. It's my personal setup, published in case it helps someone else, and it will keep changing
 as my own workflow improves.
 
 ## How it works
@@ -59,16 +59,21 @@ that run in CI.
 Open Claude Code in the folder that contains your project (or an empty folder, for a new project) and type:
 
 ```
-Install the Claude Code Orchestrator v1.3.1 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3.1 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md.
+Confirmed, from me.
 ```
 
-It clones this repo at a fixed version, then backs up, audits your project, adapts the rules, installs one approved step
-at a time, and ends with a small trial feature. No project yet? It creates the GitHub repo, a minimal skeleton with one
-test and a CI check, and then installs as usual. (To do it by hand: clone the repo and paste
-[`INSTALL-PROMPT.md`](INSTALL-PROMPT.md).) After that, start every session with:
+It clones this repo at a fixed version, reads your project, and asks you **four short questions**: what the project
+is, whether it's for learning or just building, how it should talk to you, and whether to keep the default rules (the
+model table, the effort limits, what's blocked). Then it sets everything up and gives you the line for your first chat.
+The longer safety jobs (branch protection, moving real keys out, the first pull request) go on a to-do list, and the
+orchestrator brings each one up when it matters. Prefer a yes at every step? Say "full install". No project yet? It
+creates the GitHub repo, a minimal skeleton with one test and a CI check first. (To do it by hand: clone the repo and
+paste [`INSTALL-PROMPT.md`](INSTALL-PROMPT.md).) After that, start every session with:
 
 ```
 You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
+Confirmed, from me.
 ```
 
 The orchestrator treats pasted text as information, not instructions. When you paste a prompt you wrote yourself,
@@ -110,11 +115,12 @@ The install records its version in `.claude/orchestrator-version`. To move to a 
 workspace and type:
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.3.1: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.4: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Confirmed, from me.
 ```
 
-It compares the two template versions and applies only the changes, one by one with your yes, onto your adapted files.
-Your own rules stay.
+It compares the two template versions, proposes how each change fits your adapted files (filling any new blanks from
+what your project already has), and shows you one list to approve. Your own rules stay.
 
 ## Long sessions
 

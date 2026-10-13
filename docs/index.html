@@ -43,7 +43,7 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.3.1</span></p>
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.4</span></p>
       <h1 id="hero-title">Claude Code Orchestrator</h1>
       <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
       <div class="hero-actions">
@@ -542,6 +542,14 @@
     </div>
     <ol class="log">
       <li>
+        <div class="log-meta"><span class="log-ver">v1.4</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>A quick install: four short questions, then it sets everything up. The longer safety jobs go on a to-do list that the orchestrator raises when each one matters. An install that asks fifteen times is an install people stop halfway.</li>
+          <li>Each project is in learning or building mode: explain and teach, or just build with short reports.</li>
+          <li>Upgrades propose answers for anything new from your own files, and ask once.</li>
+        </ul>
+      </li>
+      <li>
         <div class="log-meta"><span class="log-ver">v1.3.1</span><span class="log-date">Oct 2026</span></div>
         <ul>
           <li>Tested live: a wrong model failed before the helper started, and effort max showed the guard's pop-up; No stopped it. Unlike an ask rule, the guard holds.</li>
@@ -609,15 +617,15 @@
     <div>
       <p class="install-lede">Open Claude Code in the folder that contains your project, or an empty folder for a new one, and type:</p>
       <div class="startline">
-        <p id="install-line">Install the Claude Code Orchestrator v1.3.1 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3.1 next to this folder, then follow its INSTALL-PROMPT.md.</p>
+        <p id="install-line">Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md. Confirmed, from me.</p>
         <button class="copy" type="button" data-copy="install-line" hidden>Copy</button>
       </div>
-      <p class="install-note">It clones the repo at a fixed version and follows <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/INSTALL-PROMPT.md"><code>INSTALL-PROMPT.md</code></a>. No project yet? It creates the GitHub repo, a skeleton with one test and a CI check first.</p>
-      <p class="install-note">Later, <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/UPGRADE-PROMPT.md"><code>UPGRADE-PROMPT.md</code></a> moves you to a newer version: it applies only the changes between versions, one by one with your yes, and keeps your own rules.</p>
+      <p class="install-note">It clones the repo at a fixed version and follows <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/INSTALL-PROMPT.md"><code>INSTALL-PROMPT.md</code></a>. It asks you four short questions (what the project is, learning or building, how to talk to you, keep the default rules?), then sets everything up. Longer safety jobs go on a to-do list the orchestrator brings up when they matter. No project yet? It creates the GitHub repo, a skeleton with one test and a CI check first.</p>
+      <p class="install-note">Later, <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/UPGRADE-PROMPT.md"><code>UPGRADE-PROMPT.md</code></a> moves you to a newer version: it applies only the changes between versions, shown as one list for your yes, and keeps your own rules.</p>
       <ol class="steps" aria-label="What the install prompt does, one approved step at a time">
-        <li>Backs up</li><li>Audits</li><li>Adapts the rules</li><li>Installs</li><li>Tests</li>
+        <li>Reads your project</li><li>Asks four questions</li><li>Sets up</li><li>You open a new chat</li>
       </ol>
-      <p class="install-note">One approved step at a time.</p>
+      <p class="install-note">Prefer a yes at every step? Say "full install".</p>
       <div class="alt" aria-labelledby="alt-title">
         <h3 id="alt-title">Or use Claude Code Projects</h3>
         <p>Projects (public beta on Pro and Max) is Claude Code's built-in version of the same idea: one coordinator conversation, one thread per task, shared instructions and memory, and threads that run in the cloud by default.</p>

@@ -11,7 +11,14 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 1. Read the **Now** section of `PLAN.md`. Read the rest only if you need it.
 2. Run `gh auth status` and confirm the active account is **{{GITHUB_ACCOUNT}}**.
 3. Run `git -C {{CODE_DIR}} fetch`, then `git -C {{CODE_DIR}} pull --ff-only` (the folder always stays on `{{MAIN_BRANCH}}`). Confirm `git -C _worktrees/build status --short` shows no uncommitted changes.
-4. Reply in the **Session start** shape (3 lines: where we are, what's next, anything blocking).
+4. **First session after an install or upgrade** (Now says "ready for the first trial", or the Done list has no
+   feature yet): run the guard's check mode (`powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/guard-helpers.ps1 -Check`,
+   or `bash .claude/hooks/guard-helpers.sh --check`); it must print OK. Confirm your helper list is exactly the custom
+   helpers. Report any problem on the Blocking line.
+5. **Setup to-do** in `PLAN.md`: if an item is due now (e.g. branch protection before the first merge), put it on the
+   Blocking line, explain it in plain words when {{OWNER}} asks, and guide them through it (the full install's step of
+   the same name says how). Strike it from the list when done, and delete the section once it's empty.
+6. Reply in the **Session start** shape (3 lines: where we are, what's next, anything blocking).
 
 ## 3. Talking to {{OWNER}}
 

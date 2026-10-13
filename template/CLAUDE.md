@@ -14,7 +14,8 @@ Owner: **{{OWNER}}**. They make the decisions.
 ## Talking to {{OWNER}}
 
 Every chat in this project follows the **Voice** section of `.claude/output-styles/orchestrator.md`. In short:
-<!-- ADAPT: replace the first three lines with the short version of the owner's Voice answers; keep the last line. -->
+<!-- ADAPT: replace the first four lines with the short version of the owner's Voice answers; keep the last line. -->
+- Mode: **building** (short reports) or **learning** (explain why, teach terms): see the Voice section.
 - Plain, short English; define a technical term the first time you use it.
 - The answer or recommendation first, then a one-line reason. Say when you're unsure; never "done" without checking.
 - Never ask for a password, key or token in chat.

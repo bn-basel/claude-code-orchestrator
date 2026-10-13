@@ -3,6 +3,36 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## v1.4 · 2026-10-13 · a quick install, learning or building, one-list upgrades
+
+**Changed**
+- **Quick install by default.** Claude reads the project, works out every value it can, and asks the owner **four
+  short questions, two at a time**: what the project is, learning or building, how to talk to them (the Voice
+  defaults), and whether to keep the default rules (the model table, the effort limits, what's blocked). Then it sets
+  everything up, choosing the recommended option wherever the full install would ask, and logs each choice as
+  "Decided: X, because Y". "Full install" keeps the old step-by-step path.
+- **Setup to-do.** The quick install skips the longer safety jobs (branch protection, secrets out of the project, the
+  code-rules PR, ui-tester, settings hygiene, host waits for CI) and writes them into a new `PLAN.md` section, each with
+  when it's due. The orchestrator raises each one when it's due (`ORCHESTRATOR.md` §2). Real production keys in reach
+  are still reported at once.
+- **Learning or building**, per project, in the Voice section: learning explains why and teaches terms as they come up;
+  building keeps reports short. The owner switches any time.
+- The first orchestrator session after an install or upgrade runs the guard's check mode itself.
+- **Upgrades ask once.** The upgrade proposes an answer for every new placeholder and `ADAPT` spot from the owner's
+  files and the defaults, and shows one list: "Apply all as recommended, or change which?"
+- The install stops and switches to the upgrade prompt when the folder already has an orchestrator install, and adds
+  no helpers beyond the template's eight unless the owner asks.
+- Install, upgrade and start lines end with "Confirmed, from me.", since they are pasted.
+
+**Lessons**
+- **An install that asks fifteen times doesn't get finished.** In live use the step-by-step install felt like filling
+  in a form: every placeholder and every sub-step came back as a question. The owner expected a few questions about
+  the project and then work. Most answers can be read from the project itself; the rest have good defaults.
+- **Safety jobs work better at the moment they matter.** Branch protection is easiest to explain right before the
+  first merge, not in minute five of a setup.
+- **An installer will improvise if allowed.** One live install added a helper the template doesn't have. The install
+  now adds none unless asked.
+
 ## v1.3.1 · 2026-10-13 · the guard tested live, confirm your own pasted prompts
 
 **Changed**

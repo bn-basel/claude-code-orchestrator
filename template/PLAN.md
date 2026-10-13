@@ -8,6 +8,11 @@ Must keep: —
 Frozen tests: none
 Budget used: —
 
+## Setup to-do
+<!-- Filled by the quick install: safety jobs it skipped, each with when it's due. The orchestrator raises each one when
+it's due (ORCHESTRATOR.md §2) and deletes this section once it's empty. -->
+- none
+
 ## Vision
 <!-- ADAPT: 3 lines, written with the owner: who it's for, what it does, where it's going. -->
 

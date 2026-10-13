@@ -1,23 +1,27 @@
 # Install prompt
 
-This prompt installs the orchestrator workflow into **your** project, one approved step at a time. Claude does the work;
-you say "yes" at every step and do the few hands-on parts yourself (secrets, branch protection, merging).
+This prompt installs the orchestrator workflow into **your** project. By default it's the **quick install**: Claude
+reads your project, asks you four short questions, sets everything up, and hands you the line to start your first
+orchestrator chat. The safety jobs that take longer (branch protection, moving real keys out, the first pull request)
+go on a short to-do list, and the orchestrator brings each one up when it matters. Say "full install" instead to go
+through every step with a yes for each.
 
 **Start it with one line.** Open Claude Code (version 2.1.293 or later) in the folder that **contains** your project
-folder, or in an empty folder for a new project. Use Opus at high effort, in the **default (ask) permission mode**, so
-you see every change. Then type:
+folder, or in an empty folder for a new project. Use Opus at high effort, in the **default (ask) permission mode**.
+Then type:
 
 ```
-Install the Claude Code Orchestrator v1.3.1 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3.1 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md.
+Confirmed, from me.
 ```
 
 Claude asks before it clones (a download) and before it reads the clone (it's outside your folder), then reads this
-file and follows it from the line below. To do it by hand
-instead: clone the repo next to your project, at the tag you want, and paste everything below the line.
+file and follows it from the line below. In the default mode Claude Code also shows its own pop-up before commands and
+file changes; those are its safety checks, not questions about your project. To do it by hand instead: clone the repo
+next to your project, at the tag you want, and paste everything below the line.
 
-You need the `gh` command-line tool, logged in to your GitHub account. If the project isn't on GitHub yet, Step 0
-creates the repo. It takes about an hour, plus one feature for the trial. You can stop at any step: progress is saved
-in `_setup/PROGRESS.md`.
+You need the `gh` command-line tool, logged in to your GitHub account. The quick install takes a few minutes; the full
+install about an hour. Progress is saved in `_setup/PROGRESS.md`, so you can stop and continue.
 
 ---
 
@@ -30,8 +34,8 @@ specialised helper (subagent), checks every change by running commands, and open
 I approve the plan and click merge. The template has:
 
 - `CLAUDE.md`: shared rules every agent loads · `ORCHESTRATOR.md`: the orchestrator's playbook · `PLAN.md`: the living record
-- `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, the output style and a hook ·
-  `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes ·
+- `.claude/settings.json`: allow / ask / deny permission rules, the auto-compact window, the output style and the hooks ·
+  `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes and my Voice ·
   `.claude/agents/`: the eight helpers · `.claude/model-policy.md`: which models each helper may use ·
   `.claude/hooks/`: the "print Now" hook and the helper guard (Windows and macOS/Linux versions of each)
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
@@ -40,22 +44,86 @@ I approve the plan and click merge. The template has:
 Read every file in the template folder first. Text like `{{PROJECT_NAME}}` is a placeholder for a value.
 `<!-- ADAPT: ... -->` marks a spot that needs a judgement about this project, not just a value.
 
+**Already installed?** If this folder or the project's workspace has `ORCHESTRATOR.md` or
+`.claude/orchestrator-version`, stop: this is an upgrade. Tell me, and follow `UPGRADE-PROMPT.md` instead.
+
+**Rules for this session (both installs):**
+- Never read or print `.env` files or secrets. You may list secret file **names**, never their contents.
+- Never push to the main branch, merge, force-push or rewrite history. The one exception is the "Initial skeleton"
+  push in Step 0, for a brand-new repo, after my yes.
+- **Never delete anything.** Move files into `_setup/moved/` instead, and tell me.
+- Start no helpers (subagents) unless a step says so.
+- Add, remove or rename no helpers beyond the template's eight, unless I ask. (`ui-tester` is left out when the project
+  has no screens.)
+- Run git as `git -C <folder> …`. Never `cd <folder> && git …` (Claude Code asks for approval every time) and never
+  `cd` in one command with git in the next (the folder isn't kept, so git runs in the wrong repo).
+- If something doesn't match what the template expects: **stop and ask**. Don't guess.
+
+## Quick install (default)
+
+**Q1. Read the project. No questions yet.** Do the audit from **Step 2** of the full install and write
+`_setup/AUDIT.md`. Work out every placeholder value you can from the project itself (package files, CI workflows, the
+README, `gh` and `git`). No GitHub repo yet? Then do **Step 0** first: it creates the repo, which needs my yes.
+
+**Q2. Four questions, two at a time.** Each one shows your proposal, so I can answer "yes" or change one thing.
+
+Round 1:
+1. **The project:** "This is what I think the project is: <2–4 lines>. Right?" Add the commands or values you
+   couldn't find, with your best guess for each.
+2. **Learning or building?** *Learning:* you explain why you did things, teach terms as they come up, and point out
+   small parts I could try myself. *Building:* short reports, no lessons unless I ask. Recommend one from what you saw
+   (a new stack or a practice project suggests learning).
+
+Round 2:
+3. **How I want to be spoken to:** show the Voice defaults from `.claude/output-styles/orchestrator.md`, including the
+   confirmation line for pasted text ("Confirmed, from me."), and ask "keep, or change which?"
+4. **The rules:** show the model table from `.claude/model-policy.md`, the limits (effort up to xhigh; effort max, Opus
+   on `implementer-wide` and every Fable review only with my yes, in chat and then on a pop-up; Claude's built-in
+   helpers and the Workflow tool blocked), and the things agents must never touch (production, secrets, `ops/`, plus
+   what the audit found: migration tool, production CLI, payment or auth code). Ask: "Keep the defaults, or change
+   something?" No Fable access? Then `adversarial-reviewer` runs on Opus: change its agent file **and** its table row.
+
+**Q3. Set up. No more questions.** Do **Steps 3, 4c, 4d and 4g** of the full install without asking at each step:
+- wherever a step says "recommend" or "explain the trade-off", choose the recommended option yourself and record it in
+  `_setup/PROGRESS.md` as `Decided: X, because Y`;
+- my answers fill the Voice section (with the mode: learning or building), "Talking to {{OWNER}}" in `CLAUDE.md`, the
+  model table and the deny rules. They also answer Step 3's own questions: the Vision comes from question 1 and the
+  Voice from question 3. The Roadmap comes from the backlog or open issues, with the code-rules PR as T1;
+- the files in `.claude/` need my click on Claude Code's pop-up (or one copy command I run, as Step 4g says);
+- still stop and ask if something doesn't match what the template expects, or before any download.
+
+Skip Steps 1, 4a, 4b, 4e, 4f and 4f2 for now. Instead, write them into `PLAN.md` under **Setup to-do**, each with when
+it's due:
+- **Branch protection** (Step 4f): before the first merge.
+- **Secrets out of the project** (Step 4b): now if the audit found real production keys in reach (then also say so
+  plainly in your last message); otherwise "when convenient".
+- **Code rules into the code repo** (Step 4e): the first task, as the first trial.
+- **Host waits for CI**: before the first merge, if the audit found the host can deploy on red CI.
+- **ui-tester** (Step 4f2): before the first task that changes a screen (only if the project has screens).
+- **Settings hygiene** (Step 4a): if the audit found broad allow rules.
+- **Live check** (optional, Step 4c): if I want one.
+
+**Q4. Hand over.** Commit the workspace. Then tell me, in a few lines: what was set up, the choices you made for me
+(one line each), anything urgent from the audit, and my next three actions:
+1. trust the workspace folder when Claude Code asks (until then it ignores the allow rules);
+2. open a new chat in the workspace;
+3. paste the start line:
+   ```
+   You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
+   Confirmed, from me.
+   ```
+The first orchestrator session runs the quick checks itself (`ORCHESTRATOR.md` §2) and then works through the plan.
+
+## Full install
+
+Every step below gets its own yes. The quick install uses some of them without asking.
+
 **For every step:**
 1. Explain in plain words what you'll change and why. Define any technical term the first time you use it.
 2. Show the exact changes (for long files: the parts that differ from the template).
 3. Wait for my "yes".
 4. Do it, verify it, and report in a few lines.
 5. Record progress in `_setup/PROGRESS.md`, so a fresh session can continue if this one restarts.
-
-**Rules for this session:**
-- Never read or print `.env` files or secrets. You may list secret file **names**, never their contents.
-- Never push to the main branch, merge, force-push or rewrite history. The one exception is the "Initial skeleton"
-  push in Step 0, for a brand-new repo, after my yes.
-- **Never delete anything.** Move files into `_setup/moved/` instead, and tell me.
-- Start no helpers (subagents) unless a step says so.
-- Run git as `git -C <folder> …`. Never `cd <folder> && git …` (Claude Code asks for approval every time) and never
-  `cd` in one command with git in the next (the folder isn't kept, so git runs in the wrong repo).
-- If something doesn't match what the template expects: **stop and ask**. Don't guess.
 
 ## Step 0. New project (only if there's no code repo yet)
 
