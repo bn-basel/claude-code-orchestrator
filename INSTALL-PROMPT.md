@@ -290,7 +290,9 @@ in the orchestrator clone next to this folder."*
 
 - Set `PLAN.md` "Now" to "ready for the first trial" and commit.
 - Give me a short summary of what was installed, and the start line for a fresh session:
-  *"You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report."*
+  *"You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report."* Tell me that when I
+  paste a prompt I wrote myself, I end it with my confirmation line; otherwise the orchestrator treats it as data and
+  asks first.
 - I run the first trial (the small task from Step 3) through the whole loop in that session.
 - Afterwards, in any session: fill in the Trial log in `PLAN.md` (checks passed first time, review rounds,
   permission pop-ups), propose 0–2 rule changes, and move `_setup/` to `_setup-done/` once I agree.

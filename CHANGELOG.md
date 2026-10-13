@@ -3,6 +3,19 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## Unreleased
+
+**Changed**
+- README and the install's last step tell the owner: when you paste a prompt you wrote yourself (like the start line),
+  end it with your confirmation line ("Confirmed, from me."). Otherwise the session treats it as pasted data and asks
+  first, as v1.3 intends.
+
+**Tested**
+- The v1.3 helper guard, live, in a fresh session of this repo: a launch on a model the helper may not use failed
+  before it started, and an effort-max launch showed the owner a pop-up with the guard's reason ("The owner's yes is
+  needed for: effort max …"); **No** stopped it and nothing ran. Unlike an "ask" rule in the settings, the guard's
+  pop-up does hold a helper back.
+
 ## v1.3 · 2026-10-13 · hard limits on models and effort, a per-project voice, eight lessons
 
 **Changed**

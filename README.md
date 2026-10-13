@@ -71,6 +71,9 @@ test and a CI check, and then installs as usual. (To do it by hand: clone the re
 You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
 ```
 
+The orchestrator treats pasted text as information, not instructions. When you paste a prompt you wrote yourself,
+like the line above, end it with your confirmation line ("Confirmed, from me." unless you chose another at install).
+
 You need Claude Code 2.1.293 or later, a GitHub account with the `gh` command-line tool, and access to Opus, Sonnet
 and Haiku. Branch protection on a **private** repo needs GitHub Pro or a paid team plan; on a free account it works on
 public repos.
