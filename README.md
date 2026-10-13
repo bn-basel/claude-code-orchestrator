@@ -15,7 +15,7 @@ problems: every hand-off was a chance for something to get lost or misread.
 So I gave the job of the go-between to a single **orchestrator** session. It talks to me, delegates to helpers,
 checks their work itself, and only comes back to me for the decisions that are really mine.
 
-This is **version 1.3**. It's my personal setup, published in case it helps someone else, and it will keep changing
+This is **version 1.3.1**. It's my personal setup, published in case it helps someone else, and it will keep changing
 as my own workflow improves.
 
 ## How it works
@@ -59,7 +59,7 @@ that run in CI.
 Open Claude Code in the folder that contains your project (or an empty folder, for a new project) and type:
 
 ```
-Install the Claude Code Orchestrator v1.3 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.3.1 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3.1 next to this folder, then follow its INSTALL-PROMPT.md.
 ```
 
 It clones this repo at a fixed version, then backs up, audits your project, adapts the rules, installs one approved step
@@ -110,7 +110,7 @@ The install records its version in `.claude/orchestrator-version`. To move to a 
 workspace and type:
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.3: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.3.1: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
 ```
 
 It compares the two template versions and applies only the changes, one by one with your yes, onto your adapted files.

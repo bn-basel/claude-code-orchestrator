@@ -9,7 +9,7 @@ whole files over yours.
 the [changelog](CHANGELOG.md) lists them):
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.3: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.3.1: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
 ```
 
 ---

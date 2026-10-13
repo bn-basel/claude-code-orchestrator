@@ -3,7 +3,7 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
-## Unreleased
+## v1.3.1 · 2026-10-13 · the guard tested live, confirm your own pasted prompts
 
 **Changed**
 - README and the install's last step tell the owner: when you paste a prompt you wrote yourself (like the start line),
