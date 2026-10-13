@@ -8,7 +8,7 @@ folder, or in an empty folder for a new project. Use Opus at high effort, in the
 you see every change. Then type:
 
 ```
-Install the Claude Code Orchestrator v1.2 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.2 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.3 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.3 next to this folder, then follow its INSTALL-PROMPT.md.
 ```
 
 Claude asks before it clones (a download) and before it reads the clone (it's outside your folder), then reads this

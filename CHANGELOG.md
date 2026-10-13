@@ -3,7 +3,7 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
-## v1.3 · unreleased
+## v1.3 · 2026-10-13 · hard limits on models and effort, a per-project voice, eight lessons
 
 **Changed**
 - **Hard limits on models and effort.** `.claude/model-policy.md` is the one table of which models each helper may use
