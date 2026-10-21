@@ -14,6 +14,9 @@
 - Database changes are migrations, **add-only**: add tables and columns; renaming or deleting happens later, separately. **Never apply a migration**; {{OWNER}} does that.
 - Secrets come only from environment variables. Locally there are **no production secrets**: the database is local and outside services run on fakes or test keys.
 - Customer-facing text lives in <!-- ADAPT: the strings file or translation folder -->, never inline in logic.
+- **The product's name lives in one place**: one translation key or constant per app
+  (<!-- ADAPT: e.g. `app.name` in the strings file -->). Pages, emails and PDFs use that key; never type the name
+  directly. A rename is then a one-line change. <!-- ADAPT: delete this line if the project has no user-facing name. -->
 <!-- ADAPT: anything that must hold for every change, e.g. "every webhook handler is idempotent". -->
 
 ## Feature switches

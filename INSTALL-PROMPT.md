@@ -11,7 +11,7 @@ folder, or in an empty folder for a new project. Use Opus at high effort, in the
 Then type:
 
 ```
-Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.5 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.5 next to this folder, then follow its INSTALL-PROMPT.md.
 Confirmed, from me.
 ```
 
@@ -38,6 +38,8 @@ I approve the plan and click merge. The template has:
   `.claude/output-styles/orchestrator.md`: the orchestrator's fixed reply shapes and my Voice ·
   `.claude/agents/`: the eight helpers · `.claude/model-policy.md`: which models each helper may use ·
   `.claude/hooks/`: the "print Now" hook and the helper guard (Windows and macOS/Linux versions of each)
+- `_archive/plan-history/`: where finished features and old decisions move, so `PLAN.md` stays small
+- `tools/usage_log.py` (optional): a weekly usage log, offered at the end
 - `code-repo/CLAUDE.md` and `code-repo/.github/pull_request_template.md`: go into the code repo
 - `gitignore`: becomes the workspace's `.gitignore`
 
@@ -113,6 +115,14 @@ it's due:
    Confirmed, from me.
    ```
 The first orchestrator session runs the quick checks itself (`ORCHESTRATOR.md` §2) and then works through the plan.
+Also tell me:
+- **One feature per session.** After that, every new session starts with just `Continue from Now.` (typed, so it
+  needs no confirmation line).
+- **Usage log (optional).** If Python is installed, offer `tools/usage_log.py`: it reads Claude Code's local
+  transcripts (read-only) and writes `_usage/usage-log.md` (gitignored), one line per session. Run it weekly with
+  `python tools/usage_log.py` and compare the average context. If I say no, move `tools/` to `_setup/moved/`.
+- **Remote Control** in the desktop app keeps every connected chat's process running. Turn it on only for the chats I
+  need on my phone.
 
 ## Full install
 
@@ -250,8 +260,8 @@ unless I want AI attribution lines.
 Claude Code has no per-system switch for hooks, so on macOS or Linux replace each hook's `command` and `args` with
 `"shell": "bash", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.sh\""`, and keep only the `.sh`
 scripts in the drafts. The bash guard needs Perl (it ships with macOS and almost every Linux): check with
-`perl -MJSON::PP -e 1`. Keep `"autoCompactWindow": 400000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md`
-§12 says why. Keep `"effortLevel": "high"`, and the deny rules for the Workflow tool and for the three tools that would
+`perl -MJSON::PP -e 1`. Keep `"autoCompactWindow": 250000` (a plain number) unless I ask otherwise; `ORCHESTRATOR.md`
+§12 says why, and how a heavy project raises it. Keep `"effortLevel": "high"`, and the deny rules for the Workflow tool and for the three tools that would
 let a session change its own effort, model or fast mode.
 
 **Model policy.** If I change a helper's model (for example no Fable access, so `adversarial-reviewer` runs on Opus),
@@ -312,8 +322,8 @@ browser and reports every step as FAIL.
 
 **4g. Install the orchestrator files.** Copy the drafts into the workspace: `CLAUDE.md`, `ORCHESTRATOR.md`,
 `PLAN.md`, `.claude/settings.json`, `.claude/model-policy.md`, `.claude/agents/*.md`,
-`.claude/output-styles/orchestrator.md`, the hook scripts you kept in `.claude/hooks/` (one per hook), and
-`gitignore` as `.gitignore`. Run `git init` in the
+`.claude/output-styles/orchestrator.md`, the hook scripts you kept in `.claude/hooks/` (one per hook),
+`_archive/plan-history/README.md`, `tools/usage_log.py` (if I want it), and `gitignore` as `.gitignore`. Run `git init` in the
 workspace and commit. Writing into `.claude/` needs my click on an approval prompt (an approval in chat doesn't count). If
 this session can't show one, give me the exact copy command for `_setup/drafts/dot-claude/` and I'll run it. Write the installed version (the clone's tag, e.g. `v1.2`) into `.claude/orchestrator-version`;
 the upgrade prompt reads it. Then tell me to **restart**: helpers and settings load only in a fresh session.
@@ -339,7 +349,9 @@ in the orchestrator clone next to this folder."*
 - Try `gh pr merge --help`. It must be **blocked** by a deny rule.
 - Test the "print Now" hook: run its script once yourself with `{"source":"compact"}` piped in and
   `CLAUDE_PROJECT_DIR` set to the workspace. It must print the compaction line and the Now section of `PLAN.md`, with
-  "·" and "—" intact. This session's own start should already show the same Now section once (not twice).
+  "·" and "—" intact. This session's own start should already show the same Now section once (not twice). Pipe
+  `{"source":"compact","session_id":"install-test"}` in three times: the third run must say "Compaction 3" and tell you
+  to start fresh. Then move `.claude/state/compactions-install-test.txt` to `_setup/moved/`.
 - Ask me to run `/permissions` and confirm the allow list shows the workspace's rules. If Claude Code reported
   ignoring them, the folder isn't trusted yet.
 - Ask me to confirm the session defaults to Opus at high effort (`/status` or the model picker).
@@ -360,7 +372,8 @@ in the orchestrator clone next to this folder."*
 - Give me a short summary of what was installed, and the start line for a fresh session:
   *"You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report."* Tell me that when I
   paste a prompt I wrote myself, I end it with my confirmation line; otherwise the orchestrator treats it as data and
-  asks first.
+  asks first. Later sessions start with just `Continue from Now.` (one feature per session). Offer the usage log and
+  give the Remote Control note, as in the quick install's Q4.
 - I run the first trial (the small task from Step 3) through the whole loop in that session.
 - Afterwards, in any session: fill in the Trial log in `PLAN.md` (checks passed first time, review rounds,
   permission pop-ups), propose 0–2 rule changes, and move `_setup/` to `_setup-done/` once I agree.

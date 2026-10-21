@@ -3,6 +3,49 @@
 Each version lists what changed and the lesson behind it. The workflow is used day to day on a live production
 app, so most entries come from something that went wrong or cost too much.
 
+## v1.5 · 2026-10-22 · usage and housekeeping
+
+**Changed**
+- **One feature per session.** When a feature is merged and verified, the orchestrator updates Now, archives the
+  feature and tells the owner to start fresh. Within a feature, auto-compaction handles long work: no manual handover.
+  A fresh session needs only "Continue from Now." (`ORCHESTRATOR.md` §8).
+- **Auto-compaction at 250k** (was 400k). A heavy project can raise it in its own settings, or with `/autocompact`.
+- **A fresh session after 3 compactions**: the print-Now hook now counts compactions per session (in the gitignored
+  `.claude/state/`) and says so at the third. **After an idle break of over an hour** with a long conversation, start
+  fresh: the main session's cache lasts an hour. The orchestrator can't see the clock, so it reminds the owner whenever
+  it hands them a step.
+- **Session start reads only Now**, and Current feature only if Now points to it; never finished features or the archive.
+- **Now** gains a "keep it short" rule: about 10 lines, details in Current feature. Must keep is written the moment a
+  decision is made. Frozen tests stay in Now, because the checks after a compaction need them.
+- **PLAN.md stays small.** When a feature is verified, its section moves to `_archive/plan-history/<YYYY-MM>.md` in the
+  same commit; decisions older than a month follow. The "Done (this month)" section is gone (the Roadmap status covers
+  it). The upgrade prompt has a one-time "shrink PLAN.md" step that copies exact line ranges with a shell command
+  instead of moving hundreds of lines with Edit, and checks that the line counts add up.
+- **Keep tool output small** (new `CLAUDE.md` section): quiet tests, failures only; tail/head/grep but never cut off an
+  error; search first, read big files in parts; don't re-read unchanged files; reports use file:line.
+- **Stop every server you started**, at most one preview per project at a time.
+- **The product name lives in one place** (code-repo `CLAUDE.md`): one translation key or constant per app.
+- **Claims check for landing pages** (`ORCHESTRATOR.md` §5 step 1b): `reviewer-light` marks every claim true today or
+  not yet; not-yet claims go on a launch checklist, made true or reworded before go-live. Legal claims are never
+  published until they're true.
+- **Light mode** ([LIGHT-MODE.md](LIGHT-MODE.md)) for design-only projects: a coordinator chat (Opus, medium) and one
+  fresh Opus helper at high effort per screen, screenshots at wide and narrow sizes, the owner's "cleared",
+  `HANDOFF.md` as the Now, a new chat per screen.
+- **Optional usage log** (`tools/usage_log.py`): reads Claude Code's local transcripts read-only and writes one line per
+  session (turns, peak and average context, helper launches) plus helper runs by model. Run it weekly.
+- Setup docs: Remote Control in the desktop app keeps every connected chat's process running; turn it on only for the
+  chats you need on your phone.
+- **Unchanged on purpose:** helper models and efforts. They stay as they are until the effect of the session changes
+  is measured.
+
+**Lessons**
+- **Context size, not effort, is the main cost.** A usage audit of a live install found the cost came from long
+  orchestrator sessions: 470–1,000 turns, averaging 250k–465k tokens of context per turn, because every turn re-reads
+  the whole conversation. Effort level was not the main cost. Shorter sessions make every turn cheaper.
+- **Summaries of summaries drift.** One compaction keeps the thread; several in a row lose detail that only Now can
+  bring back.
+- **Forgotten servers add up.** One live install had about 100 leftover server processes holding about 13 GB of memory.
+
 ## v1.4 · 2026-10-13 · a quick install, learning or building, one-list upgrades
 
 **Changed**

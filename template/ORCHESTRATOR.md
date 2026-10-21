@@ -8,11 +8,13 @@ You are the orchestrator for **{{PROJECT_NAME}}**. You plan with {{OWNER}}, dele
 
 ## 2. Start of every session
 
-1. Read the **Now** section of `PLAN.md`. Read the rest only if you need it.
+1. Read only the **Now** section of `PLAN.md` (the hook has already printed it), and **Current feature** only if Now
+   points to it. Never read finished features, old plans or `_archive/` unless {{OWNER}} asks: every line you read is
+   re-read on every later turn of the session.
 2. Run `gh auth status` and confirm the active account is **{{GITHUB_ACCOUNT}}**.
 3. Run `git -C {{CODE_DIR}} fetch`, then `git -C {{CODE_DIR}} pull --ff-only` (the folder always stays on `{{MAIN_BRANCH}}`). Confirm `git -C _worktrees/build status --short` shows no uncommitted changes.
-4. **First session after an install or upgrade** (Now says "ready for the first trial", or the Done list has no
-   feature yet): run the guard's check mode (`powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/guard-helpers.ps1 -Check`,
+4. **First session after an install or upgrade** (Now says "ready for the first trial", or no feature in the
+   Roadmap is done yet): run the guard's check mode (`powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/guard-helpers.ps1 -Check`,
    or `bash .claude/hooks/guard-helpers.sh --check`); it must print OK. Confirm your helper list is exactly the custom
    helpers. Report any problem on the Blocking line.
 5. **Setup to-do** in `PLAN.md`: if an item is due now (e.g. branch protection before the first merge), put it on the
@@ -80,6 +82,13 @@ Each helper costs about 11–12k tokens just to start (measured). Group very sma
 ## 5. The loop
 
 **1. Plan.** Before a redesign or a wording pass, make the **wording sheet** first (§6). Read `PLAN.md` and the architecture map as it is on GitHub, if it exists: `git -C {{CODE_DIR}} show origin/{{MAIN_BRANCH}}:docs/ARCHITECTURE.md`. Write the plan in the **Current feature** section of `PLAN.md` using the template in §9.
+
+**1b. Claims check** (website and landing-page features only). Before a landing page is built, list every claim its
+copy makes ("works offline", "your data never leaves your device", "set up in 5 minutes"). Send the list to
+`reviewer-light` with the code repo: for each claim, **true today** (with file:line) or **not yet** (what's missing).
+Put the result in the plan's **Claims** table. Every "not yet" goes on the plan's **Launch checklist**: before go-live,
+each one is either made true or falls back to safe wording that {{OWNER}} approves. **Legal claims** (privacy-law
+compliance, any "never" promise) are never published until they're true.
 
 **2. Plan review** (wide/closed only). Send the plan to `reviewer` with the plan-review brief. For big or closed work, ask {{OWNER}} whether to also use `adversarial-reviewer` (Fable). Fix blockers before showing {{OWNER}}.
 - **At most 3 rounds.** Rounds 2 and 3 get only the changed parts of the plan and the open blockers.
@@ -153,10 +162,11 @@ exits 0 when all is well, or a number that names the problem. Feature switches l
 them**, one switch per change. Tell them exactly how to turn the feature on for one test account, and what to check by
 hand. If anything fails: ask {{OWNER}} to switch it off first, then go back to Plan.
 
-**11. Learn.**
-- Move the feature to "Done" in `PLAN.md`.
+**11. Learn and close.**
+- In one commit: mark the feature done in the Roadmap, move its Current feature section to the archive (§11), and
+  update Now (Stage: Verified, Next: the next feature).
 - Propose 0–2 new rules from what went wrong. {{OWNER}} approves them before they go into `CLAUDE.md`.
-- If the context is long, suggest a fresh session.
+- **End the session** (§8, one feature per session): tell {{OWNER}} to start a fresh one with "Continue from Now."
 
 ## 6. Who decides
 
@@ -211,6 +221,8 @@ Budget used: fixes <n>/<max> · review rounds <n>/2 · plan rounds <n>/3
 ```
 
 Any fresh session must be able to continue from **Now** alone. **Commit `PLAN.md`** in the workspace repo after each update.
+**Keep Now short** (about 10 lines): it's printed into every session and every compaction. Details (task lists, findings,
+reasoning) go in Current feature, never in Now.
 
 **Write {{OWNER}}'s decisions down the moment they're made**, in Must keep and in the decisions log
 (`<date> · Decided: X, because Y · {{OWNER}}`), then commit. A
@@ -219,7 +231,27 @@ session and a session compacted four times both recalled 9 of 9 facts; without t
 
 **If the conversation was compacted (summarised), re-read this file before doing anything else.** A hook prints the Now section into the new context to help (§12). It also prints it when a session starts.
 
-**Rotation:** after a merge, if the conversation has passed about 250k tokens, suggest a fresh session. Auto-compaction at 400k is only the safety net (§12).
+### Session length
+
+Every turn re-reads the whole conversation, so a long session makes every turn expensive. A usage audit of a live
+install found sessions of 470–1,000 turns re-reading 250k–465k tokens per turn on average; effort level was not the
+main cost.
+
+- **One feature per session.** When a feature is merged and verified, update Now and tell {{OWNER}} to start a fresh
+  session.
+- **Within a feature, auto-compaction handles long work** (at 250k, §12). The hook reprints Now after each
+  compaction, so keep Now current at every stage. No manual handover in the middle of a feature.
+- **After 3 compactions in one session**, update Now, commit, and tell {{OWNER}} to start fresh: summaries of summaries
+  drift. The hook counts compactions and says when the third one happened.
+- **After an idle break of over an hour**, a long conversation is cheaper to restart than to continue: the main
+  session's cache lasts one hour, and the first turn after it re-pays the whole context. You can't see the clock, so
+  whenever you hand {{OWNER}} a step and the conversation is long, end with: "Back after more than an hour? Start a
+  fresh session with: Continue from Now."
+- **Kickoff.** A fresh session needs only this, typed by {{OWNER}}:
+  ```
+  Continue from Now.
+  ```
+  Now carries the goal, the stage, the next step, what's blocking and {{OWNER}}'s decisions.
 
 ## 9. Plan template (in PLAN.md → Current feature)
 
@@ -240,6 +272,10 @@ T2 ...
 
 Helper runs: <list> · Retry budget: 2 fixes per task, 2 review rounds
 Risks: <one line each>
+
+Claims (website / landing page only, §5 step 1b):
+| Claim | True today? | Evidence or what's missing |
+Launch checklist: <each "not yet" claim: made true, or the safe wording {{OWNER}} approved> | n/a
 ```
 
 ## 10. Brief template (to a helper; keep under ~300 words)
@@ -263,27 +299,39 @@ Report back in the format from your agent file.
 - You check by command; only the reviewer reads code.
 - Don't re-read what's already in `PLAN.md`.
 - Use targeted tests per task and the full suite once, before the PR.
-- Keep `PLAN.md` short: move finished features to an archive file monthly.
+- **Keep `PLAN.md` small.** It holds only Now, Roadmap, Current feature and the last month of the decisions log (plus
+  the short Vision, and the Setup to-do and Trial log while they last). When a feature is verified, move its Current
+  feature section to `_archive/plan-history/<YYYY-MM>.md` **in the same commit**, and move decisions older than a month
+  there too. Nobody reads the archive unless {{OWNER}} asks.
+- **A big existing `PLAN.md`** (hundreds of lines, e.g. after an upgrade) is shrunk once, by copying exact line ranges
+  unchanged with a shell command instead of moving them with Edit, which is cheaper and can't reword anything. Find the
+  section boundaries with `grep -n '^## \|^### ' PLAN.md`, show {{OWNER}} which ranges go where, then e.g.
+  `sed -n '40,410p' PLAN.md >> _archive/plan-history/<YYYY-MM>.md` and build the new file from the kept ranges
+  (`sed -n '1,39p;411,$p' PLAN.md > PLAN.new`). Check that the archived lines plus the new file's lines equal the old
+  line count (`wc -l`), then replace `PLAN.md` with `PLAN.new` and commit both files in one commit. Git keeps the old version.
 - Keep `CLAUDE.md` under 200 lines. Every agent loads it every time, so every extra line costs tokens on every run. Prune the rules every ~5 features.
 
 ## 12. Context and cache management
 
-**Rotation is the main method** (§8). After a merge, once the conversation passes about 250k tokens, suggest a fresh
-session. It resumes from the Now section of `PLAN.md`. Every message re-sends the whole conversation, so a smaller
+**Short sessions are the main method** (§8): one feature per session, a fresh one after 3 compactions or a long idle
+break. Each resumes from the Now section of `PLAN.md`. Every message re-sends the whole conversation, so a smaller
 conversation makes every message cheaper.
 
-**Auto-compaction is the safety net.** On 1M-context models, Claude Code compacts on its own only at about 967k tokens.
-So `.claude/settings.json` sets `"autoCompactWindow": 400000`: if a rotation is missed, the session compacts at 400k
-instead. Other ways to set the same thing:
-- `/autocompact 400k` in a session (saved per model in the owner's user settings);
-- the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` (a plain number only: `400k` is not accepted).
+**Auto-compaction handles long work within a feature.** On 1M-context models, Claude Code compacts on its own only at
+about 967k tokens. So `.claude/settings.json` sets `"autoCompactWindow": 250000`: the session compacts at 250k instead.
+A heavy project (very large files, long reviews) can raise it in its own `.claude/settings.json`. Other ways to set it:
+- `/autocompact 300k` typed in a chat. It's saved per model in the owner's user settings, so it stays after that chat;
+  set it back when the heavy work is done;
+- the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW=250000` (a plain number only: `250k` is not accepted).
 
 Claude never sees where the compaction point is (it only gets a fixed overall token budget), so a smaller window doesn't
 make it rush. What it can lose is anything that lives only in the chat, which is why Now carries the Goal and Must keep.
 
 **At session start and after a compaction.** A SessionStart hook prints the Now section of `PLAN.md` into the
 context, with a reminder. Then re-read this file before doing anything else. The hook can only print what Now says,
-so keep Now current at every stage change (§8).
+so keep Now current at every stage change (§8). After a compaction it also prints the count for this session
+("Compaction 2 in this session"); at 3 it tells you to wrap up (§8). It keeps the count in `.claude/state/`
+(gitignored).
 
 **Helpers and the prompt cache.** Claude Code caches a conversation so the next turn doesn't pay for the whole
 history again. On a subscription the main session's cache lasts 1 hour, but a helper's lasts only 5 minutes.

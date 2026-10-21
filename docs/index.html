@@ -43,7 +43,7 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.4</span></p>
+      <p class="eyebrow">A multi-agent workflow for Claude Code <span class="eyebrow-ver">v1.5</span></p>
       <h1 id="hero-title">Claude Code Orchestrator</h1>
       <p class="lede">One orchestrator plans with you in plain language, hands each small task to a specialised helper, proves every change by command, and opens one pull request per feature. <strong>You approve the plan and click merge.</strong> Everything in between runs on its own.</p>
       <div class="hero-actions">
@@ -511,18 +511,21 @@
           <div><dt>app/</dt><dd>your code repo, always on main</dd></div>
           <div><dt>ops/</dt><dd>production scripts, human only</dd></div>
           <div><dt>_worktrees/build</dt><dd>where helpers code</dd></div>
+          <div><dt>_archive/</dt><dd>finished features, read only on request</dd></div>
+          <div><dt>tools/</dt><dd>optional weekly usage log</dd></div>
         </dl>
       </figure>
       <div class="sessions">
-        <p class="mini-h">Start line</p>
+        <p class="mini-h">Start line, every fresh session</p>
         <div class="startline">
-          <p id="startline-text">You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.</p>
+          <p id="startline-text">Continue from Now.</p>
           <button class="copy" type="button" data-copy="startline-text" hidden>Copy</button>
         </div>
         <ul class="ticks">
           <li>The <strong>Now</strong> block in PLAN.md is updated at every stage, with the goal and your decisions written down as you make them, so any fresh session can pick up where the last one stopped.</li>
-          <li>Start a fresh session after a merge once the conversation passes about 250k tokens.</li>
-          <li>As a safety net, the template sets auto-compaction to 400k; on 1M-context models it would otherwise wait until about 967k.</li>
+          <li>One feature per session. Every turn re-reads the whole conversation, so context size, not effort, is the main cost.</li>
+          <li>Within a feature, auto-compaction at 250k handles long work (on 1M-context models it would otherwise wait until about 967k). After 3 compactions, or an idle break of over an hour, start fresh.</li>
+          <li>PLAN.md stays small: sessions read only Now, and finished features move to <code>_archive/</code>.</li>
           <li>Every reply follows one of five fixed shapes (an output style), from the first message of every session.</li>
           <li>How the agents talk to you (length, tone, how decisions look, questions at a time, language) is chosen at install and stored in the project, so every chat in it follows your voice.</li>
           <li>When a session starts and after any compaction, a hook prints the <strong>Now</strong> block into the conversation, so the current state is never lost.</li>
@@ -541,6 +544,16 @@
       <p class="sec-intro">What each version changed, and why. The full list is in the <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/CHANGELOG.md">changelog</a>.</p>
     </div>
     <ol class="log">
+      <li>
+        <div class="log-meta"><span class="log-ver">v1.5</span><span class="log-date">Oct 2026</span></div>
+        <ul>
+          <li>Context size, not effort, is the main cost. A usage audit of a live install found sessions of 470–1,000 turns re-reading 250k–465k tokens per turn on average. Now it's one feature per session, auto-compaction at 250k, and a fresh session after 3 compactions or an hour's break.</li>
+          <li>PLAN.md holds only what's current; finished features move to an archive. Tool output stays small: quiet tests, file:line, no pasted logs.</li>
+          <li>Stop every server you start. One install had about 100 forgotten server processes holding about 13 GB of memory.</li>
+          <li>Landing pages get a claims check: each claim is true today or goes on a launch checklist. The product name lives in one place.</li>
+          <li>A light mode for design-only projects, and an optional weekly usage log.</li>
+        </ul>
+      </li>
       <li>
         <div class="log-meta"><span class="log-ver">v1.4</span><span class="log-date">Oct 2026</span></div>
         <ul>
@@ -617,7 +630,7 @@
     <div>
       <p class="install-lede">Open Claude Code in the folder that contains your project, or an empty folder for a new one, and type:</p>
       <div class="startline">
-        <p id="install-line">Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md. Confirmed, from me.</p>
+        <p id="install-line">Install the Claude Code Orchestrator v1.5 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.5 next to this folder, then follow its INSTALL-PROMPT.md. Confirmed, from me.</p>
         <button class="copy" type="button" data-copy="install-line" hidden>Copy</button>
       </div>
       <p class="install-note">It clones the repo at a fixed version and follows <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/INSTALL-PROMPT.md"><code>INSTALL-PROMPT.md</code></a>. It asks you four short questions (what the project is, learning or building, how to talk to you, keep the default rules?), then sets everything up. Longer safety jobs go on a to-do list the orchestrator brings up when they matter. No project yet? It creates the GitHub repo, a skeleton with one test and a CI check first.</p>
@@ -626,6 +639,8 @@
         <li>Reads your project</li><li>Asks four questions</li><li>Sets up</li><li>You open a new chat</li>
       </ol>
       <p class="install-note">Prefer a yes at every step? Say "full install".</p>
+      <p class="install-note">Remote Control in the desktop app keeps every connected chat's process running. Turn it on only for the chats you need on your phone.</p>
+      <p class="install-note">Only designing, with no tests, PRs or backend? Skip the orchestrator and use <a href="https://github.com/bn-basel/claude-code-orchestrator/blob/main/LIGHT-MODE.md">light mode</a>: one coordinator chat and one fresh helper per screen.</p>
       <div class="alt" aria-labelledby="alt-title">
         <h3 id="alt-title">Or use Claude Code Projects</h3>
         <p>Projects (public beta on Pro and Max) is Claude Code's built-in version of the same idea: one coordinator conversation, one thread per task, shared instructions and memory, and threads that run in the cloud by default.</p>

@@ -10,7 +10,7 @@ whole files over yours.
 the [changelog](CHANGELOG.md) lists them):
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.4: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.5: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
 Confirmed, from me.
 ```
 
@@ -69,6 +69,19 @@ For each approved change: edit, show me the diff, check it, and record it in `_u
 - `.claude/model-policy.md`: keep the models I chose (for example `adversarial-reviewer` on Opus); add new rows.
 - New files (e.g. a new helper): fill in the placeholders from my existing values.
 - Afterwards, search the workspace for `{{` and for any `ADAPT:` the plan said would stay resolved.
+
+**Shrink `PLAN.md` once** (upgrading to v1.5 or later, if `PLAN.md` holds more than Now, Roadmap, Current feature, the
+last month of decisions, and the short Vision, Setup to-do and Trial log sections). Put it in the plan as its own change:
+1. List the section boundaries: `grep -n '^## \|^### ' PLAN.md`. Show me which line ranges stay and which move to
+   `_archive/plan-history/<YYYY-MM>.md` (finished features, old plans, decisions older than a month; one file per month
+   they belong to, or the current month if the dates are unclear).
+2. After my yes, **copy the exact line ranges unchanged with a shell command**, never by rewriting them with Edit:
+   `sed -n '<a>,<b>p' PLAN.md >> _archive/plan-history/<YYYY-MM>.md` for each moved range, then
+   `sed -n '<kept ranges, e.g. 1,39p;411,$p>' PLAN.md > PLAN.new`.
+3. Check: the moved lines plus `PLAN.new`'s lines equal `PLAN.md`'s old line count (`wc -l`), and Now is intact.
+   Then replace `PLAN.md` with `PLAN.new`, add `_archive/plan-history/README.md` from the template, and commit both in
+   one commit: "Archive old plan history". Git keeps the old `PLAN.md`.
+4. Bring Now into the v1.5 format (`ORCHESTRATOR.md` §8) with Edit, keeping every value it already has.
 
 ## Step 4. Check and finish
 

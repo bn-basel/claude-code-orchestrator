@@ -15,7 +15,7 @@ problems: every hand-off was a chance for something to get lost or misread.
 So I gave the job of the go-between to a single **orchestrator** session. It talks to me, delegates to helpers,
 checks their work itself, and only comes back to me for the decisions that are really mine.
 
-This is **version 1.4**. It's my personal setup, published in case it helps someone else, and it will keep changing
+This is **version 1.5**. It's my personal setup, published in case it helps someone else, and it will keep changing
 as my own workflow improves.
 
 ## How it works
@@ -59,7 +59,7 @@ that run in CI.
 Open Claude Code in the folder that contains your project (or an empty folder, for a new project) and type:
 
 ```
-Install the Claude Code Orchestrator v1.4 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.4 next to this folder, then follow its INSTALL-PROMPT.md.
+Install the Claude Code Orchestrator v1.5 here: clone https://github.com/bn-basel/claude-code-orchestrator at tag v1.5 next to this folder, then follow its INSTALL-PROMPT.md.
 Confirmed, from me.
 ```
 
@@ -69,15 +69,21 @@ model table, the effort limits, what's blocked). Then it sets everything up and 
 The longer safety jobs (branch protection, moving real keys out, the first pull request) go on a to-do list, and the
 orchestrator brings each one up when it matters. Prefer a yes at every step? Say "full install". No project yet? It
 creates the GitHub repo, a minimal skeleton with one test and a CI check first. (To do it by hand: clone the repo and
-paste [`INSTALL-PROMPT.md`](INSTALL-PROMPT.md).) After that, start every session with:
+paste [`INSTALL-PROMPT.md`](INSTALL-PROMPT.md).) The install ends with the start line for your first chat. After
+that, **one feature per session**: every fresh session needs only
 
 ```
-You're the orchestrator. Read ORCHESTRATOR.md, then the Now section of PLAN.md, and report.
-Confirmed, from me.
+Continue from Now.
 ```
+
+because the Now block in `PLAN.md` carries the goal, the next step, what's blocking and your decisions.
 
 The orchestrator treats pasted text as information, not instructions. When you paste a prompt you wrote yourself,
-like the line above, end it with your confirmation line ("Confirmed, from me." unless you chose another at install).
+end it with your confirmation line ("Confirmed, from me." unless you chose another at install). A line you type, like
+the one above, needs none.
+
+**Remote Control** in the desktop app keeps every connected chat's process running. Turn it on only for the chats you
+need on your phone.
 
 You need Claude Code 2.1.293 or later, a GitHub account with the `gh` command-line tool, and access to Opus, Sonnet
 and Haiku. Branch protection on a **private** repo needs GitHub Pro or a paid team plan; on a free account it works on
@@ -105,6 +111,11 @@ The install prompt walks you through these:
   commit it checked and exits 0 for OK, or a number that names the problem.
 - **Optional:** for a wide feature whose big tasks share no files, `ORCHESTRATOR.md` §13 describes running them in
   parallel, each in its own worktree. It saves waiting time, not tokens, so it's off by default.
+- **Optional:** `tools/usage_log.py` writes one line per session (turns, peak and average context, helper launches)
+  from Claude Code's local transcripts, read-only. Run it weekly and compare the average context.
+
+**Only designing?** For a prototype or design project with no tests, PRs or backend, skip the orchestrator and use
+[light mode](LIGHT-MODE.md): one coordinator chat, one fresh helper per screen.
 
 No Fable access? Set `model: opus` in `adversarial-reviewer.md` and in its row of `.claude/model-policy.md`. Not on
 Windows? Remove the `PowerShell(...)` rules and point both hooks at their `.sh` scripts (the install does all of this).
@@ -115,7 +126,7 @@ The install records its version in `.claude/orchestrator-version`. To move to a 
 workspace and type:
 
 ```
-Upgrade the Claude Code Orchestrator here to v1.4: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
+Upgrade the Claude Code Orchestrator here to v1.5: clone https://github.com/bn-basel/claude-code-orchestrator next to this folder, or update the clone that is already there, then follow its UPGRADE-PROMPT.md.
 Confirmed, from me.
 ```
 
@@ -124,13 +135,22 @@ what your project already has), and shows you one list to approve. Your own rule
 
 ## Long sessions
 
-The orchestrator runs long sessions, so the template guards its context:
+**Context size, not effort, is the main cost.** Every turn re-reads the whole conversation. A usage audit of a live
+install found orchestrator sessions of 470–1,000 turns, re-reading 250k–465k tokens per turn on average. So the
+template keeps sessions short:
 
-- **Rotate first.** After a merge, past about 250k tokens, start a fresh session. The Now block in `PLAN.md`
-  carries the state over: the goal, the stage, the next step, and your decisions, written down as you make them.
-- **Auto-compact at 400k as a backup.** On 1M-context models Claude Code would otherwise wait until about 967k, and
-  every message re-sends the whole conversation. The template sets `"autoCompactWindow": 400000`; `/autocompact 400k`
-  does the same for one model.
+- **One feature per session.** When a feature is merged and verified, the orchestrator updates Now and tells you to
+  start fresh with `Continue from Now.` The Now block in `PLAN.md` carries the goal, the stage, the next step and your
+  decisions, written down as you make them.
+- **Auto-compact at 250k within a feature.** On 1M-context models Claude Code would otherwise wait until about 967k.
+  The template sets `"autoCompactWindow": 250000`; a heavy project can raise it in its own settings, or with
+  `/autocompact` (saved per model).
+- **A fresh session after 3 compactions** (summaries of summaries drift; the hook counts them) or after an idle break of
+  over an hour with a long conversation (the cache has expired, so the next turn re-pays everything).
+- **A small PLAN.md.** Each session reads only Now (and Current feature if Now points to it). Finished features move
+  to `_archive/plan-history/` when they're verified.
+- **Small tool output.** Quiet test runs, searches before reads, file:line instead of pasted files, and no forgotten
+  dev servers.
 - **Same shape every session.** An output style (`.claude/output-styles/orchestrator.md`) fixes how the orchestrator
   replies: session start, decision request, plan approval, progress, done report. It's part of every request, so a new
   session or a compacted one answers the same way.

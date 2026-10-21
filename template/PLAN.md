@@ -23,13 +23,13 @@ it's due (ORCHESTRATOR.md §2) and deletes this section once it's empty. -->
 | — | <!-- ADAPT: the real next features, from the backlog --> | — | planned |
 
 ## Current feature
-*(empty: the orchestrator writes the plan here using the template in ORCHESTRATOR.md §9)*
-
-## Done (this month)
-- <!-- date --> · Orchestrator setup installed
+*(empty: the orchestrator writes the plan here using the template in ORCHESTRATOR.md §9. When the feature is verified,
+this section moves to `_archive/plan-history/<YYYY-MM>.md` in the same commit.)*
 
 ## Decisions log
-<!-- One line each, newest last: <date> · Decided: X, because Y · {{OWNER}} or orchestrator -->
+<!-- One line each, newest last: <date> · Decided: X, because Y · {{OWNER}} or orchestrator.
+Only the last month stays here; older lines move to `_archive/plan-history/<YYYY-MM>.md`. -->
+- <!-- date --> · Orchestrator setup installed · orchestrator
 - <!-- date --> · Decided: moved to the orchestrator + helpers workflow, because <!-- the owner's reason --> · {{OWNER}}
 
 ## Trial log (first features only; delete after the look-back)

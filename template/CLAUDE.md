@@ -27,6 +27,8 @@ Every chat in this project follows the **Voice** section of `.claude/output-styl
 | Path | What it is | Agents may… |
 |---|---|---|
 | `PLAN.md` | The one living record: Now · Roadmap · Current feature · Decisions log | read (only the orchestrator edits it) |
+| `_archive/` | Finished features and old decisions | **read only when {{OWNER}} asks** |
+| `tools/` | Optional helpers for {{OWNER}}, e.g. the usage log | leave alone |
 | `backlog/` | Feature ideas, one file each | read |
 | `{{CODE_DIR}}/` | **Code repo** (own git, branch `{{MAIN_BRANCH}}`) | read only. **All code work happens in `_worktrees/build`** |
 | `_worktrees/build` | The permanent build worktree of `{{CODE_DIR}}` | work here, on the branch you were given |
@@ -65,6 +67,8 @@ If a task seems to need any of the above: **stop and report**. Don't work around
 ## Machine traps
 
 - Change files only with the **Edit and Write tools**. No `sed -i` and no ad-hoc scripts that rewrite files: those skip the permission rules and leave no clear record.
+  **One exception**, for the orchestrator only: the one-time archive of a big `PLAN.md` may copy **exact line ranges,
+  unchanged**, with a shell command (`ORCHESTRATOR.md` §11). No rewriting on the way, and the line counts must add up.
 - **Never run a command that waits for input without giving it any** (e.g. `cat > file` with nothing piped in). It hangs in the background for hours.
 - **Run git as `git -C <folder> …`**, e.g. `git -C _worktrees/build status`. Never `cd <folder> && git …`: Claude Code
   asks for approval every time, because git in another folder can run that folder's hooks. Never `cd` in one command and
@@ -77,6 +81,20 @@ If a task seems to need any of the above: **stop and report**. Don't work around
   tool already reports the exit code. Run one command per call rather than chaining several with `;`.
 - If more than one GitHub account is logged in, `gh` can drift to the wrong one. The right one is **{{GITHUB_ACCOUNT}}**. Check with `gh auth status`.
 - To confirm a deploy, use **GitHub statuses**. A health endpoint usually can't show which version is live.
+- **Stop every server you started** (dev server, preview, static server) before you finish your task, and run **at most
+  one preview per project** at a time. Start it in the background so you have its ID, and stop it by that ID; never stop
+  all `node` or `python` processes, which would end other people's work too. One live install had about 100 forgotten
+  server processes holding about 13 GB of memory.
+
+## Keep tool output small
+
+Every line a command prints stays in the conversation and is re-read on every later turn.
+- Run tests in **quiet mode, failures only** (e.g. `-q`, `--reporter=dot`, `--silent`).
+- Long output goes through `tail`, `head` or `grep` (PowerShell: `Select-Object -Last`, `Select-String`), but **never cut
+  off an error message**: if the cut hides the error, run it again with more lines.
+- **Search first**, then read big files in parts (the lines you need), never the whole file.
+- Don't re-read a file that hasn't changed since you read it.
+- Reports point to **file:line**. Never paste whole files, JSON dumps or logs into a report.
 <!-- ADAPT: add your own traps. Examples: "Windows shell: no heredocs." · "Set PYTHONIOENCODING=utf-8 before printing non-English text." · "The database stores UTC; the test store uses local time. Never mix them without converting." -->
 
 ## Quality basics (details in `{{CODE_DIR}}/CLAUDE.md`)

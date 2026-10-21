@@ -7,6 +7,10 @@ _worktrees/
 # Screenshots from ui-tester
 _ui-evidence/
 
+# Compaction counts from the print-Now hook, and the optional usage log (it lists every project on this machine)
+.claude/state/
+_usage/
+
 # Setup notes and backups (old settings files can contain tokens)
 _setup/
 _setup-done/
